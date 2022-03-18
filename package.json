@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/gftf2011/clean-ts-cv-generator/issues"
   },
-  "homepage": "https://github.com/gftf2011/clean-ts-cv-generator#readme"
+  "homepage": "https://github.com/gftf2011/clean-ts-cv-generator#readme",
+  "devDependencies": {
+    "typescript": "^4.6.2"
+  }
 }
