@@ -31,7 +31,8 @@
   "dependencies": {
     "dotenv": "^16.0.0",
     "module-alias": "^2.2.2",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "redis": "3.1.2"
   },
   "_moduleAliases": {
     "@": "dist"
