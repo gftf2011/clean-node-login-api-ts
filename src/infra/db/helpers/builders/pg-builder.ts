@@ -6,7 +6,7 @@ import { Pool } from 'pg'
 /**
  * Domain | Data
  */
-import { IDbClientBuilder } from '@/data/protocols/db/builder'
+import { IDbClientBuilder } from '@/infra/contracts'
 
 export class PgClientBuilder implements IDbClientBuilder {
   private host?: string
