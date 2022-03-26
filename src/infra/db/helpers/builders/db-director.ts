@@ -1,7 +1,7 @@
 /**
  * Domain | Data
  */
-import { IDbClientBuilder, IDbDirector } from '@/data/protocols/db/builder'
+import { IDbClientBuilder, IDbDirector } from '@/infra/contracts'
 
 export class DbDirector implements IDbDirector {
   private builder?: IDbClientBuilder
