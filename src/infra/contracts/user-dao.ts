@@ -1,5 +1,8 @@
-import { UserEntity as User } from '@/entities'
+/**
+ * Use Cases
+ */
+import { UserDto as User } from '@/use-cases/ports'
 
 export interface IUserDao {
-  create: (user: User) => Promise<void>
+  create: (user: User) => Promise<User>
 }
