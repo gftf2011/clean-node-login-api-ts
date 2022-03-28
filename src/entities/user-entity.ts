@@ -6,12 +6,19 @@ import { Either, left, right } from '@/shared/either'
 /**
  * Entities | Errors
  */
-import { IDomainError, InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError } from '@/entities/errors'
+import { IDomainError, InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError, InvalidPasswordError } from '@/entities/errors'
 
 const EMAIL_REGEX: RegExp = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/g
 const TAXVAT_BASIC_REGEX: RegExp = /^([0-9]{3})\.([0-9]{3})\.([0-9]{3})-([0-9]{2})$/g
 const TAXVAT_BASIC_ONLY_NUMBERS_REGEX: RegExp = /^([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})$/g
 
+const NOT_CAPITAL_LETTER_REGEX: RegExp = /([^A-Z]*)/g
+const NOT_LOWER_CASE_LETTER_REGEX: RegExp = /([^a-z]*)/g
+const NOT_NUMBER_REGEX: RegExp = /([^0-9]*)/g
+const NOT_SPECIAL_CHARACTER_REGEX: RegExp = /([^!@#$%&?]*)/g
+const NO_SPACE_REGEX: RegExp = /([ ]*)/g
+
+const EMPTY_CHARACTER: string = ''
 const EMAIL_ADDRESS_SEPARATOR: string = '@'
 const EMAIL_DOMAIN_SEPARATOR: string = '.'
 
@@ -21,15 +28,15 @@ export class UserEntity {
   private readonly taxvat: string
   private readonly email: string
   private readonly password: string
-  private readonly hash: string
+  // private readonly hash: string
 
-  private constructor (name: string, lastname: string, taxvat: string, email: string, password: string, hash: string) {
+  private constructor (name: string, lastname: string, taxvat: string, email: string, password: string) {
     this.name = name
     this.lastname = lastname
     this.taxvat = taxvat
     this.email = email
     this.password = password
-    this.hash = hash
+    // this.hash = hash
     Object.freeze(this)
   }
 
@@ -53,9 +60,9 @@ export class UserEntity {
     return this.password
   }
 
-  getHash (): string {
-    return this.hash
-  }
+  // getHash (): string {
+  //   return this.hash
+  // }
 
   private static validateName (name: string): boolean {
     if (!name || name.trim().length < 2 || name.trim().length > 255) {
@@ -180,7 +187,31 @@ export class UserEntity {
     return true
   }
 
-  private static validate (name: string, lastname: string, taxvat: string, email: string): Either<IDomainError, true> {
+  private static validatePassword (password: string): boolean {
+    const pass: string = password.replace(NO_SPACE_REGEX, EMPTY_CHARACTER)
+    if (!pass || pass.length < 11) {
+      return false
+    }
+    const onlyNumbers: string = pass.replace(NOT_NUMBER_REGEX, EMPTY_CHARACTER)
+    if (onlyNumbers.length < 8) {
+      return false
+    }
+    const onlyCapitalLetters: string = pass.replace(NOT_CAPITAL_LETTER_REGEX, EMPTY_CHARACTER)
+    if (onlyCapitalLetters.length < 1) {
+      return false
+    }
+    const onlyLowerCaseLetters: string = pass.replace(NOT_LOWER_CASE_LETTER_REGEX, EMPTY_CHARACTER)
+    if (onlyLowerCaseLetters.length < 1) {
+      return false
+    }
+    const onlySpecialCharacters: string = pass.replace(NOT_SPECIAL_CHARACTER_REGEX, EMPTY_CHARACTER)
+    if (onlySpecialCharacters.length < 1) {
+      return false
+    }
+    return true
+  }
+
+  private static validate (name: string, lastname: string, taxvat: string, email: string, password: string): Either<IDomainError, true> {
     if (!UserEntity.validateName(name)) {
       return left(new InvalidNameError(name))
     }
@@ -193,13 +224,16 @@ export class UserEntity {
     if (!UserEntity.validateEmail(email)) {
       return left(new InvalidEmailError(email))
     }
+    if (!UserEntity.validatePassword(password)) {
+      return left(new InvalidPasswordError(email))
+    }
     return right(true)
   }
 
-  static create (name: string, lastname: string, taxvat: string, email: string, password: string, hash: string): Either<IDomainError, UserEntity> {
-    const either = UserEntity.validate(name, lastname, taxvat, email)
+  static create (name: string, lastname: string, taxvat: string, email: string, password: string): Either<IDomainError, UserEntity> {
+    const either = UserEntity.validate(name, lastname, taxvat, email, password)
     if (either.isRight()) {
-      return right(new UserEntity(name, lastname, taxvat, email, password, hash))
+      return right(new UserEntity(name, lastname, taxvat, email, password))
     }
     return left(either.value)
   }
