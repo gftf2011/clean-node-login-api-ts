@@ -1,8 +1,8 @@
 /**
- * Domain
+ * Use Cases
  */
-import { UserEntity as User } from '@/entities'
+import { UserDto as User } from '@/use-cases/ports'
 
 export interface IUserRepository {
-  create: (user: User) => Promise<void>
+  create: (user: User) => Promise<User>
 }
