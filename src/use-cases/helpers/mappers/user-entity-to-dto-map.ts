@@ -8,13 +8,13 @@ import { UserEntity } from '@/entities'
  */
 import { UserDto } from '@/use-cases/ports'
 
-export const mapUserEntityToDto = (userEntity: UserEntity): UserDto => {
+export const mapUserEntityToDto = (userEntity: UserEntity, hash: string, hashedPassword: string): UserDto => {
   const userDto: UserDto = {
     email: userEntity.getEmail(),
-    hash: userEntity.getHash(),
+    hash,
     lastname: userEntity.getLastname(),
     name: userEntity.getName(),
-    password: userEntity.getPassword(),
+    password: hashedPassword,
     taxvat: userEntity.getTaxvat()
   }
   return userDto
