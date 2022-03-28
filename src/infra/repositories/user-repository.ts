@@ -1,15 +1,10 @@
 /**
- * Domain
- */
-import { UserEntity } from '@/entities'
-
-/**
  * Use Cases
  */
-import { IUserRepository } from '@/use-cases/ports/user-repository'
+import { IUserRepository, UserDto as User } from '@/use-cases/ports'
 
 /**
- * Infra
+ * Infrastructure
  */
 import { IUserDao } from '@/infra/contracts'
 
@@ -20,7 +15,7 @@ export class UserRepository implements IUserRepository {
     this.userDAO = userDAO
   }
 
-  async create (user: UserEntity): Promise<void> {
-    await this.userDAO.create(user)
+  async create (user: User): Promise<User> {
+    return await this.userDAO.create(user)
   }
 }
