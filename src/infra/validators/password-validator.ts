@@ -8,6 +8,11 @@ const NO_SPACE_REGEX: RegExp = /([ ]*)/g
 
 const EMPTY_CHARACTER: string = ''
 
+/**
+  * Singleton class
+  *
+  * This class manages the global instance for Password Validator
+  */
 export class PasswordValidator implements IPasswordValidator {
   private static instance: PasswordValidator
 
