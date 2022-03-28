@@ -4,8 +4,8 @@
 import { Pool, PoolClient } from 'pg'
 
 /**
-  * Data
-  */
+ * Infrastructure | Contracts
+ */
 import { DbTransaction } from '@/infra/contracts'
 
 /**

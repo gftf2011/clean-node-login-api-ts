@@ -4,7 +4,7 @@
 import { Pool } from 'pg'
 
 /**
- * Domain | Data
+ * Entities
  */
 import { IDbClientBuilder } from '@/infra/contracts'
 

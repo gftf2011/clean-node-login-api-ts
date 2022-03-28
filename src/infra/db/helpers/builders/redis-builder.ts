@@ -4,8 +4,8 @@
 import redis from 'redis'
 
 /**
-  * Domain | Data
-  */
+ * Entities
+ */
 import { IDbClientBuilder } from '@/infra/contracts'
 
 export class RedisClientBuilder implements IDbClientBuilder {

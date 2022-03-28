@@ -1,5 +1,5 @@
 /**
- * Domain | Data
+ * Entities
  */
 import { IDbClientBuilder, IDbDirector } from '@/infra/contracts'
 
