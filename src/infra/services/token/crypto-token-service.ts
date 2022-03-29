@@ -1,5 +1,9 @@
 import crypto from 'crypto'
-import { ITokenService } from '@/infra/contracts'
+
+/**
+ * Use Cases
+ */
+import { ITokenService } from '@/use-cases/ports'
 
 const CRYPTOGRAPHY_TYPE: string = 'sha512'
 const HASH_SIZE: number = 128
