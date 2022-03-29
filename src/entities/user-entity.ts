@@ -1,12 +1,8 @@
 /**
  * Shared
  */
-import { Either, left, right } from '@/shared/either'
-
-/**
- * Entities | Errors
- */
-import { IDomainError, InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError, InvalidPasswordError } from '@/entities/errors'
+import { Either, left, right } from '@/shared'
+import { InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError, InvalidPasswordError } from '@/shared/errors'
 
 const EMAIL_REGEX: RegExp = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/g
 const TAXVAT_BASIC_REGEX: RegExp = /^([0-9]{3})\.([0-9]{3})\.([0-9]{3})-([0-9]{2})$/g
@@ -28,7 +24,6 @@ export class UserEntity {
   private readonly taxvat: string
   private readonly email: string
   private readonly password: string
-  // private readonly hash: string
 
   private constructor (name: string, lastname: string, taxvat: string, email: string, password: string) {
     this.name = name
@@ -36,7 +31,6 @@ export class UserEntity {
     this.taxvat = taxvat
     this.email = email
     this.password = password
-    // this.hash = hash
     Object.freeze(this)
   }
 
@@ -59,10 +53,6 @@ export class UserEntity {
   getPassword (): string {
     return this.password
   }
-
-  // getHash (): string {
-  //   return this.hash
-  // }
 
   private static validateName (name: string): boolean {
     if (!name || name.trim().length < 2 || name.trim().length > 255) {
@@ -211,7 +201,7 @@ export class UserEntity {
     return true
   }
 
-  private static validate (name: string, lastname: string, taxvat: string, email: string, password: string): Either<IDomainError, true> {
+  private static validate (name: string, lastname: string, taxvat: string, email: string, password: string): Either<Error, true> {
     if (!UserEntity.validateName(name)) {
       return left(new InvalidNameError(name))
     }
@@ -230,7 +220,7 @@ export class UserEntity {
     return right(true)
   }
 
-  static create (name: string, lastname: string, taxvat: string, email: string, password: string): Either<IDomainError, UserEntity> {
+  static create (name: string, lastname: string, taxvat: string, email: string, password: string): Either<Error, UserEntity> {
     const either = UserEntity.validate(name, lastname, taxvat, email, password)
     if (either.isRight()) {
       return right(new UserEntity(name, lastname, taxvat, email, password))
