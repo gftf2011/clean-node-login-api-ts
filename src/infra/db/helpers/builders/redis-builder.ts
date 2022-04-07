@@ -13,7 +13,7 @@ export class RedisClientBuilder implements IDbClientBuilder {
 
   private port?: number
 
-  private user?: string
+  private readonly user?: string
 
   private pass?: string
 
@@ -28,9 +28,7 @@ export class RedisClientBuilder implements IDbClientBuilder {
     this.port = entryPort ? +entryPort : 6379
   }
 
-  public setUser (): void {
-    this.user = process.env.REDIS_USER
-  }
+  public setUser (): void {}
 
   public setPass (): void {
     this.pass = process.env.REDIS_PASSWORD
@@ -44,7 +42,10 @@ export class RedisClientBuilder implements IDbClientBuilder {
 
   public build (): any {
     const result = redis.createClient({
-      url: `redis://${this.user}:${this.pass}@${this.host}:${this.port}/${this.db}`,
+      password: this.pass,
+      db: this.db,
+      host: this.host,
+      port: this.port,
       enable_offline_queue: false
     })
     return result
