@@ -5,7 +5,7 @@ export interface UserDto {
   taxvat: string
   email: string
   password: string
-  hash: string
+  salt: string
 }
 
-export type BasicUserDto = Omit<Omit<UserDto, 'hash'>, 'id'>
+export type BasicUserDto = Omit<Omit<UserDto, 'salt'>, 'id'>
