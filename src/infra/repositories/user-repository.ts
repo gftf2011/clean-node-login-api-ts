@@ -18,4 +18,8 @@ export class UserRepository implements IUserRepository {
   async create (user: User): Promise<User> {
     return await this.userDAO.create(user)
   }
+
+  async findUserByEmail (email: string): Promise<User> {
+    return await this.userDAO.findUserByEmail(email)
+  }
 }
