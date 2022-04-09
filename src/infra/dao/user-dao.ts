@@ -17,4 +17,8 @@ export class UserDao implements IUserDao {
     this.users.push(user)
     return user
   }
+
+  async findUserByEmail (email: string): Promise<User> {
+    return this.users.find((user: User) => user.email === email)
+  }
 }
