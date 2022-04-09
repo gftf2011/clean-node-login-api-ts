@@ -1,6 +1,13 @@
 /**
  * Use Cases
  */
-import { IUseCase } from '@/use-cases/contracts'
+import { UserDto, BasicUserDto } from '@/use-cases/ports'
 
-export interface ISignUpUseCase extends IUseCase {}
+/**
+ * Shared
+ */
+import { Either } from '@/shared/either'
+
+export interface ISignUpUseCase {
+  perform: (request: BasicUserDto) => Promise<Either<Error, UserDto>>
+}
