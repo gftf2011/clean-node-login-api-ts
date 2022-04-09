@@ -1,5 +1,5 @@
 {
-  "name": "clean-ts-cv-generator",
+  "name": "clean-node-login-api-ts",
   "version": "1.0.0",
   "description": "",
   "main": "dist/main/index.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gftf2011/clean-ts-cv-generator.git"
+    "url": "git+https://github.com/gftf2011/clean-node-login-api-ts.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gftf2011/clean-ts-cv-generator/issues"
+    "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
   },
-  "homepage": "https://github.com/gftf2011/clean-ts-cv-generator#readme",
+  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme",
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/node": "^17.0.21",
