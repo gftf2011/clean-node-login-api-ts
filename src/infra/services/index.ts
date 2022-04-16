@@ -1,1 +1,2 @@
-export * from './token/crypto-token-service'
+export * from './token'
+export * from './encrypt'
