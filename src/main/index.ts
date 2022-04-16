@@ -9,7 +9,7 @@ import cluster from 'cluster'
 import os from 'os'
 import process from 'process'
 
-if (cluster.isPrimary) {
+if (cluster.isPrimary && Boolean(process.env.MULTI_THREAD)) {
   os.cpus().forEach(() => cluster.fork())
 } else {
   loader().then(() => {
