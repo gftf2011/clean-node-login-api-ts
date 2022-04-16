@@ -4,7 +4,7 @@
 import { Either, left, right } from '@/shared'
 import { InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError, InvalidPasswordError } from '@/shared/errors'
 
-const EMAIL_REGEX: RegExp = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/g
+const EMAIL_REGEX: RegExp = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/
 const TAXVAT_BASIC_REGEX: RegExp = /^([0-9]{3})\.([0-9]{3})\.([0-9]{3})-([0-9]{2})$/g
 const TAXVAT_BASIC_ONLY_NUMBERS_REGEX: RegExp = /^([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})$/g
 
@@ -12,11 +12,35 @@ const NOT_CAPITAL_LETTER_REGEX: RegExp = /([^A-Z]*)/g
 const NOT_LOWER_CASE_LETTER_REGEX: RegExp = /([^a-z]*)/g
 const NOT_NUMBER_REGEX: RegExp = /([^0-9]*)/g
 const NOT_SPECIAL_CHARACTER_REGEX: RegExp = /([^!@#$%&?]*)/g
-const NO_SPACE_REGEX: RegExp = /([ ]*)/g
+const MULTI_SPACE_REGEX: RegExp = /([ ]+)/g
 
+const SINGLE_SPACE_SEPARATOR: string = ' '
 const EMPTY_CHARACTER: string = ''
 const EMAIL_ADDRESS_SEPARATOR: string = '@'
 const EMAIL_DOMAIN_SEPARATOR: string = '.'
+
+const TAXVAT_BLACKLIST: string[] = [
+  '000.000.000-00',
+  '111.111.111-11',
+  '222.222.222-22',
+  '333.333.333-33',
+  '444.444.444-44',
+  '555.555.555-55',
+  '666.666.666-66',
+  '777.777.777-77',
+  '888.888.888-88',
+  '999.999.999-99',
+  '00000000000',
+  '11111111111',
+  '22222222222',
+  '33333333333',
+  '44444444444',
+  '55555555555',
+  '66666666666',
+  '77777777777',
+  '88888888888',
+  '99999999999'
+]
 
 export class UserEntity {
   private readonly name: string
@@ -55,14 +79,22 @@ export class UserEntity {
   }
 
   private static validateName (name: string): boolean {
-    if (!name || name.trim().length < 2 || name.trim().length > 255) {
+    if (!name) {
+      return false
+    }
+    const cleanName = name.trim().replace(MULTI_SPACE_REGEX, SINGLE_SPACE_SEPARATOR)
+    if (cleanName.length < 2 || cleanName.length > 255) {
       return false
     }
     return true
   }
 
   private static validateLastname (lastname: string): boolean {
-    if (!lastname || lastname.trim().length < 2 || lastname.trim().length > 255) {
+    if (!lastname) {
+      return false
+    }
+    const cleanLastname = lastname.trim().replace(MULTI_SPACE_REGEX, SINGLE_SPACE_SEPARATOR)
+    if (cleanLastname.length < 2 || cleanLastname.length > 255) {
       return false
     }
     return true
@@ -70,6 +102,10 @@ export class UserEntity {
 
   private static validateTaxvat (taxvat: string): boolean {
     if (taxvat.length !== 14 && taxvat.length !== 11) {
+      return false
+    }
+
+    if (TAXVAT_BLACKLIST.some((value: string) => value === taxvat)) {
       return false
     }
 
@@ -178,8 +214,11 @@ export class UserEntity {
   }
 
   private static validatePassword (password: string): boolean {
-    const pass: string = password.replace(NO_SPACE_REGEX, EMPTY_CHARACTER)
+    const pass: string = password
     if (!pass || pass.length < 11) {
+      return false
+    }
+    if (MULTI_SPACE_REGEX.test(pass)) {
       return false
     }
     const onlyNumbers: string = pass.replace(NOT_NUMBER_REGEX, EMPTY_CHARACTER)
@@ -215,7 +254,7 @@ export class UserEntity {
       return left(new InvalidEmailError(email))
     }
     if (!UserEntity.validatePassword(password)) {
-      return left(new InvalidPasswordError(email))
+      return left(new InvalidPasswordError(password))
     }
     return right(true)
   }
