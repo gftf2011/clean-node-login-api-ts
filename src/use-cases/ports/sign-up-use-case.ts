@@ -9,5 +9,5 @@ import { UserDto, BasicUserDto } from '@/use-cases/ports'
 import { Either } from '@/shared/either'
 
 export interface ISignUpUseCase {
-  perform: (request: BasicUserDto) => Promise<Either<Error, UserDto>>
+  perform: (request: BasicUserDto, host: string) => Promise<Either<Error, UserDto>>
 }

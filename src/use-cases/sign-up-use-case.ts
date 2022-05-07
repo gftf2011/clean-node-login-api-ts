@@ -21,7 +21,7 @@ export class SignUpUseCase implements ISignUpUseCase {
     private readonly encryptService: IEncryptService
   ) {}
 
-  async perform (request: BasicUserDto): Promise<Either<Error, UserDto>> {
+  async perform (request: BasicUserDto, host: string): Promise<Either<Error, UserDto>> {
     if (!process.env.CODE_SALT) {
       return left(new ServerError())
     }
