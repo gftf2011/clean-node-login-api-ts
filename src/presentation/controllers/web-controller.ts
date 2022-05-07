@@ -1,7 +1,7 @@
 /**
  * Shared
  */
-import { MissingParamsError } from '@/shared/errors'
+import { MissingParamsError, MissingHeaderParamsError } from '@/shared/errors'
 
 /**
  * Presentation
@@ -32,6 +32,10 @@ export class WebController {
       if (missingParams.length !== 0) {
         return badRequest(new MissingParamsError(missingParams))
       }
+      const missingHeaderParams: string[] = WebController.getMissingHeaderParams(request, this.controllerOperation.requiredHeaderParams)
+      if (missingHeaderParams.length !== 0) {
+        return badRequest(new MissingHeaderParamsError(missingHeaderParams))
+      }
       const response = await this.controllerOperation.operation(request)
       return response
     } catch (error) {
@@ -49,6 +53,22 @@ export class WebController {
     const missingParams: string[] = []
     requiredParams.forEach((name) => {
       if (!Object.keys(request.body).includes(name)) {
+        missingParams.push(name)
+      }
+    })
+    return missingParams
+  }
+
+  /**
+   * @desc check which parameters are missing in the headers request
+   * @param {HttpRequest} request - data input which comes from the `client`
+   * @param {string[]} requiredHeaderParams - required parameters which must be sent in the headers request
+   * @returns {string[]} array of missing parameters
+   */
+  public static getMissingHeaderParams (request: HttpRequest, requiredHeaderParams: string[]): string[] {
+    const missingParams: string[] = []
+    requiredHeaderParams.forEach((name) => {
+      if (!Object.keys(request.headers).includes(name)) {
         missingParams.push(name)
       }
     })
