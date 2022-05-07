@@ -5,7 +5,10 @@ import { WebController } from '@/presentation/controllers'
 export const adaptRoute = (controller: WebController) => {
   return async (req: Request, res: Response) => {
     const httpRequest: HttpRequest = {
-      body: req.body
+      body: req.body,
+      headers: {
+        host: req.headers.host
+      }
     }
     const httpResponse = await controller.handle(httpRequest)
     res.status(httpResponse.statusCode).json(httpResponse.body)
