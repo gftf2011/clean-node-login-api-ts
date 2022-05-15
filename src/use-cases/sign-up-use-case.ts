@@ -12,13 +12,14 @@ import { UserEntity } from '@/entities'
 /**
  * Use Cases
  */
-import { IUserRepository, UserDto, BasicUserDto, ISignUpUseCase, IHashService, IEncryptService } from '@/use-cases/ports'
+import { IUserRepository, UserDto, BasicUserDto, ISignUpUseCase, IHashService, IEncryptService, ITokenService } from '@/use-cases/ports'
 
 export class SignUpUseCase implements ISignUpUseCase {
   constructor (
     private readonly userRepository: IUserRepository,
     private readonly hashService: IHashService,
-    private readonly encryptService: IEncryptService
+    private readonly encryptService: IEncryptService,
+    private readonly tokenService: ITokenService
   ) {}
 
   async perform (request: BasicUserDto, host: string): Promise<Either<Error, UserDto>> {
@@ -47,6 +48,8 @@ export class SignUpUseCase implements ISignUpUseCase {
       taxvat: this.encryptService.encode(userOrError.value.getTaxvat()),
       password: strongHashedPassword
     }
+    // const token = this.tokenService.sign({ id: 1 }, { subject: email, issuer: host })
+    // console.log(this.tokenService.verify(token, { subject: email, issuer: host }))
     return right(await this.userRepository.create(user))
   }
 }
