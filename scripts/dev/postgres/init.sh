@@ -22,7 +22,7 @@ psql $POSTGRES_DEV_DB -c "CREATE TABLE user_schema.users (
   lastname VARCHAR (256) NOT NULL,
   email VARCHAR(256) UNIQUE NOT NULL,
   password VARCHAR(256) NOT NULL,
-  refresh_token_id uuid,
+  refresh_token_id uuid DEFAULT NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_refresh_token FOREIGN(refresh_token_id) REFERENCES user_schema.refresh_token(id)
 )"
