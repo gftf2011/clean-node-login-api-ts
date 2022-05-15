@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: clean-node-login-api-ts-postgres-dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_MASTER_USER}
+      POSTGRES_DB: ${POSTGRES_MASTER_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_MASTER_PASSWORD}
+      POSTGRES_MAX: ${POSTGRES_MAX}
+      POSTGRES_ENCODING: ${POSTGRES_ENCODING}
+      POSTGRES_DEV_DB: ${POSTGRES_DB}
+      POSTGRES_DEV_USER: ${POSTGRES_USER}
+      POSTGRES_DEV_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./scripts/dev/postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - ${POSTGRES_PORT}:5432
+volumes:
+  postgres_data: {}
