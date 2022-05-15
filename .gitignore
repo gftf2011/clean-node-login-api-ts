@@ -108,3 +108,10 @@ package-lock.json
 
 # yarn.lock
 yarn.lock
+
+# Docker Compose
+docker-compose.yml
+!docker/dev/docker-compose.yml
+
+# env folder
+!env/dev/.env
