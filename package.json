@@ -4,6 +4,10 @@
   "description": "",
   "main": "dist/main/index.js",
   "scripts": {
+    "build:dev": "rm -rf .env && cat ./env/dev/.env >> .env",
+    "build:docker:dev": "rm -rf docker-compose.yml && cat docker/dev/docker-compose.yml >> docker-compose.yml",
+    "scripts:dev": "chmod +x ./scripts/dev/postgres/init.sh",
+    "start:dev": "npm run build:dev && npm run build:docker:dev && npm run scripts:dev",
     "build": "rimraf dist && tsc -p tsconfig.json",
     "prestart": "npm run build",
     "start": "node dist/main/index.js"
@@ -14,7 +18,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
   },
