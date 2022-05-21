@@ -13,14 +13,16 @@ import { WebController, SignUpController } from '@/presentation/controllers'
  */
 import { CryptoHashService, CryptoEncryptService, JwtTokenService } from '@/infra/services'
 import { UserRepository } from '@/infra/repositories/user-repository'
-import { UserDao } from '@/infra/dao/user-dao'
+import { UserDao, RefreshTokenDao } from '@/infra/dao'
 import { Postgres } from '@/infra/db'
 
 export const makeSignUpController = (): WebController => {
-  const postgresDb = Postgres
+  const postgresDb = Postgres.connect()
 
-  const userDao = new UserDao(postgresDb.connect())
-  const userRepository = new UserRepository(userDao)
+  const userDao = new UserDao(postgresDb)
+  const refreshTokenDAO = new RefreshTokenDao(postgresDb)
+
+  const userRepository = new UserRepository(userDao, refreshTokenDAO)
 
   const cryptoEncryptService = new CryptoEncryptService()
   const cryptoHashService = new CryptoHashService()
