@@ -12,7 +12,7 @@ import { UserEntity } from '@/entities'
 /**
  * Use Cases
  */
-import { IUserRepository, UserDto, BasicUserDto, ISignUpUseCase, IHashService, IEncryptService, ITokenService } from '@/use-cases/ports'
+import { IUserRepository, UserDto, RefreshTokenDto, BasicUserDto, ISignUpUseCase, IHashService, IEncryptService, ITokenService } from '@/use-cases/ports'
 
 export class SignUpUseCase implements ISignUpUseCase {
   constructor (
@@ -48,8 +48,11 @@ export class SignUpUseCase implements ISignUpUseCase {
       taxvat: this.encryptService.encode(userOrError.value.getTaxvat()),
       password: strongHashedPassword
     }
+    const refreshToken: RefreshTokenDto = {
+      expiresIn: Date.now() + (1000 * 60 * 60 * 12)
+    }
     // const token = this.tokenService.sign({ id: 1 }, { subject: email, issuer: host })
     // console.log(this.tokenService.verify(token, { subject: email, issuer: host }))
-    return right(await this.userRepository.create(user))
+    return right(await this.userRepository.create(user, refreshToken))
   }
 }
