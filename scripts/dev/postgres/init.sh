@@ -2,38 +2,38 @@
 
 set -e
 
-psql $POSTGRES_DB -c "CREATE DATABASE $POSTGRES_DEV_DB WITH ENCODING '$POSTGRES_ENCODING' TEMPLATE template0"
-psql $POSTGRES_DB -c "CREATE USER $POSTGRES_DEV_USER WITH PASSWORD '$POSTGRES_DEV_PASSWORD'"
-psql $POSTGRES_DB -c "CREATE ROLE dev_role VALID UNTIL '2030-01-01' CONNECTION LIMIT $POSTGRES_MAX"
+psql postgres -c "CREATE DATABASE clean_node_login_api_ts_postgres_dev_db WITH ENCODING 'UTF8' TEMPLATE template0"
+psql postgres -c "CREATE USER dev_user WITH PASSWORD 'dev_user' VALID UNTIL '2030-01-01' CONNECTION LIMIT 1000"
 
-psql $POSTGRES_DEV_DB -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE EXTENSION \"uuid-ossp\""
 
-psql $POSTGRES_DEV_DB -c "CREATE SCHEMA user_schema AUTHORIZATION dev_role"
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE SCHEMA IF NOT EXISTS users_schema AUTHORIZATION dev_user"
 
-psql $POSTGRES_DEV_DB -c "CREATE TABLE user_schema.refresh_token (
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS users_schema.refresh_token (
   id uuid DEFAULT uuid_generate_v4 (),
   expires_in BIGINT NOT NULL,
   PRIMARY KEY (id)
 )"
-psql $POSTGRES_DEV_DB -c "CREATE TABLE user_schema.users (
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   id uuid DEFAULT uuid_generate_v4 (),
-  taxvat VARCHAR (11) NOT NULL,
-  name VARCHAR (256) NOT NULL,
-  lastname VARCHAR (256) NOT NULL,
-  email VARCHAR(256) UNIQUE NOT NULL,
+  taxvat VARCHAR (32) NOT NULL,
+  name VARCHAR (32) NOT NULL,
+  lastname VARCHAR (32) NOT NULL,
+  email VARCHAR(32) UNIQUE NOT NULL,
   password VARCHAR(256) NOT NULL,
   refresh_token_id uuid DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_refresh_token FOREIGN(refresh_token_id) REFERENCES user_schema.refresh_token(id)
+  FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id)
 )"
 
-psql $POSTGRES_DB -c "GRANT CONNECT ON DATABASE $POSTGRES_DEV_DB TO dev_role"
-psql $POSTGRES_DB -c "GRANT dev_role TO $POSTGRES_DEV_USER"
+psql postgres -c "GRANT CONNECT ON DATABASE clean_node_login_api_ts_postgres_dev_db TO dev_user"
 
-psql $POSTGRES_DEV_DB -c "GRANT USAGE ON SCHEMA user_schema TO dev_role"
-psql $POSTGRES_DEV_DB -c "GRANT ALL ON ALL TABLES IN SCHEMA user_schema TO dev_role"
+psql clean_node_login_api_ts_postgres_dev_db -c "GRANT USAGE ON SCHEMA users_schema TO dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "GRANT ALL ON ALL TABLES IN SCHEMA users_schema TO dev_user"
 
-psql $POSTGRES_DB -c "ALTER DATABASE $POSTGRES_DEV_DB OWNER TO dev_role"
+psql postgres -c "ALTER DATABASE clean_node_login_api_ts_postgres_dev_db OWNER TO dev_user"
 
-psql $POSTGRES_DEV_DB -c "ALTER TABLE user_schema.users OWNER TO dev_role"
-psql $POSTGRES_DEV_DB -c "ALTER TABLE user_schema.refresh_token OWNER TO dev_role"
+psql clean_node_login_api_ts_postgres_dev_db -c "ALTER SCHEMA users_schema OWNER TO dev_user"
+
+psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE users_schema.users OWNER TO dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE users_schema.refresh_token OWNER TO dev_user"
