@@ -4,13 +4,20 @@
   "description": "",
   "main": "dist/main/index.js",
   "scripts": {
+    "docker:up": "docker-compose up -d --remove-orphans",
+    "docker:down": "docker-compose down",
+    "docker:clear": "docker-compose down && npm run docker:delete:volumes",
+    "docker:delete:volumes": "docker volume prune -f",
     "build:dev": "rm -rf .env && cat ./env/dev/.env >> .env",
     "build:docker:dev": "rm -rf docker-compose.yml && cat docker/dev/docker-compose.yml >> docker-compose.yml",
-    "scripts:dev": "chmod +x ./scripts/dev/postgres/init.sh",
-    "start:dev": "npm run build:dev && npm run build:docker:dev && npm run scripts:dev",
+    "build:script:dev": "chmod +x ./scripts/dev/postgres/init.sh",
     "build": "rimraf dist && tsc -p tsconfig.json",
-    "prestart": "npm run build",
-    "start": "node dist/main/index.js"
+    "start": "node dist/main/index.js",
+    "prerun:docker:dev": "npm run docker:clear",
+    "run:docker:dev": "npm run build:dev && npm run build:script:dev && npm run build:docker:dev",
+    "postrun:docker:dev": "npm run docker:up",
+    "prestart:dev": "npm run run:docker:dev",
+    "start:dev": "npm run build && npm run start"
   },
   "repository": {
     "type": "git",
@@ -42,7 +49,7 @@
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "module-alias": "^2.2.2",
-    "pg": "^8.7.3",
+    "pg": "8.7.3",
     "redis": "3.1.2"
   },
   "_moduleAliases": {
