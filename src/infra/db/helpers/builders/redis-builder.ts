@@ -13,8 +13,6 @@ export class RedisClientBuilder implements IDbClientBuilder {
 
   private port?: number
 
-  private readonly user?: string
-
   private pass?: string
 
   private db?: string
