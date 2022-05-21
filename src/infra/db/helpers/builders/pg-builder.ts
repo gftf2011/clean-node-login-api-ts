@@ -9,6 +9,8 @@ import { Pool } from 'pg'
 import { IDbClientBuilder } from '@/infra/contracts'
 
 export class PgClientBuilder implements IDbClientBuilder {
+  private product: Pool
+
   private host?: string
 
   private port?: number
@@ -21,34 +23,40 @@ export class PgClientBuilder implements IDbClientBuilder {
 
   private max?: number
 
-  public setHost (): void {
-    this.host = process.env.POSTGRES_HOST
+  public constructor () {
+    this.reset()
   }
 
-  public setPort (): void {
-    const entryPort = process.env.POSTGRES_PORT
-    this.port = entryPort ? +entryPort : 5432
+  private reset (): void {
+    this.product = undefined
   }
 
-  public setUser (): void {
-    this.user = process.env.POSTGRES_USER
+  public setHost (host: string): void {
+    this.host = host
   }
 
-  public setPass (): void {
-    this.pass = process.env.POSTGRES_PASSWORD
+  public setPort (port: string): void {
+    this.port = +port
   }
 
-  public setDb (): void {
-    this.db = process.env.POSTGRES_DB
+  public setUser (user: string): void {
+    this.user = user
   }
 
-  public setMax (): void {
-    const maxConnections = process.env.POSTGRES_MAX
-    this.max = maxConnections ? +maxConnections : 1
+  public setPass (pass: string): void {
+    this.pass = pass
+  }
+
+  public setDb (db: string): void {
+    this.db = db
+  }
+
+  public setMax (max: string): void {
+    this.max = +max
   }
 
   public build (): Pool {
-    const result = new Pool({
+    this.product = new Pool({
       host: this.host,
       port: this.port,
       user: this.user,
@@ -56,6 +64,8 @@ export class PgClientBuilder implements IDbClientBuilder {
       database: this.db,
       max: this.max
     })
+    const result = this.product
+    this.reset()
     return result
   }
 }
