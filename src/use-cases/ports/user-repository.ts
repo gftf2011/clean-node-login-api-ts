@@ -1,9 +1,9 @@
 /**
  * Use Cases
  */
-import { UserDto as User } from '@/use-cases/ports'
+import { UserDto as User, RefreshTokenDto as RefreshToken } from '@/use-cases/ports'
 
 export interface IUserRepository {
-  create: (user: User) => Promise<User>
+  create: (user: User, refreshToken: RefreshToken) => Promise<User>
   findUserByEmail: (email: string) => Promise<User>
 }
