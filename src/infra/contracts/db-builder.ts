@@ -1,13 +1,8 @@
 export interface IDbClientBuilder {
-  setHost: () => void
-  setPort: () => void
-  setUser: () => void
-  setPass: () => void
-  setDb: () => void
-  setMax: () => void
-}
-
-export interface IDbDirector {
-  setBuilder: (builder: IDbClientBuilder) => void
-  build: () => void
+  setHost: (host: string) => void
+  setPort: (port: string) => void
+  setUser: (user: string) => void
+  setPass: (pass: string) => void
+  setDb: (db: string) => void
+  setMax: (max: string) => void
 }
