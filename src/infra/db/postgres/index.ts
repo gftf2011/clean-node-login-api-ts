@@ -9,16 +9,15 @@ import { Pool, PoolClient } from 'pg'
 import { DbTransaction } from '@/infra/contracts'
 
 /**
-  * Infrastructure | Utils
-  */
-import { DbDirector } from '@/infra/db/helpers/builders/db-director'
+ * Infrastructure | Utils
+ */
 import { PgClientBuilder } from '@/infra/db/helpers/builders/pg-builder'
 
 /**
-  * Singleton class
-  *
-  * This class manages the global instance from a PostgresSQL Pool
-  */
+ * Singleton class
+ *
+ * This class manages the global instance from a PostgresSQL Pool
+ */
 export class Postgres implements DbTransaction {
   private static pool: Pool
   private static instance: Postgres
@@ -28,9 +27,13 @@ export class Postgres implements DbTransaction {
   public static connect (): Postgres {
     if (Postgres.instance === undefined || Postgres.instance === null) {
       const builder = new PgClientBuilder()
-      const director = new DbDirector()
 
-      director.setBuilder(builder)
+      builder.setDb(process.env.POSTGRES_DB)
+      builder.setHost(process.env.POSTGRES_HOST)
+      builder.setMax(process.env.POSTGRES_MAX)
+      builder.setPass(process.env.POSTGRES_PASSWORD)
+      builder.setPort(process.env.POSTGRES_PORT)
+      builder.setUser(process.env.POSTGRES_USER)
 
       Postgres.pool = builder.build()
       Postgres.instance = new Postgres()
@@ -52,7 +55,7 @@ export class Postgres implements DbTransaction {
     return result
   }
 
-  public closeTransaction (client: PoolClient): void {
+  public async closeTransaction (client: PoolClient): Promise<void> {
     client.release()
   }
 
