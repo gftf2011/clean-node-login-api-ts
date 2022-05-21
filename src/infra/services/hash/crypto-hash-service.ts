@@ -6,7 +6,7 @@ import crypto from 'crypto'
 import { IHashService } from '@/use-cases/ports'
 
 const CIPHER: string = 'sha512'
-const ENCODED_PASSWORD_SIZE: number = 256
+const ENCODED_PASSWORD_SIZE: number = 128
 const ENCODED_ITERATIONS = 50000
 
 export class CryptoHashService implements IHashService {
