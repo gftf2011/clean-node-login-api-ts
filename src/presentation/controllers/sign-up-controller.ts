@@ -7,7 +7,7 @@ import { ISignUpUseCase } from '@/use-cases/ports'
  * Presentation
  */
 import { HttpResponse, HttpRequest, ControllerOperation } from '@/presentation/ports'
-import { created, badRequest } from '@/presentation/helpers/http-helper'
+import { created } from '@/presentation/helpers/http-helper'
 
 export class SignUpController implements ControllerOperation {
   readonly requiredParams = ['email', 'password', 'taxvat', 'name', 'lastname']
@@ -21,10 +21,10 @@ export class SignUpController implements ControllerOperation {
   async operation (request: HttpRequest): Promise<HttpResponse> {
     const response = await this.signUpUseCase.perform(request.body, request.headers.host)
 
-    if (response.isRight()) {
-      return created(response.value)
+    if (response.isLeft()) {
+      throw response.value
     }
 
-    return badRequest(response.value)
+    return created(response.value)
   }
 }
