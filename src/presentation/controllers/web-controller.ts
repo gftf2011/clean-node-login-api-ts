@@ -1,13 +1,13 @@
 /**
  * Shared
  */
-import { MissingParamsError, MissingHeaderParamsError } from '@/shared/errors'
+import { MissingParamsError, MissingHeaderParamsError, Error400, Error401, Error403 } from '@/shared/errors'
 
 /**
  * Presentation
  */
 import { HttpResponse, HttpRequest, ControllerOperation } from '@/presentation/ports'
-import { badRequest, serverError } from '@/presentation/helpers/http-helper'
+import { badRequest, serverError, unauthorized, forbidden } from '@/presentation/helpers/http-helper'
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -22,6 +22,24 @@ export class WebController {
   }
 
   /**
+   * @desc handles throwable errors returned by the applicaion
+   * @param {Error} err - error thrown by the application
+   * @returns {HttpResponse} data output after operation
+   */
+  private static handleError (err: Error): HttpResponse {
+    if (err instanceof Error400) {
+      return badRequest(err)
+    }
+    if (err instanceof Error401) {
+      return unauthorized(err)
+    }
+    if (err instanceof Error403) {
+      return forbidden(err)
+    }
+    return serverError(err)
+  }
+
+  /**
    * @desc handles the user input
    * @param {HttpRequest} request - data input which comes from the `client`
    * @returns {Promise<HttpResponse>} data output after operation
@@ -30,16 +48,16 @@ export class WebController {
     try {
       const missingParams: string[] = WebController.getMissingParams(request, this.controllerOperation.requiredParams)
       if (missingParams.length !== 0) {
-        return badRequest(new MissingParamsError(missingParams))
+        throw new MissingParamsError(missingParams)
       }
       const missingHeaderParams: string[] = WebController.getMissingHeaderParams(request, this.controllerOperation.requiredHeaderParams)
       if (missingHeaderParams.length !== 0) {
-        return badRequest(new MissingHeaderParamsError(missingHeaderParams))
+        throw new MissingHeaderParamsError(missingHeaderParams)
       }
       const response = await this.controllerOperation.operation(request)
       return response
     } catch (error) {
-      return serverError(error as Error)
+      return WebController.handleError(error as Error)
     }
   }
 
