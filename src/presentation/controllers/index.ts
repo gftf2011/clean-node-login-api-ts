@@ -1,2 +1,1 @@
-export * from './sign-up-controller'
-export * from './web-controller'
+export * from './template-method'

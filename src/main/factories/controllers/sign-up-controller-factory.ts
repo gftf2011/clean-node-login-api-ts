@@ -31,7 +31,6 @@ export const makeSignUpController = (): WebController => {
   const signUpUseCase = new SignUpUseCase(userRepository, cryptoHashService, cryptoEncryptService, jwtTokenService)
 
   const signUpController = new SignUpController(signUpUseCase)
-  const controller = new WebController(signUpController)
 
-  return controller
+  return signUpController
 }
