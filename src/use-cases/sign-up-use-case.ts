@@ -7,12 +7,22 @@ import { UserAlreadyExistsError, ServerError } from '@/shared/errors'
 /**
  * Entites
  */
-import { UserEntity } from '@/entities'
+import { UserEntity, RefreshTokenEntity } from '@/entities'
 
 /**
  * Use Cases
  */
-import { IUserRepository, UserDto, RefreshTokenDto, BasicUserDto, ISignUpUseCase, IHashService, IEncryptService, ITokenService } from '@/use-cases/ports'
+import {
+  IUserRepository,
+  UserDto,
+  RefreshTokenDto,
+  BasicUserDto,
+  ISignUpUseCase,
+  IHashService,
+  IEncryptService,
+  ITokenService,
+  AuthenticatedAccountDto
+} from '@/use-cases/ports'
 
 export class SignUpUseCase implements ISignUpUseCase {
   constructor (
@@ -22,25 +32,36 @@ export class SignUpUseCase implements ISignUpUseCase {
     private readonly tokenService: ITokenService
   ) {}
 
-  async perform (request: BasicUserDto, host: string): Promise<Either<Error, UserDto>> {
-    if (!process.env.CODE_SALT) {
+  async perform (request: BasicUserDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
+    if (!process.env.CODE_SALT && !process.env.REFRESH_TOKEN_DURATION) {
       return left(new ServerError())
     }
+
     const { email, password, lastname, name, taxvat } = request
+
     const userOrError: Either<Error, UserEntity> = UserEntity.create(name, lastname, taxvat, email, password)
+    const refreshTokenOrError: Either<Error, RefreshTokenEntity> = RefreshTokenEntity.create(Date.now(), +process.env.REFRESH_TOKEN_DURATION)
+
     if (userOrError.isLeft()) {
       return left(userOrError.value)
     }
+    if (refreshTokenOrError.isLeft()) {
+      return left(refreshTokenOrError.value)
+    }
+
     const userExists = await this.userRepository.findUserByEmail(this.encryptService.encode(userOrError.value.getEmail()))
+
     if (userExists) {
       return left(new UserAlreadyExistsError())
     }
+
     const customSalt = `${userOrError.value.getEmail()}${userOrError.value.getTaxvat()}`
     const defaultSalt = process.env.CODE_SALT
     // encrypt password with user custom salt hash value
     const hashedPassword = this.hashService.encode(password, customSalt)
     // encrypt encrypted password with code default salt hash value
     const strongHashedPassword = this.hashService.encode(hashedPassword, defaultSalt)
+
     const user: UserDto = {
       email: this.encryptService.encode(userOrError.value.getEmail()),
       name: this.encryptService.encode(userOrError.value.getName()),
@@ -49,10 +70,21 @@ export class SignUpUseCase implements ISignUpUseCase {
       password: strongHashedPassword
     }
     const refreshToken: RefreshTokenDto = {
-      expiresIn: Date.now() + (1000 * 60 * 60 * 12)
+      expiresIn: refreshTokenOrError.value.getExpiresIn()
     }
-    // const token = this.tokenService.sign({ id: 1 }, { subject: email, issuer: host })
-    // console.log(this.tokenService.verify(token, { subject: email, issuer: host }))
-    return right(await this.userRepository.create(user, refreshToken))
+
+    const { refreshTokenId } = await this.userRepository.create(user, refreshToken)
+    const accessTokenOrError = this.tokenService.sign({ id: refreshTokenId }, { subject: email, issuer: host })
+
+    if (accessTokenOrError.isLeft()) {
+      return left(accessTokenOrError.value)
+    }
+
+    const authenticatedAccount: AuthenticatedAccountDto = {
+      accessToken: accessTokenOrError.value,
+      refreshToken: refreshTokenId
+    }
+
+    return right(authenticatedAccount)
   }
 }
