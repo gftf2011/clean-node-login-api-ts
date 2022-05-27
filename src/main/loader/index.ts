@@ -1,5 +1,5 @@
-import { Postgres } from '@/infra/db'
+import { PostgresDbClientPool } from '@/infra/db'
 
 export const loader = async (): Promise<any> => {
-  Postgres.connect()
+  PostgresDbClientPool.connect()
 }
