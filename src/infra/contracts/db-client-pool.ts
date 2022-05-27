@@ -1,5 +1,5 @@
-import { DbClientManager } from './db-client-manager'
+import { DbClient } from './db-client'
 
 export interface DbClientPool {
-  getClientManager: () => Promise<DbClientManager>
+  getClient: () => Promise<DbClient>
 }
