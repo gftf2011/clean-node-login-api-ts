@@ -6,9 +6,8 @@ import { Pool } from 'pg'
 /**
  * Infrastructure
  */
-import { DbClientManager, DbClientPool } from '@/infra/contracts'
+import { DbClient, DbClientPool } from '@/infra/contracts'
 import { PgClientBuilder } from '@/infra/db/helpers/builders/pg-builder'
-import { PostgresDbClientManager } from './postrges-db-client-manager'
 
 export class PostgresDbClientPool implements DbClientPool {
   private static pool: Pool
@@ -16,7 +15,7 @@ export class PostgresDbClientPool implements DbClientPool {
 
   private constructor () {}
 
-  connect (): void {
+  static connect (): void {
     if (!PostgresDbClientPool.pool || !PostgresDbClientPool.instance) {
       const builder = new PgClientBuilder()
 
@@ -32,8 +31,11 @@ export class PostgresDbClientPool implements DbClientPool {
     }
   }
 
-  public async getClientManager (): Promise<DbClientManager> {
-    const client = await PostgresDbClientPool.pool.connect()
-    return new PostgresDbClientManager(client)
+  static getInstance (): DbClientPool {
+    return PostgresDbClientPool.instance
+  }
+
+  public async getClient (): Promise<DbClient> {
+    return await PostgresDbClientPool.pool.connect()
   }
 }
