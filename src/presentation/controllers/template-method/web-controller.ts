@@ -6,7 +6,7 @@ import { MissingParamsError, MissingHeaderParamsError, Error400, Error401, Error
 /**
   * Presentation
   */
-import { HttpResponse, HttpRequest } from '@/presentation/ports'
+import { HttpResponse, HttpRequest, Controller } from '@/presentation/ports'
 import { badRequest, serverError, unauthorized, forbidden } from '@/presentation/helpers/http-helper'
 
 /**
@@ -14,7 +14,7 @@ import { badRequest, serverError, unauthorized, forbidden } from '@/presentation
   * @desc Contains the base algorithm that handles the data presentation.
   * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
   */
-export abstract class WebController {
+export abstract class WebController implements Controller {
   public requiredParams: string[] = []
   public requiredHeaderParams: string[] = []
 

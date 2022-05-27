@@ -6,7 +6,7 @@ import { SignUpUseCase } from '@/use-cases/sign-up-use-case'
 /**
  * Presentation
  */
-import { WebController, SignUpController } from '@/presentation/controllers'
+import { SignUpController } from '@/presentation/controllers'
 
 /**
  * Infrastructure
@@ -15,8 +15,9 @@ import { CryptoHashService, CryptoEncryptService, JwtTokenService } from '@/infr
 import { UserRepository } from '@/infra/repositories/user-repository'
 import { UserDao, RefreshTokenDao } from '@/infra/dao'
 import { Postgres } from '@/infra/db'
+import { Controller } from '@/presentation/ports'
 
-export const makeSignUpController = (): WebController => {
+export const makeSignUpController = (): Controller => {
   const postgresDb = Postgres.connect()
 
   const userDao = new UserDao(postgresDb)
