@@ -1,7 +1,6 @@
-import { DbQuery } from './db-query'
-
 export interface DbClientManager {
-  query: () => DbQuery
+  query: (statement: string, values: any[]) => Promise<any>
+  createClient: () => Promise<void>
   openTransaction: () => Promise<void>
   closeTransaction: () => Promise<void>
   commit: () => Promise<void>
