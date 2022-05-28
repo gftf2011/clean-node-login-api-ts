@@ -2,8 +2,6 @@
 
 set -e
 
-# echo "The present working directory is $( pwd; )";
-
 # Create Databases
 psql postgres -c "CREATE DATABASE clean_node_login_api_ts_postgres_dev_db WITH ENCODING 'UTF8' TEMPLATE template0"
 
@@ -32,7 +30,9 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS user
   password VARCHAR(256) NOT NULL,
   refresh_token_id uuid DEFAULT NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id)
+  FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id),
+  CONSTRAINT users_name_check CHECK (LENGTH(CAST(name AS TEXT)) > 1),
+  CONSTRAINT users_lastname_check CHECK (LENGTH(CAST(lastname AS TEXT)) > 1)
 )"
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS emails_schema.email_blacklist(
   id uuid DEFAULT uuid_generate_v4 (),
