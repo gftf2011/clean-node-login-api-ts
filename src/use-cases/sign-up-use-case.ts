@@ -63,9 +63,9 @@ export class SignUpUseCase implements ISignUpUseCase {
     const strongHashedPassword = this.hashService.encode(hashedPassword, defaultSalt)
 
     const user: UserDto = {
-      email: this.encryptService.encode(userOrError.value.getEmail()),
-      name: this.encryptService.encode(userOrError.value.getName()),
-      lastname: this.encryptService.encode(userOrError.value.getLastname()),
+      email: userOrError.value.getEmail(),
+      name: userOrError.value.getName(),
+      lastname: userOrError.value.getLastname(),
       taxvat: this.encryptService.encode(userOrError.value.getTaxvat()),
       password: strongHashedPassword
     }
