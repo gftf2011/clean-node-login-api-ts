@@ -11,6 +11,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
     volumes:
+      - ./documents/disposable-emails.txt:/documents/disposable-emails.txt
       - ./scripts/dev/postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
       - postgres_data:/var/lib/postgresql/data
     restart: always

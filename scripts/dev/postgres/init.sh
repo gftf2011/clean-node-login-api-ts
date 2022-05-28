@@ -2,13 +2,22 @@
 
 set -e
 
+# echo "The present working directory is $( pwd; )";
+
+# Create Databases
 psql postgres -c "CREATE DATABASE clean_node_login_api_ts_postgres_dev_db WITH ENCODING 'UTF8' TEMPLATE template0"
+
+# Create Users
 psql postgres -c "CREATE USER dev_user WITH PASSWORD 'dev_user' VALID UNTIL '2030-01-01' CONNECTION LIMIT 1000"
 
+# Create Extentions
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE EXTENSION \"uuid-ossp\""
 
+# Create Schemas
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE SCHEMA IF NOT EXISTS users_schema AUTHORIZATION dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE SCHEMA IF NOT EXISTS emails_schema AUTHORIZATION dev_user"
 
+# Create Tables
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS users_schema.refresh_token (
   id uuid DEFAULT uuid_generate_v4 (),
   expires_in BIGINT NOT NULL,
@@ -17,23 +26,50 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS user
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   id uuid DEFAULT uuid_generate_v4 (),
   taxvat VARCHAR (32) NOT NULL,
-  name VARCHAR (32) NOT NULL,
-  lastname VARCHAR (32) NOT NULL,
-  email VARCHAR(32) UNIQUE NOT NULL,
+  name VARCHAR (255) NOT NULL,
+  lastname VARCHAR (255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(256) NOT NULL,
   refresh_token_id uuid DEFAULT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id)
 )"
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS emails_schema.email_blacklist(
+  id uuid DEFAULT uuid_generate_v4 (),
+  domain VARCHAR(255) UNIQUE NOT NULL,
+  PRIMARY KEY (id)
+)"
 
+# Insert Black List Emails Domain
+# ========================================
+
+file='./documents/disposable-emails.txt'
+
+while read line; do
+  psql clean_node_login_api_ts_postgres_dev_db -c "INSERT INTO emails_schema.email_blacklist (domain) VALUES ('$line')"
+done < $file
+# ========================================
+
+
+# Create Index for gmail like index domains
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_gmail ON users_schema.users(email) WHERE email LIKE '%gmail.com%'"
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_outlook ON users_schema.users(email) WHERE email LIKE '%outlook.com%'"
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_yahoo ON users_schema.users(email) WHERE email LIKE '%yahoo.com%'"
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_aol ON users_schema.users(email) WHERE email LIKE '%aol.com%'"
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_hotmail ON users_schema.users(email) WHERE email LIKE '%hotmail.com%'"
+
+# Grant Privileges
 psql postgres -c "GRANT CONNECT ON DATABASE clean_node_login_api_ts_postgres_dev_db TO dev_user"
 
 psql clean_node_login_api_ts_postgres_dev_db -c "GRANT USAGE ON SCHEMA users_schema TO dev_user"
 psql clean_node_login_api_ts_postgres_dev_db -c "GRANT ALL ON ALL TABLES IN SCHEMA users_schema TO dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "GRANT ALL ON ALL TABLES IN SCHEMA emails_schema TO dev_user"
 
+# Alter Data
 psql postgres -c "ALTER DATABASE clean_node_login_api_ts_postgres_dev_db OWNER TO dev_user"
 
 psql clean_node_login_api_ts_postgres_dev_db -c "ALTER SCHEMA users_schema OWNER TO dev_user"
 
 psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE users_schema.users OWNER TO dev_user"
 psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE users_schema.refresh_token OWNER TO dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE emails_schema.email_blacklist OWNER TO dev_user"
