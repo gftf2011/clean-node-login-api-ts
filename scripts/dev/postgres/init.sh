@@ -88,7 +88,7 @@ psql clean_node_login_api_ts_postgres_dev_db -c "GRANT USAGE ON SCHEMA emails_sc
 psql clean_node_login_api_ts_postgres_dev_db -c "GRANT ALL ON ALL TABLES IN SCHEMA users_schema TO dev_user"
 psql clean_node_login_api_ts_postgres_dev_db -c "GRANT ALL ON ALL TABLES IN SCHEMA emails_schema TO dev_user"
 
-# psql clean_node_login_api_ts_postgres_dev_db -c "GRANT EXECUTE ON FUNCTION is_user_email_domain_valid(VARCHAR) TO dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "GRANT EXECUTE ON FUNCTION is_user_email_domain_valid(VARCHAR) TO dev_user"
 
 # Alter Data
 psql postgres -c "ALTER DATABASE clean_node_login_api_ts_postgres_dev_db OWNER TO dev_user"

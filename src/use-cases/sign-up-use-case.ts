@@ -49,7 +49,7 @@ export class SignUpUseCase implements ISignUpUseCase {
       return left(refreshTokenOrError.value)
     }
 
-    const userExists = await this.userRepository.findUserByEmail(this.encryptService.encode(userOrError.value.getEmail()))
+    const userExists = await this.userRepository.findUserByEmail(userOrError.value.getEmail())
 
     if (userExists) {
       return left(new UserAlreadyExistsError())

@@ -30,7 +30,7 @@ export class UserDao implements IUserDao {
   }
 
   async findUserByEmail (email: string): Promise<User> {
-    const statement: string = 'SELECT * FROM users_schema.users WHERE "email" = $1'
+    const statement: string = 'SELECT * FROM users_schema.users WHERE email LIKE $1'
 
     const values: any[] = [email]
 
