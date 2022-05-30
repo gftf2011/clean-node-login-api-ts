@@ -73,6 +73,27 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS user
   )
 )"
 
+# Create Function to encrypt data
+# ========================================
+# psql clean_node_login_api_ts_postgres_dev_db -c "CREATE OR REPLACE FUNCTION encrypt_users_email () RETURNS TRIGGER AS \$\$
+#   BEGIN
+#     IF (TG_OP = 'INSERT') THEN
+#       UPDATE users_schema.users
+#       SET email = encrypt(NEW.email, NEW.taxvat)
+#       WHERE id = NEW.id;
+#     END IF;
+#     RETURN NEW;
+#   END;
+# \$\$ LANGUAGE plpgsql"
+# ========================================
+
+# Create Trigger to encrypt email
+# ========================================
+# psql clean_node_login_api_ts_postgres_dev_db -c "
+#   CREATE TRIGGER encrypt_users_email_trigger AFTER INSERT ON users_schema.users FOR EACH ROW EXECUTE PROCEDURE encrypt_users_email()
+# "
+# ========================================
+
 # Create Index for gmail like index domains
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_gmail ON users_schema.users(email) WHERE email LIKE '%gmail.com%'"
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_outlook ON users_schema.users(email) WHERE email LIKE '%outlook.com%'"
@@ -85,8 +106,8 @@ psql postgres -c "GRANT CONNECT ON DATABASE clean_node_login_api_ts_postgres_dev
 
 psql clean_node_login_api_ts_postgres_dev_db -c "GRANT USAGE ON SCHEMA users_schema TO dev_user"
 psql clean_node_login_api_ts_postgres_dev_db -c "GRANT USAGE ON SCHEMA emails_schema TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "GRANT ALL ON ALL TABLES IN SCHEMA users_schema TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "GRANT ALL ON ALL TABLES IN SCHEMA emails_schema TO dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA users_schema TO dev_user"
+psql clean_node_login_api_ts_postgres_dev_db -c "GRANT SELECT ON ALL TABLES IN SCHEMA emails_schema TO dev_user"
 
 psql clean_node_login_api_ts_postgres_dev_db -c "GRANT EXECUTE ON FUNCTION is_user_email_domain_valid(VARCHAR) TO dev_user"
 
