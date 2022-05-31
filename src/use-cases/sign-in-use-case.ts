@@ -9,6 +9,10 @@ import { ServerError, UnauthorizedError } from '@/shared/errors'
  */
 import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository } from '@/use-cases/ports'
 
+/**
+  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+  * @desc Contains the logic to perform a sign-in operation
+  */
 export class SignInUseCase implements ISignInUseCase {
   constructor (
     private readonly userRepository: IUserRepository,
@@ -17,6 +21,12 @@ export class SignInUseCase implements ISignInUseCase {
     private readonly tokenService: ITokenService
   ) {}
 
+  /**
+   * @desc performs the sign-up action
+   * @param {AccountDto} request - request that contains an account information
+   * @param {string} host - the application host
+   * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-in
+   */
   async perform (request: AccountDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (!process.env.CODE_SALT) {
       return left(new ServerError())
