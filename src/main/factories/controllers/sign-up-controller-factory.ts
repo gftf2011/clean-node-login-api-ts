@@ -1,7 +1,7 @@
 /**
  * Use Cases
  */
-import { SignUpUseCase } from '@/use-cases/sign-up-use-case'
+import { SignUpUseCase } from '@/use-cases'
 
 /**
  * Presentation
@@ -13,7 +13,7 @@ import { SignUpController } from '@/presentation/controllers'
  * Infrastructure
  */
 import { CryptoHashService, CryptoEncryptService, JwtTokenService } from '@/infra/services'
-import { UserRepository } from '@/infra/repositories/user-repository'
+import { UserRepository } from '@/infra/repositories'
 import { UserDao, RefreshTokenDao } from '@/infra/dao'
 import { PostgresDbClientManager, PostgresDbClientPool } from '@/infra/db'
 import { DbTransactionDecorator } from '@/infra/db/helpers/decorators/db-transaction-decorator'
