@@ -24,6 +24,10 @@ import {
   AuthenticatedAccountDto
 } from '@/use-cases/ports'
 
+/**
+  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+  * @desc Contains the logic to perform a sign-up operation
+  */
 export class SignUpUseCase implements ISignUpUseCase {
   constructor (
     private readonly userRepository: IUserRepository,
@@ -32,6 +36,12 @@ export class SignUpUseCase implements ISignUpUseCase {
     private readonly tokenService: ITokenService
   ) {}
 
+  /**
+   * @desc performs the sign-up action
+   * @param {BasicUserDto} request - request that contains an user information
+   * @param {string} host - the application host
+   * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-up
+   */
   async perform (request: BasicUserDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (!process.env.CODE_SALT && !process.env.REFRESH_TOKEN_DURATION) {
       return left(new ServerError())
