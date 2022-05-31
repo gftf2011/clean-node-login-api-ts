@@ -23,7 +23,7 @@ export class SignUpController extends WebController {
    */
   public override requiredHeaderParams: string[] = ['host']
   /**
-   * @des values ovrrides - ['email', 'password', 'taxvat', 'name', 'lastname']
+   * @desc values ovrrides - ['email', 'password', 'taxvat', 'name', 'lastname']
    */
   public override requiredParams: string[] = ['email', 'password', 'taxvat', 'name', 'lastname']
 
