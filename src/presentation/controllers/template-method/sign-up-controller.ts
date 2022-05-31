@@ -19,11 +19,11 @@ export class SignUpController extends WebController {
   private readonly signUpUseCase: ISignUpUseCase
 
   /**
-   * @des values ovrrides - ['host']
+   * @desc values overrides - ['host']
    */
   public override requiredHeaderParams: string[] = ['host']
   /**
-   * @desc values ovrrides - ['email', 'password', 'taxvat', 'name', 'lastname']
+   * @desc values overrides - ['email', 'password', 'taxvat', 'name', 'lastname']
    */
   public override requiredParams: string[] = ['email', 'password', 'taxvat', 'name', 'lastname']
 
