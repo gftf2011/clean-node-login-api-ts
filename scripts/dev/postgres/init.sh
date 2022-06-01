@@ -55,6 +55,7 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE OR REPLACE FUNCTION is_u
   END;
 \$\$ LANGUAGE plpgsql"
 # ========================================
+
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   id uuid DEFAULT uuid_generate_v4 (),
   taxvat VARCHAR (32) NOT NULL,
@@ -64,7 +65,7 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS user
   password VARCHAR (256) NOT NULL,
   refresh_token_id uuid DEFAULT NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id),
+  FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id) ON UPDATE CASCADE,
   CONSTRAINT users_name_check CHECK (LENGTH(CAST(name AS TEXT)) > 1),
   CONSTRAINT users_lastname_check CHECK (LENGTH(CAST(lastname AS TEXT)) > 1),
   CONSTRAINT users_email_check CHECK (
@@ -72,6 +73,35 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS user
     AND is_user_email_domain_valid(email)
   )
 )"
+
+# Create Function to update client refresh token
+# ========================================
+psql clean_node_login_api_ts_postgres_dev_db -c "CREATE OR REPLACE FUNCTION update_client_refresh_token (token_id uuid, expiration_time bigint) RETURNS
+  TABLE (
+    id uuid,
+    taxvat VARCHAR (32),
+    name VARCHAR (255),
+    lastname VARCHAR (255),
+    email VARCHAR (255),
+    password VARCHAR (256),
+    refresh_token_id uuid
+  ) AS \$\$
+  BEGIN
+
+    UPDATE users_schema.refresh_token
+    SET
+      expires_in = expiration_time
+    WHERE id = token_id;
+
+    RETURN QUERY UPDATE users_schema.users
+    SET
+      refresh_token_id = uuid_generate_v4 ()
+    WHERE refresh_token_id = token_id
+    RETURNING id, taxvat, name, lastname, email, password, refresh_token_id;
+
+  END;
+\$\$ LANGUAGE plpgsql"
+# ========================================
 
 # Create Index for gmail like index domains
 psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_gmail ON users_schema.users(email) WHERE email LIKE '%gmail.com%'"
