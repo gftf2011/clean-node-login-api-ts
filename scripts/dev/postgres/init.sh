@@ -3,25 +3,25 @@
 set -e
 
 # Create Databases
-psql postgres -c "CREATE DATABASE clean_node_login_api_ts_postgres_dev_db WITH ENCODING 'UTF8' TEMPLATE template0"
+psql $POSTGRES_DB -c "CREATE DATABASE $POSTGRES_DEV_DB WITH ENCODING 'UTF8' TEMPLATE template0"
 
 # Create Users
-psql postgres -c "CREATE USER dev_user WITH PASSWORD 'dev_user' VALID UNTIL '2030-01-01' CONNECTION LIMIT 1000"
+psql $POSTGRES_DB -c "CREATE USER $POSTGRES_DEV_USER WITH PASSWORD '$POSTGRES_DEV_PASSWORD' VALID UNTIL '2030-01-01' CONNECTION LIMIT $POSTGRES_MAX_CONNECTIONS"
 
 # Create Extentions
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE EXTENSION \"uuid-ossp\""
+psql $POSTGRES_DEV_DB -c "CREATE EXTENSION \"uuid-ossp\""
 
 # Create Schemas
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE SCHEMA IF NOT EXISTS users_schema AUTHORIZATION dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE SCHEMA IF NOT EXISTS emails_schema AUTHORIZATION dev_user"
+psql $POSTGRES_DEV_DB -c "CREATE SCHEMA IF NOT EXISTS users_schema AUTHORIZATION $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "CREATE SCHEMA IF NOT EXISTS emails_schema AUTHORIZATION $POSTGRES_DEV_USER"
 
 # Create Tables
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS users_schema.refresh_token (
+psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.refresh_token (
   id uuid DEFAULT uuid_generate_v4 (),
   expires_in BIGINT NOT NULL,
   PRIMARY KEY (id)
 )"
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS emails_schema.email_blacklist(
+psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS emails_schema.email_blacklist(
   id uuid DEFAULT uuid_generate_v4 (),
   domain VARCHAR(255) UNIQUE NOT NULL,
   PRIMARY KEY (id)
@@ -33,13 +33,13 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS emai
 file='./documents/disposable-emails.txt'
 
 while read line; do
-  psql clean_node_login_api_ts_postgres_dev_db -c "INSERT INTO emails_schema.email_blacklist (domain) VALUES ('$line')"
+  psql $POSTGRES_DEV_DB -c "INSERT INTO emails_schema.email_blacklist (domain) VALUES ('$line')"
 done < $file
 # ========================================
 
 # Create Function to Check if email is in the Blacklist
 # ========================================
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE OR REPLACE FUNCTION is_user_email_domain_valid (email VARCHAR(255)) RETURNS BOOLEAN AS \$\$
+psql $POSTGRES_DEV_DB -c "CREATE OR REPLACE FUNCTION is_user_email_domain_valid (email VARCHAR(255)) RETURNS BOOLEAN AS \$\$
   DECLARE
     invalid_domains INT;
     email_domain VARCHAR(255);
@@ -56,7 +56,7 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE OR REPLACE FUNCTION is_u
 \$\$ LANGUAGE plpgsql"
 # ========================================
 
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS users_schema.users(
+psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   id uuid DEFAULT uuid_generate_v4 (),
   taxvat VARCHAR (32) NOT NULL,
   name VARCHAR (255) NOT NULL,
@@ -75,29 +75,29 @@ psql clean_node_login_api_ts_postgres_dev_db -c "CREATE TABLE IF NOT EXISTS user
 )"
 
 # Create Index for gmail like index domains
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_gmail ON users_schema.users(email) WHERE email LIKE '%gmail.com%'"
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_outlook ON users_schema.users(email) WHERE email LIKE '%outlook.com%'"
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_yahoo ON users_schema.users(email) WHERE email LIKE '%yahoo.com%'"
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_aol ON users_schema.users(email) WHERE email LIKE '%aol.com%'"
-psql clean_node_login_api_ts_postgres_dev_db -c "CREATE INDEX IF NOT EXISTS idx_users_email_hotmail ON users_schema.users(email) WHERE email LIKE '%hotmail.com%'"
+psql $POSTGRES_DEV_DB -c "CREATE INDEX IF NOT EXISTS idx_users_email_gmail ON users_schema.users(email) WHERE email LIKE '%gmail.com%'"
+psql $POSTGRES_DEV_DB -c "CREATE INDEX IF NOT EXISTS idx_users_email_outlook ON users_schema.users(email) WHERE email LIKE '%outlook.com%'"
+psql $POSTGRES_DEV_DB -c "CREATE INDEX IF NOT EXISTS idx_users_email_yahoo ON users_schema.users(email) WHERE email LIKE '%yahoo.com%'"
+psql $POSTGRES_DEV_DB -c "CREATE INDEX IF NOT EXISTS idx_users_email_aol ON users_schema.users(email) WHERE email LIKE '%aol.com%'"
+psql $POSTGRES_DEV_DB -c "CREATE INDEX IF NOT EXISTS idx_users_email_hotmail ON users_schema.users(email) WHERE email LIKE '%hotmail.com%'"
 
 # Grant Privileges
-psql postgres -c "GRANT CONNECT ON DATABASE clean_node_login_api_ts_postgres_dev_db TO dev_user"
+psql $POSTGRES_DB -c "GRANT CONNECT ON DATABASE $POSTGRES_DEV_DB TO $POSTGRES_DEV_USER"
 
-psql clean_node_login_api_ts_postgres_dev_db -c "GRANT USAGE ON SCHEMA users_schema TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "GRANT USAGE ON SCHEMA emails_schema TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA users_schema TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "GRANT SELECT ON ALL TABLES IN SCHEMA emails_schema TO dev_user"
+psql $POSTGRES_DEV_DB -c "GRANT USAGE ON SCHEMA users_schema TO $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "GRANT USAGE ON SCHEMA emails_schema TO $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA users_schema TO $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "GRANT SELECT ON ALL TABLES IN SCHEMA emails_schema TO $POSTGRES_DEV_USER"
 
-psql clean_node_login_api_ts_postgres_dev_db -c "GRANT EXECUTE ON FUNCTION is_user_email_domain_valid(VARCHAR) TO dev_user"
+psql $POSTGRES_DEV_DB -c "GRANT EXECUTE ON FUNCTION is_user_email_domain_valid(VARCHAR) TO $POSTGRES_DEV_USER"
 
 # Alter Data
-psql postgres -c "ALTER DATABASE clean_node_login_api_ts_postgres_dev_db OWNER TO dev_user"
+psql $POSTGRES_DB -c "ALTER DATABASE $POSTGRES_DEV_DB OWNER TO $POSTGRES_DEV_USER"
 
-psql clean_node_login_api_ts_postgres_dev_db -c "ALTER SCHEMA users_schema OWNER TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "ALTER SCHEMA emails_schema OWNER TO dev_user"
+psql $POSTGRES_DEV_DB -c "ALTER SCHEMA users_schema OWNER TO $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "ALTER SCHEMA emails_schema OWNER TO $POSTGRES_DEV_USER"
 
-psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE users_schema.users OWNER TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE users_schema.refresh_token OWNER TO dev_user"
-psql clean_node_login_api_ts_postgres_dev_db -c "ALTER TABLE emails_schema.email_blacklist OWNER TO dev_user"
+psql $POSTGRES_DEV_DB -c "ALTER TABLE users_schema.users OWNER TO $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "ALTER TABLE users_schema.refresh_token OWNER TO $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "ALTER TABLE emails_schema.email_blacklist OWNER TO $POSTGRES_DEV_USER"
 

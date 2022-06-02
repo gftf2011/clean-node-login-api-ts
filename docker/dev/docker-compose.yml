@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   postgres:
-    image: postgres:14
+    build: ./docker/dev/images/postgresql
     container_name: clean-node-login-api-ts-postgres-dev
     environment:
       POSTGRES_USER: "postgres"
