@@ -1,3 +1,5 @@
+import { v4 } from 'uuid'
+
 const EMAIL_ADDRESS_SEPARATOR: string = '@'
 
 const EMAIL_DOMAIN_SEPARATOR: string = '.'
@@ -65,4 +67,8 @@ export const normalizeValueToPascalCase = (value: string): string => {
   })
 
   return formattedPieces.join('')
+}
+
+export const createUUID = (): string => {
+  return v4()
 }
