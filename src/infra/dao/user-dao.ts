@@ -35,6 +35,35 @@ export class UserDao implements IUserDao {
     const values: any[] = [email]
 
     const response = await this.dbClientManager.query(statement, values)
-    return response.rows[0]
+    const parsedResponse: User = response.rows[0]
+      ? {
+          id: response.rows[0].id,
+          email: response.rows[0].email,
+          lastname: response.rows[0].lastname,
+          name: response.rows[0].name,
+          password: response.rows[0].password,
+          taxvat: response.rows[0].taxvat,
+          refreshTokenId: response.rows[0].refresh_token_id
+        }
+      : undefined
+    return parsedResponse
+  }
+
+  async updateRefreshTokenId (oldRefreshTokenId: string, newRefreshTokenId: string): Promise<User> {
+    const statement: string = 'UPDATE users_schema.users SET refresh_token_id = $1 WHERE refresh_token_id = $2 RETURNING *'
+
+    const values: any[] = [newRefreshTokenId, oldRefreshTokenId]
+
+    const response = await this.dbClientManager.query(statement, values)
+    const parsedResponse: User = {
+      id: response.rows[0].id,
+      email: response.rows[0].email,
+      lastname: response.rows[0].lastname,
+      name: response.rows[0].name,
+      password: response.rows[0].password,
+      taxvat: response.rows[0].taxvat,
+      refreshTokenId: response.rows[0].refresh_token_id
+    }
+    return parsedResponse
   }
 }
