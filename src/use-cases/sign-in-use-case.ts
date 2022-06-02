@@ -5,6 +5,11 @@ import { Either, left, right } from '@/shared'
 import { ServerError, UnauthorizedError } from '@/shared/errors'
 
 /**
+ * Entites
+ */
+import { RefreshTokenEntity } from '@/entities'
+
+/**
  * Use Cases
  */
 import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository } from '@/use-cases/ports'
@@ -28,8 +33,14 @@ export class SignInUseCase implements ISignInUseCase {
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-in
    */
   async perform (request: AccountDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
-    if (!process.env.CODE_SALT) {
+    if (!process.env.CODE_SALT && !process.env.REFRESH_TOKEN_DURATION) {
       return left(new ServerError())
+    }
+
+    const refreshTokenOrError: Either<Error, RefreshTokenEntity> = RefreshTokenEntity.create(Date.now(), +process.env.REFRESH_TOKEN_DURATION)
+
+    if (refreshTokenOrError.isLeft()) {
+      return left(refreshTokenOrError.value)
     }
 
     const { email, password } = request
@@ -51,11 +62,24 @@ export class SignInUseCase implements ISignInUseCase {
       return left(new UnauthorizedError())
     }
 
-    const accessTokenOrError = this.tokenService.sign({ id: userExists.refreshTokenId }, { subject: email, issuer: host })
+    const accessTokenOrError = this.tokenService.sign(
+      {
+        id: userExists.refreshTokenId
+      },
+      {
+        subject: email,
+        issuer: host
+      }
+    )
 
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value)
     }
+
+    await this.userRepository.updateUserRefreshToken(
+      userExists.refreshTokenId,
+      refreshTokenOrError.value.getExpiresIn()
+    )
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
