@@ -2,16 +2,23 @@
  * Shared
  */
 import { Either, left, right } from '@/shared'
-import { InvalidRefreshTokenDurationError, InvalidRefreshTokenExpirationError } from '@/shared/errors'
+import { InvalidRefreshTokenDurationError, InvalidRefreshTokenExpirationError, InvalidRefreshTokenIdError } from '@/shared/errors'
+import { createUUID, validateUUID } from '@/shared/utils'
 
 export class RefreshTokenEntity {
+  private readonly id: string
   private readonly expiresIn: number
   private readonly duration: number
 
-  private constructor (expiresIn: number, duration: number) {
+  private constructor (id: string, expiresIn: number, duration: number) {
+    this.id = id
     this.expiresIn = expiresIn
     this.duration = duration
     Object.freeze(this)
+  }
+
+  getId (): string {
+    return this.id
   }
 
   getExpiresIn (): number {
@@ -20,6 +27,10 @@ export class RefreshTokenEntity {
 
   getDuration (): number {
     return this.duration
+  }
+
+  private static validateUUID (uuid: string): boolean {
+    return validateUUID(uuid)
   }
 
   private static validateDuration (duration: number): boolean {
@@ -46,7 +57,10 @@ export class RefreshTokenEntity {
     return true
   }
 
-  private static validate (expiresIn: number, duration: number): Either<Error, true> {
+  private static validate (id: string, expiresIn: number, duration: number): Either<Error, true> {
+    if (!RefreshTokenEntity.validateUUID(id)) {
+      return left(new InvalidRefreshTokenIdError(id))
+    }
     if (!RefreshTokenEntity.validateExpiresIn(expiresIn)) {
       return left(new InvalidRefreshTokenExpirationError())
     }
@@ -57,9 +71,10 @@ export class RefreshTokenEntity {
   }
 
   static create (expiresIn: number, duration: number): Either<Error, RefreshTokenEntity> {
-    const either = RefreshTokenEntity.validate(expiresIn, duration)
+    const uuid = createUUID()
+    const either = RefreshTokenEntity.validate(uuid, expiresIn, duration)
     if (either.isRight()) {
-      return right(new RefreshTokenEntity(expiresIn + duration, duration))
+      return right(new RefreshTokenEntity(uuid, expiresIn + duration, duration))
     }
     return left(either.value)
   }
