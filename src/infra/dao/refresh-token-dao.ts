@@ -24,6 +24,19 @@ export class RefreshTokenDao implements IRefreshTokenDao {
     return parsedResponse
   }
 
+  async deleteById (id: string): Promise<RefreshToken> {
+    const statement: string = 'DELETE FROM users_schema.refresh_token WHERE id = $1 RETURNING *'
+
+    const values: any[] = [id]
+
+    const response = await this.dbClientManager.query(statement, values)
+    const parsedResponse: RefreshToken = {
+      id: response.rows[0].id,
+      expiresIn: response.rows[0].expires_in
+    }
+    return parsedResponse
+  }
+
   async updateExpiresIn (refreshTokenId: string, expiresIn: number): Promise<RefreshToken> {
     const statement: string = 'UPDATE users_schema.refresh_token SET expires_in = $1 WHERE id = $2 RETURNING *'
 

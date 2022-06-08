@@ -27,7 +27,13 @@ export class UserRepository implements IUserRepository {
     return await this.userDAO.findUserByEmail(email)
   }
 
-  async updateUserRefreshToken (refreshTokenId: string, expiresIn: number): Promise<void> {
-    await this.refreshTokenDAO.updateExpiresIn(refreshTokenId, expiresIn)
+  async updateUserRefreshToken (oldRefreshTokenId: string, refreshToken: RefreshToken): Promise<User> {
+    /**
+     * The order from the functions called below must not be changed
+     */
+    const createdRefreshTokenResponse = await this.refreshTokenDAO.create(refreshToken)
+    const updatedUserResponse = await this.userDAO.updateRefreshTokenId(oldRefreshTokenId, createdRefreshTokenResponse.id)
+    await this.refreshTokenDAO.deleteById(oldRefreshTokenId)
+    return updatedUserResponse
   }
 }

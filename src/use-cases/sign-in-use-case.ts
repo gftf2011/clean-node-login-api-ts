@@ -12,7 +12,7 @@ import { RefreshTokenEntity } from '@/entities'
 /**
  * Use Cases
  */
-import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository } from '@/use-cases/ports'
+import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository, RefreshTokenDto } from '@/use-cases/ports'
 
 /**
   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -62,9 +62,18 @@ export class SignInUseCase implements ISignInUseCase {
       return left(new UnauthorizedError())
     }
 
+    const refreshToken: RefreshTokenDto = {
+      expiresIn: refreshTokenOrError.value.getExpiresIn()
+    }
+
+    const updatedUser = await this.userRepository.updateUserRefreshToken(
+      userExists.refreshTokenId,
+      refreshToken
+    )
+
     const accessTokenOrError = this.tokenService.sign(
       {
-        id: userExists.refreshTokenId
+        id: updatedUser.refreshTokenId
       },
       {
         subject: email,
@@ -76,14 +85,9 @@ export class SignInUseCase implements ISignInUseCase {
       return left(accessTokenOrError.value)
     }
 
-    await this.userRepository.updateUserRefreshToken(
-      userExists.refreshTokenId,
-      refreshTokenOrError.value.getExpiresIn()
-    )
-
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
-      refreshToken: userExists.refreshTokenId
+      refreshToken: updatedUser.refreshTokenId
     }
 
     return right(authenticatedAccount)

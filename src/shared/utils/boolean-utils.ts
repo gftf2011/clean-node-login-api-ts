@@ -1,5 +1,3 @@
-import { validate } from 'uuid'
-
 const VALID_EMAIL_REGEX: RegExp = /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/
 const PASSWORD_HAS_ANY_SPACE_REGEX: RegExp = /([ ]+)/g
 
@@ -102,8 +100,4 @@ export const isTaxvatSecondDigitValid = (taxvat: string): boolean => {
   }
 
   return +String(validationDigits).charAt(1) === result
-}
-
-export const validateUUID = (uuid: string): boolean => {
-  return validate(uuid)
 }
