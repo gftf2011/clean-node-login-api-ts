@@ -1,0 +1,26 @@
+{
+  "name": "clean-node-login-api-ts-message-broker",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "docker:up": "docker-compose up -d --remove-orphans",
+    "docker:down": "docker-compose down",
+    "docker:clear": "docker-compose down && npm run docker:delete:volumes",
+    "docker:delete:volumes": "docker volume prune -f",
+    "build:docker:dev": "rm -rf docker-compose.yml && cat docker/dev/docker-compose.yml >> docker-compose.yml",
+    "start": "npm run docker:up",
+    "prestart:dev": "npm run docker:clear || true",
+    "start:dev": "npm run build:docker:dev && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gftf2011/clean-node-login-api-ts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
+  },
+  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme"
+}

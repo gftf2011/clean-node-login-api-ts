@@ -1,5 +1,5 @@
 {
-  "name": "clean-node-login-api-ts",
+  "name": "clean-node-login-api-ts-backend",
   "version": "1.0.0",
   "description": "",
   "main": "dist/main/index.js",
