@@ -6,20 +6,23 @@ import { IUserRepository, UserDto as User, RefreshTokenDto as RefreshToken } fro
 /**
  * Infrastructure
  */
-import { IUserDao, IRefreshTokenDao } from '@/infra/contracts'
+import { IUserDao, IRefreshTokenDao, IAccessTokenDao } from '@/infra/contracts'
 
 export class UserRepository implements IUserRepository {
   private readonly userDAO: IUserDao
   private readonly refreshTokenDAO: IRefreshTokenDao
+  private readonly accessTokenDAO: IAccessTokenDao
 
-  constructor (userDAO: IUserDao, refreshTokenDAO: IRefreshTokenDao) {
+  constructor (userDAO: IUserDao, refreshTokenDAO: IRefreshTokenDao, accessTokenDAO: IAccessTokenDao) {
     this.userDAO = userDAO
     this.refreshTokenDAO = refreshTokenDAO
+    this.accessTokenDAO = accessTokenDAO
   }
 
-  async create (user: User, refreshToken: RefreshToken): Promise<User> {
+  async create (user: User, refreshToken: RefreshToken, accessToken: string): Promise<User> {
     const refreshTokenResponse = await this.refreshTokenDAO.create(refreshToken)
-    const userResponse = await this.userDAO.create(user, refreshTokenResponse.id)
+    const accessTokenResponse = await this.accessTokenDAO.create(accessToken)
+    const userResponse = await this.userDAO.create(user, refreshTokenResponse.id, accessTokenResponse.id)
     return userResponse
   }
 

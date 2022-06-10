@@ -21,6 +21,11 @@ psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.refresh_token 
   expires_in BIGINT NOT NULL,
   PRIMARY KEY (id)
 )"
+psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.access_token(
+  id uuid DEFAULT uuid_generate_v4 (),
+  token TEXT NOT NULL,
+  PRIMARY KEY (id)
+)"
 psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS emails_schema.email_blacklist(
   id uuid DEFAULT uuid_generate_v4 (),
   domain VARCHAR(255) UNIQUE NOT NULL,
@@ -64,7 +69,9 @@ psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   email VARCHAR (255) UNIQUE NOT NULL,
   password VARCHAR (256) NOT NULL,
   refresh_token_id uuid DEFAULT NULL,
+  access_token_id uuid DEFAULT NULL,
   PRIMARY KEY (id),
+  FOREIGN KEY (access_token_id) REFERENCES users_schema.access_token(id),
   FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id),
   CONSTRAINT users_name_check CHECK (LENGTH(CAST(name AS TEXT)) > 1),
   CONSTRAINT users_lastname_check CHECK (LENGTH(CAST(lastname AS TEXT)) > 1),

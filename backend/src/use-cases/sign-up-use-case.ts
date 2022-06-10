@@ -83,12 +83,21 @@ export class SignUpUseCase implements ISignUpUseCase {
       expiresIn: refreshTokenOrError.value.getExpiresIn()
     }
 
-    const { refreshTokenId } = await this.userRepository.create(user, refreshToken)
-    const accessTokenOrError = this.tokenService.sign({ id: refreshTokenId }, { subject: email, issuer: host })
+    const accessTokenOrError = this.tokenService.sign(
+      {
+        id: this.encryptService.encode(userOrError.value.getTaxvat())
+      },
+      {
+        subject: email,
+        issuer: host
+      }
+    )
 
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value)
     }
+
+    const { refreshTokenId } = await this.userRepository.create(user, refreshToken, accessTokenOrError.value)
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,

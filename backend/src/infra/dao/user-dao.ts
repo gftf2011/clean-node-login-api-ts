@@ -11,10 +11,10 @@ import { IUserDao, DbClientManager } from '@/infra/contracts'
 export class UserDao implements IUserDao {
   constructor (private readonly dbClientManager: DbClientManager) {}
 
-  async create (user: User, refreshTokenId: string): Promise<User> {
-    const statement: string = 'INSERT INTO users_schema.users(name, lastname, taxvat, email, password, refresh_token_id) VALUES($1, $2, $3, $4, $5, $6) RETURNING *'
+  async create (user: User, refreshTokenId: string, accessTokenId: string): Promise<User> {
+    const statement: string = 'INSERT INTO users_schema.users(name, lastname, taxvat, email, password, access_token_id, refresh_token_id) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *'
 
-    const values: any[] = [user.name, user.lastname, user.taxvat, user.email, user.password, refreshTokenId]
+    const values: any[] = [user.name, user.lastname, user.taxvat, user.email, user.password, accessTokenId, refreshTokenId]
 
     const response = await this.dbClientManager.query(statement, values)
     const parsedResponse: User = {
