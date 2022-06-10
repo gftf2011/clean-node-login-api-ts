@@ -1,0 +1,25 @@
+{
+  "name": "clean-node-login-api-ts-backend",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+      "backend",
+      "message-broker",
+      "micro-services"
+  ],
+  "scripts": {
+    "start:dev:backend": "npm run start:dev --workspace=backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gftf2011/clean-node-login-api-ts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
+  },
+  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme"
+}
+  
