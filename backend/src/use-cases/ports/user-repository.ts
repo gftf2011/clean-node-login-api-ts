@@ -7,4 +7,5 @@ export interface IUserRepository {
   create: (user: User, refreshToken: RefreshToken, accessToken: string) => Promise<User>
   findUserByEmail: (email: string) => Promise<User>
   updateUserRefreshToken: (oldRefreshTokenId: string, refreshToken: RefreshToken) => Promise<User>
+  updateUserAccessToken: (oldAccessTokenId: string, newAccessToken: string) => Promise<User>
 }

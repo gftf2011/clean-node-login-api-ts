@@ -24,6 +24,7 @@ export class UserDao implements IUserDao {
       name: response.rows[0].name,
       password: response.rows[0].password,
       taxvat: response.rows[0].taxvat,
+      accessTokenId: response.rows[0].access_token_id,
       refreshTokenId: response.rows[0].refresh_token_id
     }
     return parsedResponse
@@ -43,6 +44,7 @@ export class UserDao implements IUserDao {
           name: response.rows[0].name,
           password: response.rows[0].password,
           taxvat: response.rows[0].taxvat,
+          accessTokenId: response.rows[0].access_token_id,
           refreshTokenId: response.rows[0].refresh_token_id
         }
       : undefined
@@ -62,6 +64,26 @@ export class UserDao implements IUserDao {
       name: response.rows[0].name,
       password: response.rows[0].password,
       taxvat: response.rows[0].taxvat,
+      accessTokenId: response.rows[0].access_token_id,
+      refreshTokenId: response.rows[0].refresh_token_id
+    }
+    return parsedResponse
+  }
+
+  async updateAccessTokenId (oldAccessTokenId: string, newAccessTokenId: string): Promise<User> {
+    const statement: string = 'UPDATE users_schema.users SET access_token_id = $1 WHERE access_token_id = $2 RETURNING *'
+
+    const values: any[] = [newAccessTokenId, oldAccessTokenId]
+
+    const response = await this.dbClientManager.query(statement, values)
+    const parsedResponse: User = {
+      id: response.rows[0].id,
+      email: response.rows[0].email,
+      lastname: response.rows[0].lastname,
+      name: response.rows[0].name,
+      password: response.rows[0].password,
+      taxvat: response.rows[0].taxvat,
+      accessTokenId: response.rows[0].access_token_id,
       refreshTokenId: response.rows[0].refresh_token_id
     }
     return parsedResponse

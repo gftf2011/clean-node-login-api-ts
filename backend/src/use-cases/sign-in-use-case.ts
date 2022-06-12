@@ -53,9 +53,13 @@ export class SignInUseCase implements ISignInUseCase {
     const decryptedTaxvat = this.encryptService.decode(userExists.taxvat)
     const customSalt = `${email}${decryptedTaxvat}`
     const defaultSalt = process.env.CODE_SALT
-    // encrypt password with user custom salt hash value
+    /**
+     * encrypt password with user custom salt hash value
+     */
     const hashedPassword = this.hashService.encode(password, customSalt)
-    // encrypt encrypted password with code default salt hash value
+    /**
+     * encrypt encrypted password with code default salt hash value
+     */
     const strongHashedPassword = this.hashService.encode(hashedPassword, defaultSalt)
 
     if (strongHashedPassword !== userExists.password) {
@@ -66,14 +70,9 @@ export class SignInUseCase implements ISignInUseCase {
       expiresIn: refreshTokenOrError.value.getExpiresIn()
     }
 
-    const updatedUser = await this.userRepository.updateUserRefreshToken(
-      userExists.refreshTokenId,
-      refreshToken
-    )
-
     const accessTokenOrError = this.tokenService.sign(
       {
-        id: updatedUser.refreshTokenId
+        id: this.encryptService.encode(userExists.email)
       },
       {
         subject: email,
@@ -84,6 +83,16 @@ export class SignInUseCase implements ISignInUseCase {
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value)
     }
+
+    let updatedUser = await this.userRepository.updateUserRefreshToken(
+      userExists.refreshTokenId,
+      refreshToken
+    )
+
+    updatedUser = await this.userRepository.updateUserAccessToken(
+      userExists.accessTokenId,
+      accessTokenOrError.value
+    )
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,

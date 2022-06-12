@@ -67,9 +67,13 @@ export class SignUpUseCase implements ISignUpUseCase {
 
     const customSalt = `${userOrError.value.getEmail()}${userOrError.value.getTaxvat()}`
     const defaultSalt = process.env.CODE_SALT
-    // encrypt password with user custom salt hash value
+    /**
+     * encrypt password with user custom salt hash value
+     */
     const hashedPassword = this.hashService.encode(password, customSalt)
-    // encrypt encrypted password with code default salt hash value
+    /**
+     * encrypt encrypted password with code default salt hash value
+     */
     const strongHashedPassword = this.hashService.encode(hashedPassword, defaultSalt)
 
     const user: UserDto = {
@@ -83,9 +87,13 @@ export class SignUpUseCase implements ISignUpUseCase {
       expiresIn: refreshTokenOrError.value.getExpiresIn()
     }
 
+    /**
+     * To generate an unique id the email, that is already unique for every user,
+     * will be encrypted to generate a hash to sign the access token
+     */
     const accessTokenOrError = this.tokenService.sign(
       {
-        id: this.encryptService.encode(userOrError.value.getTaxvat())
+        id: this.encryptService.encode(userOrError.value.getEmail())
       },
       {
         subject: email,

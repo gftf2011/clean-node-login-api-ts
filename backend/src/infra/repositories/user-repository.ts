@@ -39,4 +39,14 @@ export class UserRepository implements IUserRepository {
     await this.refreshTokenDAO.deleteById(oldRefreshTokenId)
     return updatedUserResponse
   }
+
+  async updateUserAccessToken (oldAccessTokenId: string, newAccessToken: string): Promise<User> {
+    /**
+     * The order from the functions called below must not be changed
+     */
+    const createdAccessTokenResponse = await this.accessTokenDAO.create(newAccessToken)
+    const updatedUserResponse = await this.userDAO.updateAccessTokenId(oldAccessTokenId, createdAccessTokenResponse.id)
+    await this.accessTokenDAO.deleteById(oldAccessTokenId)
+    return updatedUserResponse
+  }
 }
