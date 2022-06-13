@@ -27,7 +27,7 @@ export class SignInUseCase implements ISignInUseCase {
    * @param {string} host - the application host
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-in
    */
-  async perform (request: AccountDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
+  async perform (request: AccountDto, host: string, subject: string): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
       !process.env.CODE_SALT &&
       !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
@@ -74,7 +74,7 @@ export class SignInUseCase implements ISignInUseCase {
         email: this.encryptService.encode(userExists.email)
       },
       {
-        subject: email,
+        subject,
         issuer: host,
         jwtId: accessTokenId
       },
@@ -85,7 +85,7 @@ export class SignInUseCase implements ISignInUseCase {
         id: userExists.id
       },
       {
-        subject: email,
+        subject,
         issuer: host,
         jwtId: refreshTokenId
       },

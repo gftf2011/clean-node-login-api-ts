@@ -15,6 +15,7 @@ import { badRequest, serverError, unauthorized, forbidden } from '@/presentation
   * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
   */
 export abstract class WebController implements Controller {
+  public id: string = ''
   public requiredParams: string[] = []
   public requiredHeaderParams: string[] = []
 
