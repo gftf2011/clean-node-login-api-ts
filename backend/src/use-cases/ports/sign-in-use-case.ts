@@ -9,5 +9,5 @@ import { AuthenticatedAccountDto, AccountDto } from '@/use-cases/ports'
 import { Either } from '@/shared/either'
 
 export interface ISignInUseCase {
-  perform: (request: AccountDto, host: string, subject: string) => Promise<Either<Error, AuthenticatedAccountDto>>
+  perform: (request: AccountDto, host: string) => Promise<Either<Error, AuthenticatedAccountDto>>
 }

@@ -27,13 +27,14 @@ export class SignInUseCase implements ISignInUseCase {
    * @param {string} host - the application host
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-in
    */
-  async perform (request: AccountDto, host: string, subject: string): Promise<Either<Error, AuthenticatedAccountDto>> {
+  async perform (request: AccountDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
       !process.env.CODE_SALT &&
       !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
       !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
       !process.env.JWT_ACCESS_TOKEN_ID &&
-      !process.env.JWT_REFRESH_TOKEN_ID
+      !process.env.JWT_REFRESH_TOKEN_ID &&
+      !process.env.APP_SECRET
     ) {
       return left(new ServerError())
     }
@@ -68,35 +69,34 @@ export class SignInUseCase implements ISignInUseCase {
     const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN
     const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
 
-    const accessTokenOrError = this.tokenService.sign(
-      {
-        id: userExists.id,
-        email: this.encryptService.encode(userExists.email)
-      },
-      {
-        subject,
-        issuer: host,
-        jwtId: accessTokenId
-      },
-      accessTokenExpiresIn
-    )
     const refreshTokenOrError = this.tokenService.sign(
       {
         id: userExists.id
       },
       {
-        subject,
+        subject: process.env.APP_SECRET,
         issuer: host,
         jwtId: refreshTokenId
       },
       refreshTokenExpiresIn
     )
+    const accessTokenOrError = this.tokenService.sign(
+      {
+        email: this.encryptService.encode(userExists.email)
+      },
+      {
+        subject: userExists.id,
+        issuer: host,
+        jwtId: accessTokenId
+      },
+      accessTokenExpiresIn
+    )
 
-    if (accessTokenOrError.isLeft()) {
-      return left(accessTokenOrError.value)
-    }
     if (refreshTokenOrError.isLeft()) {
       return left(refreshTokenOrError.value)
+    }
+    if (accessTokenOrError.isLeft()) {
+      return left(accessTokenOrError.value)
     }
 
     const authenticatedAccount: AuthenticatedAccountDto = {

@@ -19,12 +19,6 @@ export class SignInController extends WebController {
   private readonly signInUseCase: ISignInUseCase
 
   /**
-   * @desc values overrides - id.
-   * This field is an uuid which represents the sign in operation, inside the application
-   */
-  public override id: string = '46f76d05-3cc0-4aaa-ab41-4b0697ab028c'
-
-  /**
    * @desc values overrides - ['host']
    */
   public override requiredHeaderParams: string[] = ['host']
@@ -44,7 +38,7 @@ export class SignInController extends WebController {
    * @returns {Promise<HttpResponse>} data output after sign-in operation
    */
   public async perform (request: HttpRequest): Promise<HttpResponse> {
-    const response = await this.signInUseCase.perform(request.body, request.headers.host, this.id)
+    const response = await this.signInUseCase.perform(request.body, request.headers.host)
 
     if (response.isLeft()) {
       throw response.value

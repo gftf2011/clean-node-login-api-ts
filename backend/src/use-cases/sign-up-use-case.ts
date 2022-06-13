@@ -47,7 +47,8 @@ export class SignUpUseCase implements ISignUpUseCase {
       !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
       !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
       !process.env.JWT_ACCESS_TOKEN_ID &&
-      !process.env.JWT_REFRESH_TOKEN_ID
+      !process.env.JWT_REFRESH_TOKEN_ID &&
+      !process.env.APP_SECRET
     ) {
       return left(new ServerError())
     }
@@ -93,35 +94,34 @@ export class SignUpUseCase implements ISignUpUseCase {
 
     const userCreated = await this.userRepository.create(user)
 
-    const accessTokenOrError = this.tokenService.sign(
-      {
-        id: userCreated.id,
-        email: this.encryptService.encode(userCreated.email)
-      },
-      {
-        subject: email,
-        issuer: host,
-        jwtId: accessTokenId
-      },
-      accessTokenExpiresIn
-    )
     const refreshTokenOrError = this.tokenService.sign(
       {
         id: userCreated.id
       },
       {
-        subject: email,
+        subject: process.env.APP_SECRET,
         issuer: host,
         jwtId: refreshTokenId
       },
       refreshTokenExpiresIn
     )
+    const accessTokenOrError = this.tokenService.sign(
+      {
+        email: this.encryptService.encode(userCreated.email)
+      },
+      {
+        subject: userCreated.id,
+        issuer: host,
+        jwtId: accessTokenId
+      },
+      accessTokenExpiresIn
+    )
 
-    if (accessTokenOrError.isLeft()) {
-      return left(accessTokenOrError.value)
-    }
     if (refreshTokenOrError.isLeft()) {
       return left(refreshTokenOrError.value)
+    }
+    if (accessTokenOrError.isLeft()) {
+      return left(accessTokenOrError.value)
     }
 
     const authenticatedAccount: AuthenticatedAccountDto = {
