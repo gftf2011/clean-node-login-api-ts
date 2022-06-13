@@ -19,7 +19,7 @@ interface CustomJwtPayload extends jwt.JwtPayload {
 }
 
 export class JwtTokenService implements ITokenService {
-  sign <T>(payload: T, options: TokenOptions, expirationTime: number, jwtId: string): Either<Error, string> {
+  sign <T>(payload: T, options: TokenOptions, expirationTime: number): Either<Error, string> {
     if (!JWT_SECRET || !JWT_ALGORITHM) {
       return left(new ServerError())
     }
@@ -29,7 +29,8 @@ export class JwtTokenService implements ITokenService {
      */
     const registeredClaims = {
       subject: options.subject,
-      issuer: options.issuer
+      issuer: options.issuer,
+      jwtId: options.jwtId
     }
 
     const jsonWebToken: string = jwt.sign({ data: payload }, JWT_SECRET, {
@@ -40,30 +41,32 @@ export class JwtTokenService implements ITokenService {
       },
       subject: registeredClaims.subject,
       issuer: registeredClaims.issuer,
-      jwtid: jwtId
+      jwtid: registeredClaims.jwtId
     })
 
     return right(`${jsonWebToken}`)
   }
 
-  verify <T>(token: string, options: TokenOptions): Either<Error, T> {
+  verify (token: string, options: TokenOptions): Either<Error, CustomJwtPayload> {
     if (!JWT_SECRET || !JWT_ALGORITHM) {
       return left(new ServerError())
     }
 
     const registeredClaims = {
       subject: options.subject,
-      issuer: options.issuer
+      issuer: options.issuer,
+      jwtId: options.jwtId
     }
 
     try {
-      const { data } = jwt.verify(token, JWT_SECRET, {
+      const response = jwt.verify(token, JWT_SECRET, {
         algorithms: [JWT_ALGORITHM],
         subject: registeredClaims.subject,
-        issuer: registeredClaims.issuer
+        issuer: registeredClaims.issuer,
+        jwtid: registeredClaims.jwtId
       }) as CustomJwtPayload
 
-      return right(data as T)
+      return right(response)
     } catch (error) {
       return left(new UnauthorizedError())
     }

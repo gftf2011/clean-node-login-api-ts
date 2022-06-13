@@ -75,10 +75,10 @@ export class SignInUseCase implements ISignInUseCase {
       },
       {
         subject: email,
-        issuer: host
+        issuer: host,
+        jwtId: accessTokenId
       },
-      accessTokenExpiresIn,
-      accessTokenId
+      accessTokenExpiresIn
     )
     const refreshTokenOrError = this.tokenService.sign(
       {
@@ -86,10 +86,10 @@ export class SignInUseCase implements ISignInUseCase {
       },
       {
         subject: email,
-        issuer: host
+        issuer: host,
+        jwtId: refreshTokenId
       },
-      refreshTokenExpiresIn,
-      refreshTokenId
+      refreshTokenExpiresIn
     )
 
     if (accessTokenOrError.isLeft()) {
