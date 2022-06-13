@@ -14,7 +14,7 @@ import { SignInController } from '@/presentation/controllers'
   */
 import { CryptoHashService, CryptoEncryptService, JwtTokenService } from '@/infra/services'
 import { UserRepository } from '@/infra/repositories'
-import { UserDao, RefreshTokenDao, AccessTokenDao } from '@/infra/dao'
+import { UserDao } from '@/infra/dao'
 import { PostgresDbClientManager, PostgresDbClientPool } from '@/infra/db'
 import { DbTransactionDecorator } from '@/infra/db/helpers/decorators/db-transaction-decorator'
 
@@ -24,10 +24,8 @@ export const makeSignInController = (): Controller => {
   const postgresClientManager = new PostgresDbClientManager(postgresPool)
 
   const userDao = new UserDao(postgresClientManager)
-  const refreshTokenDao = new RefreshTokenDao(postgresClientManager)
-  const accessTokenDao = new AccessTokenDao(postgresClientManager)
 
-  const userRepository = new UserRepository(userDao, refreshTokenDao, accessTokenDao)
+  const userRepository = new UserRepository(userDao)
 
   const cryptoEncryptService = new CryptoEncryptService()
   const cryptoHashService = new CryptoHashService()

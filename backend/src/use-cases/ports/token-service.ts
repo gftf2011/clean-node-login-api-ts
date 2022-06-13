@@ -9,6 +9,6 @@ export interface TokenOptions {
 }
 
 export interface ITokenService {
-  sign: <T>(payload: T, options: TokenOptions) => Either<Error, string>
+  sign: <T>(payload: T, options: TokenOptions, expirationTime: number, jwtId: string) => Either<Error, string>
   verify: <T>(token: string, options: TokenOptions) => Either<Error, T>
 }

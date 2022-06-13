@@ -7,7 +7,7 @@ import { UserAlreadyExistsError, ServerError } from '@/shared/errors'
 /**
  * Entites
  */
-import { UserEntity, RefreshTokenEntity } from '@/entities'
+import { UserEntity } from '@/entities'
 
 /**
  * Use Cases
@@ -15,7 +15,6 @@ import { UserEntity, RefreshTokenEntity } from '@/entities'
 import {
   IUserRepository,
   UserDto,
-  RefreshTokenDto,
   BasicUserDto,
   ISignUpUseCase,
   IHashService,
@@ -43,20 +42,22 @@ export class SignUpUseCase implements ISignUpUseCase {
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-up
    */
   async perform (request: BasicUserDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
-    if (!process.env.CODE_SALT && !process.env.REFRESH_TOKEN_DURATION) {
+    if (
+      !process.env.CODE_SALT &&
+      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
+      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
+      !process.env.JWT_ACCESS_TOKEN_ID &&
+      !process.env.JWT_REFRESH_TOKEN_ID
+    ) {
       return left(new ServerError())
     }
 
     const { email, password, lastname, name, taxvat } = request
 
     const userOrError: Either<Error, UserEntity> = UserEntity.create(name, lastname, taxvat, email, password)
-    const refreshTokenOrError: Either<Error, RefreshTokenEntity> = RefreshTokenEntity.create(Date.now(), +process.env.REFRESH_TOKEN_DURATION)
 
     if (userOrError.isLeft()) {
       return left(userOrError.value)
-    }
-    if (refreshTokenOrError.isLeft()) {
-      return left(refreshTokenOrError.value)
     }
 
     const userExists = await this.userRepository.findUserByEmail(userOrError.value.getEmail())
@@ -83,33 +84,49 @@ export class SignUpUseCase implements ISignUpUseCase {
       taxvat: this.encryptService.encode(userOrError.value.getTaxvat()),
       password: strongHashedPassword
     }
-    const refreshToken: RefreshTokenDto = {
-      expiresIn: refreshTokenOrError.value.getExpiresIn()
-    }
 
-    /**
-     * To generate an unique id the email, that is already unique for every user,
-     * will be encrypted to generate a hash to sign the access token
-     */
+    const accessTokenId = process.env.JWT_ACCESS_TOKEN_ID
+    const refreshTokenId = process.env.JWT_REFRESH_TOKEN_ID
+
+    const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN
+    const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
+
+    const userCreated = await this.userRepository.create(user)
+
     const accessTokenOrError = this.tokenService.sign(
       {
-        id: this.encryptService.encode(userOrError.value.getEmail())
+        id: userCreated.id,
+        email: this.encryptService.encode(userCreated.email)
       },
       {
         subject: email,
         issuer: host
-      }
+      },
+      accessTokenExpiresIn,
+      accessTokenId
+    )
+    const refreshTokenOrError = this.tokenService.sign(
+      {
+        id: userCreated.id
+      },
+      {
+        subject: email,
+        issuer: host
+      },
+      refreshTokenExpiresIn,
+      refreshTokenId
     )
 
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value)
     }
-
-    const { refreshTokenId } = await this.userRepository.create(user, refreshToken, accessTokenOrError.value)
+    if (refreshTokenOrError.isLeft()) {
+      return left(refreshTokenOrError.value)
+    }
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
-      refreshToken: refreshTokenId
+      refreshToken: refreshTokenOrError.value
     }
 
     return right(authenticatedAccount)

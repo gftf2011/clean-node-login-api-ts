@@ -5,8 +5,6 @@ export interface UserDto {
   taxvat: string
   email: string
   password: string
-  accessTokenId?: string
-  refreshTokenId?: string
 }
 
-export type BasicUserDto = Omit<Omit<Omit<UserDto, 'accessTokenId'>, 'refreshTokenId'>, 'id'>
+export type BasicUserDto = Omit<UserDto, 'id'>

@@ -5,14 +5,9 @@ import { Either, left, right } from '@/shared'
 import { ServerError, UnauthorizedError } from '@/shared/errors'
 
 /**
- * Entites
- */
-import { RefreshTokenEntity } from '@/entities'
-
-/**
  * Use Cases
  */
-import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository, RefreshTokenDto } from '@/use-cases/ports'
+import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository } from '@/use-cases/ports'
 
 /**
   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -33,17 +28,18 @@ export class SignInUseCase implements ISignInUseCase {
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-in
    */
   async perform (request: AccountDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
-    if (!process.env.CODE_SALT && !process.env.REFRESH_TOKEN_DURATION) {
+    if (
+      !process.env.CODE_SALT &&
+      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
+      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
+      !process.env.JWT_ACCESS_TOKEN_ID &&
+      !process.env.JWT_REFRESH_TOKEN_ID
+    ) {
       return left(new ServerError())
     }
 
-    const refreshTokenOrError: Either<Error, RefreshTokenEntity> = RefreshTokenEntity.create(Date.now(), +process.env.REFRESH_TOKEN_DURATION)
-
-    if (refreshTokenOrError.isLeft()) {
-      return left(refreshTokenOrError.value)
-    }
-
     const { email, password } = request
+
     const userExists = await this.userRepository.findUserByEmail(email)
 
     if (!userExists) {
@@ -66,37 +62,46 @@ export class SignInUseCase implements ISignInUseCase {
       return left(new UnauthorizedError())
     }
 
-    const refreshToken: RefreshTokenDto = {
-      expiresIn: refreshTokenOrError.value.getExpiresIn()
-    }
+    const accessTokenId = process.env.JWT_ACCESS_TOKEN_ID
+    const refreshTokenId = process.env.JWT_REFRESH_TOKEN_ID
+
+    const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN
+    const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
 
     const accessTokenOrError = this.tokenService.sign(
       {
-        id: this.encryptService.encode(userExists.email)
+        id: userExists.id,
+        email: this.encryptService.encode(userExists.email)
       },
       {
         subject: email,
         issuer: host
-      }
+      },
+      accessTokenExpiresIn,
+      accessTokenId
+    )
+    const refreshTokenOrError = this.tokenService.sign(
+      {
+        id: userExists.id
+      },
+      {
+        subject: email,
+        issuer: host
+      },
+      refreshTokenExpiresIn,
+      refreshTokenId
     )
 
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value)
     }
-
-    let updatedUser = await this.userRepository.updateUserRefreshToken(
-      userExists.refreshTokenId,
-      refreshToken
-    )
-
-    updatedUser = await this.userRepository.updateUserAccessToken(
-      userExists.accessTokenId,
-      accessTokenOrError.value
-    )
+    if (refreshTokenOrError.isLeft()) {
+      return left(refreshTokenOrError.value)
+    }
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
-      refreshToken: updatedUser.refreshTokenId
+      refreshToken: refreshTokenOrError.value
     }
 
     return right(authenticatedAccount)

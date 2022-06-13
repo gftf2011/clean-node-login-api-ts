@@ -16,16 +16,6 @@ psql $POSTGRES_DEV_DB -c "CREATE SCHEMA IF NOT EXISTS users_schema AUTHORIZATION
 psql $POSTGRES_DEV_DB -c "CREATE SCHEMA IF NOT EXISTS emails_schema AUTHORIZATION $POSTGRES_DEV_USER"
 
 # Create Tables
-psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.refresh_token (
-  id uuid DEFAULT uuid_generate_v4 (),
-  expires_in BIGINT NOT NULL,
-  PRIMARY KEY (id)
-)"
-psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.access_token(
-  id uuid DEFAULT uuid_generate_v4 (),
-  token TEXT NOT NULL,
-  PRIMARY KEY (id)
-)"
 psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS emails_schema.email_blacklist(
   id uuid DEFAULT uuid_generate_v4 (),
   domain VARCHAR(255) UNIQUE NOT NULL,
@@ -68,11 +58,7 @@ psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   lastname VARCHAR (255) NOT NULL,
   email VARCHAR (255) UNIQUE NOT NULL,
   password VARCHAR (256) NOT NULL,
-  refresh_token_id uuid DEFAULT NULL,
-  access_token_id uuid DEFAULT NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (access_token_id) REFERENCES users_schema.access_token(id),
-  FOREIGN KEY (refresh_token_id) REFERENCES users_schema.refresh_token(id),
   CONSTRAINT users_name_check CHECK (LENGTH(CAST(name AS TEXT)) > 1),
   CONSTRAINT users_lastname_check CHECK (LENGTH(CAST(lastname AS TEXT)) > 1),
   CONSTRAINT users_email_check CHECK (
@@ -93,7 +79,7 @@ psql $POSTGRES_DB -c "GRANT CONNECT ON DATABASE $POSTGRES_DEV_DB TO $POSTGRES_DE
 
 psql $POSTGRES_DEV_DB -c "GRANT USAGE ON SCHEMA users_schema TO $POSTGRES_DEV_USER"
 psql $POSTGRES_DEV_DB -c "GRANT USAGE ON SCHEMA emails_schema TO $POSTGRES_DEV_USER"
-psql $POSTGRES_DEV_DB -c "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA users_schema TO $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA users_schema TO $POSTGRES_DEV_USER"
 psql $POSTGRES_DEV_DB -c "GRANT SELECT ON ALL TABLES IN SCHEMA emails_schema TO $POSTGRES_DEV_USER"
 
 psql $POSTGRES_DEV_DB -c "GRANT EXECUTE ON FUNCTION is_user_email_domain_valid(VARCHAR) TO $POSTGRES_DEV_USER"
@@ -105,6 +91,4 @@ psql $POSTGRES_DEV_DB -c "ALTER SCHEMA users_schema OWNER TO $POSTGRES_DEV_USER"
 psql $POSTGRES_DEV_DB -c "ALTER SCHEMA emails_schema OWNER TO $POSTGRES_DEV_USER"
 
 psql $POSTGRES_DEV_DB -c "ALTER TABLE users_schema.users OWNER TO $POSTGRES_DEV_USER"
-psql $POSTGRES_DEV_DB -c "ALTER TABLE users_schema.refresh_token OWNER TO $POSTGRES_DEV_USER"
 psql $POSTGRES_DEV_DB -c "ALTER TABLE emails_schema.email_blacklist OWNER TO $POSTGRES_DEV_USER"
-
