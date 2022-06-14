@@ -1,5 +1,5 @@
 /**
- * Infrastructure
+ * Infra
  */
 import { DbClient, DbClientManager, DbClientPool } from '@/infra/contracts'
 

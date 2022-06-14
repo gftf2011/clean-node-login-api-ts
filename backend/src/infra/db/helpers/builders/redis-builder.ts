@@ -4,7 +4,7 @@
 import redis from 'redis'
 
 /**
- * Entities
+ * Infra
  */
 import { IDbClientBuilder } from '@/infra/contracts'
 

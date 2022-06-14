@@ -4,11 +4,16 @@
 import { Pool } from 'pg'
 
 /**
- * Infrastructure
+ * Infra
  */
 import { DbClient, DbClientPool } from '@/infra/contracts'
 import { PgClientBuilder } from '@/infra/db/helpers/builders/pg-builder'
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Garantees that only one instance from the object will exists in project
+ * It uses the {@link https://refactoring.guru/pt-br/design-patterns/singleton Singleton} design pattern
+ */
 export class PostgresDbClientPool implements DbClientPool {
   private static pool: Pool
   private static instance: PostgresDbClientPool

@@ -3,12 +3,21 @@
   "version": "1.0.0",
   "description": "",
   "workspaces": [
-      "backend",
-      "message-broker",
-      "micro-services"
+    "backend",
+    "micro-services"
   ],
   "scripts": {
-    "start:dev:backend": "npm run start:dev --workspace=backend"
+    "docker:up": "docker-compose up -d --remove-orphans",
+    "docker:down": "docker-compose down",
+    "docker:clear": "docker-compose down && npm run docker:delete:volumes",
+    "docker:delete:volumes": "docker volume prune -f",
+    "build:docker:dev": "rm -rf docker-compose.yml && cat docker/dev/docker-compose.yml >> docker-compose.yml",
+    "build:script:dev": "chmod +x ./scripts/dev/postgres/init.sh",
+    "prerun:docker:dev": "npm run docker:clear || true",
+    "run:docker:dev": "npm run build:script:dev && npm run build:docker:dev",
+    "postrun:docker:dev": "npm run docker:up",
+    "prestart:dev:backend": "npm run run:docker:dev",
+    "start:dev:backend": "npm run start:dev --workspace=backend && node backend/dist/main/index.js"
   },
   "repository": {
     "type": "git",

@@ -1,9 +1,7 @@
-export interface IDbClientBuilder {
+export interface IQueueBuilder {
   setHost: (host: string) => void
   setPort: (port: string) => void
   setUser: (user: string) => void
   setPass: (pass: string) => void
-  setDb: (db: string) => void
-  setMax: (max: string) => void
-  build: () => any
+  build: () => Promise<any>
 }

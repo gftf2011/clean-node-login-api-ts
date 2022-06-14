@@ -1,13 +1,14 @@
 /**
  * Shared
  */
+
 import { Either, left, right } from '@/shared'
 import { ServerError, UnauthorizedError } from '@/shared/errors'
 
 /**
  * Use Cases
  */
-import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository } from '@/use-cases/ports'
+import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository, QueuePublishManager } from '@/use-cases/ports'
 
 /**
   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -18,7 +19,8 @@ export class SignInUseCase implements ISignInUseCase {
     private readonly userRepository: IUserRepository,
     private readonly encryptService: IEncryptService,
     private readonly hashService: IHashService,
-    private readonly tokenService: ITokenService
+    private readonly tokenService: ITokenService,
+    private readonly queueManager: QueuePublishManager
   ) {}
 
   /**
@@ -98,6 +100,8 @@ export class SignInUseCase implements ISignInUseCase {
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value)
     }
+
+    await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userExists))
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,

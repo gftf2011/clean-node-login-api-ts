@@ -20,7 +20,8 @@ import {
   IHashService,
   IEncryptService,
   ITokenService,
-  AuthenticatedAccountDto
+  AuthenticatedAccountDto,
+  QueuePublishManager
 } from '@/use-cases/ports'
 
 /**
@@ -32,7 +33,8 @@ export class SignUpUseCase implements ISignUpUseCase {
     private readonly userRepository: IUserRepository,
     private readonly hashService: IHashService,
     private readonly encryptService: IEncryptService,
-    private readonly tokenService: ITokenService
+    private readonly tokenService: ITokenService,
+    private readonly queueManager: QueuePublishManager
   ) {}
 
   /**
@@ -123,6 +125,8 @@ export class SignUpUseCase implements ISignUpUseCase {
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value)
     }
+
+    await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userCreated))
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,

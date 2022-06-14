@@ -1,15 +1,15 @@
 /**
  * Driver
  */
-import { Pool } from 'pg'
+import { Connection, connect } from 'amqplib'
 
 /**
- * Infra
+ * Entities
  */
-import { IDbClientBuilder } from '@/infra/contracts'
+import { IQueueBuilder } from '@/infra/contracts'
 
-export class PgClientBuilder implements IDbClientBuilder {
-  private product: Pool
+export class RabbitmqQueueBuilder implements IQueueBuilder {
+  private product: Connection
 
   private host?: string
 
@@ -18,10 +18,6 @@ export class PgClientBuilder implements IDbClientBuilder {
   private user?: string
 
   private pass?: string
-
-  private db?: string
-
-  private max?: number
 
   public constructor () {
     this.reset()
@@ -47,23 +43,8 @@ export class PgClientBuilder implements IDbClientBuilder {
     this.pass = pass
   }
 
-  public setDb (db: string): void {
-    this.db = db
-  }
-
-  public setMax (max: string): void {
-    this.max = +max
-  }
-
-  public build (): Pool {
-    this.product = new Pool({
-      host: this.host,
-      port: this.port,
-      user: this.user,
-      password: this.pass,
-      database: this.db,
-      max: this.max
-    })
+  public async build (): Promise<Connection> {
+    this.product = await connect(`amqp://${this.user}:${this.pass}@${this.host}:${this.port}`)
     const result = this.product
     this.reset()
     return result

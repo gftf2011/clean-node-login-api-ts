@@ -17,8 +17,12 @@ import { UserRepository } from '@/infra/repositories'
 import { UserDao } from '@/infra/dao'
 import { PostgresDbClientManager, PostgresDbClientPool } from '@/infra/db'
 import { DbTransactionDecorator } from '@/infra/db/helpers/decorators/db-transaction-decorator'
+import { RabbitmqQueueConnection, RabbitmqQueuePublishManager } from '@/infra/queue'
 
 export const makeSignUpController = (): Controller => {
+  const queue = RabbitmqQueueConnection.getInstance()
+  const queueManager = new RabbitmqQueuePublishManager(queue)
+  
   const postgresPool = PostgresDbClientPool.getInstance()
 
   const postgresClientManager = new PostgresDbClientManager(postgresPool)
@@ -31,7 +35,7 @@ export const makeSignUpController = (): Controller => {
   const cryptoHashService = new CryptoHashService()
   const jwtTokenService = new JwtTokenService()
 
-  const signUpUseCase = new SignUpUseCase(userRepository, cryptoHashService, cryptoEncryptService, jwtTokenService)
+  const signUpUseCase = new SignUpUseCase(userRepository, cryptoHashService, cryptoEncryptService, jwtTokenService, queueManager)
 
   const signUpController = new SignUpController(signUpUseCase)
 
