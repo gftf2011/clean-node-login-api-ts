@@ -47,12 +47,13 @@ export class RabbitmqQueueConnection implements QueueConnection {
           channel.sendToQueue(queue, content)
         }
       }
-
-      RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
     }
   }
 
   public static getInstance (): RabbitmqQueueConnection {
+    if (!RabbitmqQueueConnection.instance) {
+      RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
+    }
     return RabbitmqQueueConnection.instance
   }
 
