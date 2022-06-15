@@ -19,28 +19,28 @@ export class PgClientBuilder implements IDbClientBuilder {
     this.product = {}
   }
 
-  public setHost (host: string): void {
-    this.product.host = host
+  public setHost (): void {
+    this.product.host = process.env.POSTGRES_HOST
   }
 
-  public setPort (port: string): void {
-    this.product.port = +port
+  public setPort (): void {
+    this.product.port = +process.env.POSTGRES_PORT
   }
 
-  public setUser (user: string): void {
-    this.product.user = user
+  public setUser (): void {
+    this.product.user = process.env.POSTGRES_USER
   }
 
-  public setPass (pass: string): void {
-    this.product.password = pass
+  public setPass (): void {
+    this.product.password = process.env.POSTGRES_PASSWORD
   }
 
-  public setDb (db: string): void {
-    this.product.database = db
+  public setDb (): void {
+    this.product.database = process.env.POSTGRES_DB
   }
 
-  public setMax (max: string): void {
-    this.product.max = +max
+  public setMax (): void {
+    this.product.max = +process.env.POSTGRES_MAX
   }
 
   public build (): Pool {
