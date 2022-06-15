@@ -1,7 +1,7 @@
 /**
  * Driver
  */
-import { Pool } from 'pg'
+import { Pool, PoolConfig } from 'pg'
 
 /**
  * Infra
@@ -9,62 +9,42 @@ import { Pool } from 'pg'
 import { IDbClientBuilder } from '../../../contracts'
 
 export class PgClientBuilder implements IDbClientBuilder {
-  private product: Pool
-
-  private host?: string
-
-  private port?: number
-
-  private user?: string
-
-  private pass?: string
-
-  private db?: string
-
-  private max?: number
+  private product: PoolConfig
 
   public constructor () {
     this.reset()
   }
 
   private reset (): void {
-    this.product = undefined
+    this.product = {}
   }
 
   public setHost (host: string): void {
-    this.host = host
+    this.product.host = host
   }
 
   public setPort (port: string): void {
-    this.port = +port
+    this.product.port = +port
   }
 
   public setUser (user: string): void {
-    this.user = user
+    this.product.user = user
   }
 
   public setPass (pass: string): void {
-    this.pass = pass
+    this.product.password = pass
   }
 
   public setDb (db: string): void {
-    this.db = db
+    this.product.database = db
   }
 
   public setMax (max: string): void {
-    this.max = +max
+    this.product.max = +max
   }
 
   public build (): Pool {
-    this.product = new Pool({
-      host: this.host,
-      port: this.port,
-      user: this.user,
-      password: this.pass,
-      database: this.db,
-      max: this.max
-    })
-    const result = this.product
+    const result = new Pool(this.product)
     this.reset()
     return result
   }

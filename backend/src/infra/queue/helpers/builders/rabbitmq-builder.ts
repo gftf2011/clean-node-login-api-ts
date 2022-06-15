@@ -1,7 +1,7 @@
 /**
  * Driver
  */
-import { Connection, connect } from 'amqplib'
+import { Connection, connect, Options } from 'amqplib'
 
 /**
  * Entities
@@ -9,43 +9,34 @@ import { Connection, connect } from 'amqplib'
 import { IQueueBuilder } from '../../../contracts'
 
 export class RabbitmqQueueBuilder implements IQueueBuilder {
-  private product: Connection
-
-  private host?: string
-
-  private port?: number
-
-  private user?: string
-
-  private pass?: string
+  private product: Options.Connect
 
   public constructor () {
     this.reset()
   }
 
   private reset (): void {
-    this.product = undefined
+    this.product = {}
   }
 
   public setHost (host: string): void {
-    this.host = host
+    this.product.hostname = host
   }
 
   public setPort (port: string): void {
-    this.port = +port
+    this.product.port = +port
   }
 
   public setUser (user: string): void {
-    this.user = user
+    this.product.username = user
   }
 
   public setPass (pass: string): void {
-    this.pass = pass
+    this.product.password = pass
   }
 
   public async build (): Promise<Connection> {
-    this.product = await connect(`amqp://${this.user}:${this.pass}@${this.host}:${this.port}/`)
-    const result = this.product
+    const result = await connect(this.product)
     this.reset()
     return result
   }

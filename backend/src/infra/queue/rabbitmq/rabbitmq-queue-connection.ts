@@ -1,4 +1,4 @@
-import { Channel } from 'amqplib'
+import { Channel, Connection } from 'amqplib'
 
 /**
  * Infra
@@ -19,29 +19,36 @@ export class RabbitmqQueueConnection implements QueueConnection {
 
   static async connect (): Promise<void> {
     if (!RabbitmqQueueConnection.instance || !RabbitmqQueueConnection.channel) {
-      try {
-        const builder = new RabbitmqQueueBuilder()
+      const builder = new RabbitmqQueueBuilder()
 
-        builder.setHost(process.env.RABBITMQ_HOST)
-        builder.setPass(process.env.RABBITMQ_PASSWORD)
-        builder.setPort(process.env.RABBITMQ_PORT)
-        builder.setUser(process.env.RABBITMQ_USER)
+      builder.setHost(process.env.RABBITMQ_HOST)
+      builder.setPass(process.env.RABBITMQ_PASSWORD)
+      builder.setPort(process.env.RABBITMQ_PORT)
+      builder.setUser(process.env.RABBITMQ_USER)
 
-        const connection = await builder.build()
+      let connection: Connection
 
-        const channel: Channel = await connection.createChannel()
-
-        RabbitmqQueueConnection.channel = {
-          send: async (queue: string, content: Buffer) => {
-            await channel.assertQueue(queue, { durable: true })
-            channel.sendToQueue(queue, content)
-          }
+      /**
+       * Retry connection logic, queue connection is not immediate
+       */
+      while (!connection) {
+        try {
+          connection = await builder.build()
+        } catch (err) {
+          connection = null
         }
-
-        RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
-      } catch (err) {
-        await RabbitmqQueueConnection.connect()
       }
+
+      const channel: Channel = await connection.createChannel()
+
+      RabbitmqQueueConnection.channel = {
+        send: async (queue: string, content: Buffer) => {
+          await channel.assertQueue(queue, { durable: true })
+          channel.sendToQueue(queue, content)
+        }
+      }
+
+      RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
     }
   }
 
