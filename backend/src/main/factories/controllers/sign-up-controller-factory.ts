@@ -21,8 +21,9 @@ import { RabbitmqQueueConnection, RabbitmqQueuePublishManager } from '../../../i
 
 export const makeSignUpController = (): Controller => {
   const queue = RabbitmqQueueConnection.getInstance()
+
   const queueManager = new RabbitmqQueuePublishManager(queue)
-  
+
   const postgresPool = PostgresDbClientPool.getInstance()
 
   const postgresClientManager = new PostgresDbClientManager(postgresPool)

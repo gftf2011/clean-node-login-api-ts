@@ -20,8 +20,8 @@ import { DbTransactionDecorator } from '../../../infra/db/helpers/decorators/db-
 import { RabbitmqQueueConnection, RabbitmqQueuePublishManager } from '../../../infra/queue'
 
 export const makeSignInController = (): Controller => {
-
   const queue = RabbitmqQueueConnection.getInstance()
+
   const queueManager = new RabbitmqQueuePublishManager(queue)
 
   const postgresPool = PostgresDbClientPool.getInstance()
