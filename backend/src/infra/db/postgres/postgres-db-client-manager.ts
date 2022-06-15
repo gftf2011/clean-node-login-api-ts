@@ -1,7 +1,7 @@
 /**
  * Infra
  */
-import { DbClient, DbClientManager, DbClientPool } from '@/infra/contracts'
+import { DbClient, DbClientManager, DbClientPool } from '../../contracts'
 
 export class PostgresDbClientManager implements DbClientManager {
   private client: DbClient

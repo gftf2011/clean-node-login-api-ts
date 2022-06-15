@@ -3,8 +3,8 @@ import { Channel } from 'amqplib'
 /**
  * Infra
  */
-import { QueueChannel, QueueConnection } from '@/infra/contracts'
-import { RabbitmqQueueBuilder } from '@/infra/queue/helpers/builders/rabbitmq-builder'
+import { QueueChannel, QueueConnection } from '../../contracts'
+import { RabbitmqQueueBuilder } from '../helpers/builders/rabbitmq-builder'
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -15,28 +15,33 @@ export class RabbitmqQueueConnection implements QueueConnection {
   private static instance: RabbitmqQueueConnection
   private static channel: QueueChannel
 
-  private constructor() {}
+  private constructor () {}
 
-  static async connect(): Promise<void> {
+  static async connect (): Promise<void> {
     if (!RabbitmqQueueConnection.instance || !RabbitmqQueueConnection.channel) {
-      const builder = new RabbitmqQueueBuilder()
+      try {
+        const builder = new RabbitmqQueueBuilder()
 
-      builder.setHost(process.env.RABBITMQ_HOST)
-      builder.setPass(process.env.RABBITMQ_PASSWORD)
-      builder.setPort(process.env.RABBITMQ_PORT)
-      builder.setUser(process.env.RABBITMQ_USER)
+        builder.setHost(process.env.RABBITMQ_HOST)
+        builder.setPass(process.env.RABBITMQ_PASSWORD)
+        builder.setPort(process.env.RABBITMQ_PORT)
+        builder.setUser(process.env.RABBITMQ_USER)
 
-      const connection = await builder.build()
+        const connection = await builder.build()
 
-      const channel: Channel = await connection.createChannel()
+        const channel: Channel = await connection.createChannel()
 
-      RabbitmqQueueConnection.channel = {
-        send: (queue: string, content: Buffer) => {
-          channel.sendToQueue(queue, content)
+        RabbitmqQueueConnection.channel = {
+          send: async (queue: string, content: Buffer) => {
+            await channel.assertQueue(queue, { durable: true })
+            channel.sendToQueue(queue, content)
+          }
         }
-      }
 
-      RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
+        RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
+      } catch (err) {
+        await RabbitmqQueueConnection.connect()
+      }
     }
   }
 

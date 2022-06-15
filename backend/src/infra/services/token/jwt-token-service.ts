@@ -3,13 +3,13 @@ import jwt from 'jsonwebtoken'
 /**
  * Use Cases
  */
-import { ITokenService, TokenOptions } from '@/use-cases/ports'
+import { ITokenService, TokenOptions } from '../../../use-cases/ports'
 
 /**
  * Shared
  */
-import { Either, left, right } from '@/shared'
-import { ServerError, UnauthorizedError } from '@/shared/errors'
+import { Either, left, right } from '../../../shared'
+import { ServerError, UnauthorizedError } from '../../../shared/errors'
 
 const JWT_SECRET: string = process.env.JWT_SECRET // Token signature
 const JWT_ALGORITHM: jwt.Algorithm = process.env.JWT_ALGORITHM as jwt.Algorithm // JWA - (Json Web Algorithm)

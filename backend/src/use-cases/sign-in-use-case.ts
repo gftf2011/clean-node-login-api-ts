@@ -1,14 +1,13 @@
 /**
  * Shared
  */
-
-import { Either, left, right } from '@/shared'
-import { ServerError, UnauthorizedError } from '@/shared/errors'
+import { Either, left, right } from '../shared'
+import { ServerError, UnauthorizedError } from '../shared/errors'
 
 /**
  * Use Cases
  */
-import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository, QueuePublishManager } from '@/use-cases/ports'
+import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository, QueuePublishManager } from './ports'
 
 /**
   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>

@@ -6,7 +6,8 @@
   "scripts": {
     "build:dev": "rm -rf .env && cat ./env/dev/.env >> .env",
     "build": "rimraf dist && tsc -p tsconfig.json",
-    "start:dev": "npm run build:dev && npm run build"
+    "start": "node dist/main/index.js",
+    "start:dev": "npm run build:dev && npm run build && npm run start"
   },
   "keywords": [],
   "author": "",
@@ -29,11 +30,7 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
-    "module-alias": "^2.2.2",
     "pg": "^8.7.3",
     "redis": "3.1.2"
-  },
-  "_moduleAliases": {
-    "@": "dist"
   }
 }

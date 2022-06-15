@@ -2,10 +2,6 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "src",                                    /* Specify the base directory to resolve non-relative module names. */
-    "paths": {
-      "@/*": ["*"],
-      "@/tests/*": ["../tests/*"]
-    },                                                   /* Specify a set of entries that re-map imports to additional lookup locations. */
     "rootDirs": ["src", "test"],                         /* Allow multiple folders to be treated as one when resolving modules. */
     "outDir": "dist",                                    /* Specify an output folder for all emitted files. */
   },

@@ -1,8 +1,8 @@
 /**
  * Shared
  */
-import { Either, left, right } from '@/shared'
-import { InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError, InvalidPasswordError } from '@/shared/errors'
+import { Either, left, right } from '../shared'
+import { InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError, InvalidPasswordError } from '../shared/errors'
 import {
   clearTaxvat,
   isEmailValid,
@@ -22,7 +22,7 @@ import {
   getOnlyLowerCaseLettersFromValue,
   getOnlySpecialCharactersFromValue,
   normalizeValueToPascalCase
-} from '@/shared/utils'
+} from '../shared/utils'
 
 export class UserEntity {
   private readonly name: string

@@ -1,14 +1,14 @@
 /**
  * Use Cases
  */
-import { ISignInUseCase } from '@/use-cases/ports'
+import { ISignInUseCase } from '../../../use-cases/ports'
 
 /**
  * Presentation
  */
-import { HttpRequest, HttpResponse } from '@/presentation/ports'
+import { HttpRequest, HttpResponse } from '../../ports'
 import { WebController } from './web-controller'
-import { ok } from '@/presentation/helpers/http-helper'
+import { ok } from '../../helpers/http-helper'
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>

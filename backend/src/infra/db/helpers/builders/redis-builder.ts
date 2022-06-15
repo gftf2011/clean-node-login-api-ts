@@ -6,7 +6,7 @@ import redis from 'redis'
 /**
  * Infra
  */
-import { IDbClientBuilder } from '@/infra/contracts'
+import { IDbClientBuilder } from '../../../contracts'
 
 export class RedisClientBuilder implements IDbClientBuilder {
   private host?: string

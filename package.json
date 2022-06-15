@@ -17,7 +17,7 @@
     "run:docker:dev": "npm run build:script:dev && npm run build:docker:dev",
     "postrun:docker:dev": "npm run docker:up",
     "prestart:dev:backend": "npm run run:docker:dev",
-    "start:dev:backend": "npm run start:dev --workspace=backend && node backend/dist/main/index.js"
+    "start:dev:backend": "npm run start:dev --workspace=backend"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,8 @@
   "bugs": {
     "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
   },
-  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme"
+  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme",
+  "devDependencies": {
+    "@types/amqplib": "^0.8.2"
+  }
 }
-  

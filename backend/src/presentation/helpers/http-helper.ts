@@ -1,4 +1,4 @@
-import { HttpResponse } from '@/presentation/ports'
+import { HttpResponse } from '../ports'
 
 /**
  * @desc the 'ok' method indicating success in retrieve the data

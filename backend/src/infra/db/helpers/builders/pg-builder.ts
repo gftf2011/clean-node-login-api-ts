@@ -6,7 +6,7 @@ import { Pool } from 'pg'
 /**
  * Infra
  */
-import { IDbClientBuilder } from '@/infra/contracts'
+import { IDbClientBuilder } from '../../../contracts'
 
 export class PgClientBuilder implements IDbClientBuilder {
   private product: Pool

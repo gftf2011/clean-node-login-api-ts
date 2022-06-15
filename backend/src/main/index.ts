@@ -1,9 +1,8 @@
-import 'module-alias/register'
-import '@/main/bootstrap'
+import '../main/bootstrap'
 
-import { loader } from '@/main/loader'
+import { loader } from '../main/loader'
 
-import { server } from '@/main/server'
+import { server } from '../main/server'
 
 import cluster from 'cluster'
 import os from 'os'

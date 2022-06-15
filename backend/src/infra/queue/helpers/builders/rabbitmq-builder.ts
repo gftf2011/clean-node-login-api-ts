@@ -6,7 +6,7 @@ import { Connection, connect } from 'amqplib'
 /**
  * Entities
  */
-import { IQueueBuilder } from '@/infra/contracts'
+import { IQueueBuilder } from '../../../contracts'
 
 export class RabbitmqQueueBuilder implements IQueueBuilder {
   private product: Connection
@@ -44,7 +44,7 @@ export class RabbitmqQueueBuilder implements IQueueBuilder {
   }
 
   public async build (): Promise<Connection> {
-    this.product = await connect(`amqp://${this.user}:${this.pass}@${this.host}:${this.port}`)
+    this.product = await connect(`amqp://${this.user}:${this.pass}@${this.host}:${this.port}/`)
     const result = this.product
     this.reset()
     return result

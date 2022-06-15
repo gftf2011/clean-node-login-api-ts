@@ -1,7 +1,7 @@
 /**
  * Shared
  */
-import { Either } from '@/shared'
+import { Either } from '../../shared'
 
 export interface TokenOptions {
   subject: string // Must be a globally unique id

@@ -1,12 +1,12 @@
 /**
  * Use Cases
  */
-import { IUserRepository, UserDto as User } from '@/use-cases/ports'
+import { IUserRepository, UserDto as User } from '../../use-cases/ports'
 
 /**
  * Infrastructure
  */
-import { IUserDao } from '@/infra/contracts'
+import { IUserDao } from '../contracts'
 
 export class UserRepository implements IUserRepository {
   private readonly userDAO: IUserDao

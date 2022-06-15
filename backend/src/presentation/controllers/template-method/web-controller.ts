@@ -1,13 +1,13 @@
 /**
  * Shared
  */
-import { MissingParamsError, MissingHeaderParamsError, Error400, Error401, Error403 } from '@/shared/errors'
+import { MissingParamsError, MissingHeaderParamsError, Error400, Error401, Error403 } from '../../../shared/errors'
 
 /**
   * Presentation
   */
-import { HttpResponse, HttpRequest, Controller } from '@/presentation/ports'
-import { badRequest, serverError, unauthorized, forbidden } from '@/presentation/helpers/http-helper'
+import { HttpResponse, HttpRequest, Controller } from '../../ports'
+import { badRequest, serverError, unauthorized, forbidden } from '../../helpers/http-helper'
 
 /**
   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>

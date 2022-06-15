@@ -1,13 +1,13 @@
 /**
  * Shared
  */
-import { Either, left, right } from '@/shared'
-import { UserAlreadyExistsError, ServerError } from '@/shared/errors'
+import { Either, left, right } from '../shared'
+import { UserAlreadyExistsError, ServerError } from '../shared/errors'
 
 /**
  * Entites
  */
-import { UserEntity } from '@/entities'
+import { UserEntity } from '../entities'
 
 /**
  * Use Cases
@@ -22,7 +22,7 @@ import {
   ITokenService,
   AuthenticatedAccountDto,
   QueuePublishManager
-} from '@/use-cases/ports'
+} from './ports'
 
 /**
   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>

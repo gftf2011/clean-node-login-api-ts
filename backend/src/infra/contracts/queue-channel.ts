@@ -1,3 +1,3 @@
-export type QueueChannel = {
-  send: (queue: string, content: Buffer) => void
+export interface QueueChannel {
+  send: (queue: string, content: Buffer) => Promise<void>
 }

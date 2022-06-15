@@ -6,8 +6,8 @@ import { Pool } from 'pg'
 /**
  * Infra
  */
-import { DbClient, DbClientPool } from '@/infra/contracts'
-import { PgClientBuilder } from '@/infra/db/helpers/builders/pg-builder'
+import { DbClient, DbClientPool } from '../../contracts'
+import { PgClientBuilder } from '../helpers/builders/pg-builder'
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>

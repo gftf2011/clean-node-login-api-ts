@@ -1,12 +1,12 @@
 /**
  * Presentation
  */
-import { Controller, HttpRequest, HttpResponse } from '@/presentation/ports'
+import { Controller, HttpRequest, HttpResponse } from '../../../../presentation/ports'
 
 /**
  * Infrastructure
  */
-import { DbClientManager } from '@/infra/contracts'
+import { DbClientManager } from '../../../contracts'
 
 export class DbTransactionDecorator implements Controller {
   constructor (private readonly decoratee: Controller, private readonly dbClientManager: DbClientManager) {}
