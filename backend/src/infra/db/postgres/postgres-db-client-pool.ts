@@ -8,6 +8,7 @@ import { Pool } from 'pg'
  */
 import { DbClient, DbClientPool } from '../../contracts'
 import { PgClientBuilder } from '../helpers/builders/pg-builder'
+import { DbDirector } from '../helpers/builders/db-director'
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -21,22 +22,20 @@ export class PostgresDbClientPool implements DbClientPool {
   private constructor () {}
 
   static connect (): void {
-    if (!PostgresDbClientPool.pool || !PostgresDbClientPool.instance) {
+    if (!PostgresDbClientPool.pool) {
       const builder = new PgClientBuilder()
 
-      builder.setDb(process.env.POSTGRES_DB)
-      builder.setHost(process.env.POSTGRES_HOST)
-      builder.setMax(process.env.POSTGRES_MAX)
-      builder.setPass(process.env.POSTGRES_PASSWORD)
-      builder.setPort(process.env.POSTGRES_PORT)
-      builder.setUser(process.env.POSTGRES_USER)
+      const director = new DbDirector()
+      director.setBuilder(builder)
 
-      PostgresDbClientPool.pool = builder.build()
-      PostgresDbClientPool.instance = new PostgresDbClientPool()
+      PostgresDbClientPool.pool = director.getDbClient()
     }
   }
 
   static getInstance (): DbClientPool {
+    if (!PostgresDbClientPool.instance) {
+      PostgresDbClientPool.instance = new PostgresDbClientPool()
+    }
     return PostgresDbClientPool.instance
   }
 
