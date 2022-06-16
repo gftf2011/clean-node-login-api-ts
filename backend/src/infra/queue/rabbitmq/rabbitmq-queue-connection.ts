@@ -45,6 +45,10 @@ export class RabbitmqQueueConnection implements QueueConnection {
         send: async (queue: string, content: Buffer) => {
           await channel.assertQueue(queue, { durable: true })
           channel.sendToQueue(queue, content)
+        },
+
+        closeAll: async () => {
+          await connection.close()
         }
       }
     }
