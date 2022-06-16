@@ -1,23 +1,35 @@
 /**
- * Use Cases
+ * Infra
  */
-import { SignUpUseCase } from '../../../use-cases'
+import { CryptoEncryptService, CryptoHashService, JwtTokenService } from '../../../infra/services'
+import { PostgresDbClientManager, PostgresDbClientPool } from '../../../infra/db'
+import { RabbitmqQueueConnection, RabbitmqQueuePublishManager } from '../../../infra/queue'
 
 /**
  * Presentation
  */
 import { Controller } from '../../../presentation/ports'
+
+/**
+ * Infra
+ */
+import { DbTransactionDecorator } from '../../../infra/db/helpers/decorators/db-transaction-decorator'
+
+/**
+ * Presentation
+ */
 import { SignUpController } from '../../../presentation/controllers'
 
 /**
- * Infrastructure
+ * Use Cases
  */
-import { CryptoHashService, CryptoEncryptService, JwtTokenService } from '../../../infra/services'
-import { UserRepository } from '../../../infra/repositories'
+import { SignUpUseCase } from '../../../use-cases'
+
+/**
+ * Infra
+ */
 import { UserDao } from '../../../infra/dao'
-import { PostgresDbClientManager, PostgresDbClientPool } from '../../../infra/db'
-import { DbTransactionDecorator } from '../../../infra/db/helpers/decorators/db-transaction-decorator'
-import { RabbitmqQueueConnection, RabbitmqQueuePublishManager } from '../../../infra/queue'
+import { UserRepository } from '../../../infra/repositories'
 
 export const makeSignUpController = (): Controller => {
   const queue = RabbitmqQueueConnection.getInstance()

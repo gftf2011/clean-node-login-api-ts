@@ -4,7 +4,7 @@
 import { Controller, HttpRequest, HttpResponse } from '../../../../presentation/ports'
 
 /**
- * Infrastructure
+ * Infra
  */
 import { DbClientManager } from '../../../contracts'
 

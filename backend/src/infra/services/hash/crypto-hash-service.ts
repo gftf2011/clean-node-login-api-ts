@@ -1,9 +1,12 @@
-import crypto from 'crypto'
-
 /**
  * Use Cases
  */
 import { IHashService } from '../../../use-cases/ports'
+
+/**
+ * Driver
+ */
+import crypto from 'crypto'
 
 const CIPHER: string = 'sha512'
 const ENCODED_PASSWORD_SIZE: number = 128

@@ -1,4 +1,7 @@
-import jwt from 'jsonwebtoken'
+/**
+ * Shared
+ */
+import { Either, left, right } from '../../../shared'
 
 /**
  * Use Cases
@@ -8,8 +11,12 @@ import { ITokenService, TokenOptions } from '../../../use-cases/ports'
 /**
  * Shared
  */
-import { Either, left, right } from '../../../shared'
 import { ServerError, UnauthorizedError } from '../../../shared/errors'
+
+/**
+ * Driver
+ */
+import jwt from 'jsonwebtoken'
 
 const JWT_SECRET: string = process.env.JWT_SECRET // Token signature
 const JWT_ALGORITHM: jwt.Algorithm = process.env.JWT_ALGORITHM as jwt.Algorithm // JWA - (Json Web Algorithm)
@@ -19,7 +26,7 @@ interface CustomJwtPayload extends jwt.JwtPayload {
 }
 
 export class JwtTokenService implements ITokenService {
-  sign <T>(payload: T, options: TokenOptions, expirationTime: number): Either<Error, string> {
+  sign <T> (payload: T, options: TokenOptions, expirationTime: number): Either<Error, string> {
     if (!JWT_SECRET || !JWT_ALGORITHM) {
       return left(new ServerError())
     }

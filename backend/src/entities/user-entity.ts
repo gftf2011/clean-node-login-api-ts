@@ -2,36 +2,48 @@
  * Shared
  */
 import { Either, left, right } from '../shared'
-import { InvalidEmailError, InvalidLastnameError, InvalidNameError, InvalidTaxvatError, InvalidPasswordError } from '../shared/errors'
+import {
+  InvalidEmailError,
+  InvalidLastnameError,
+  InvalidNameError,
+  InvalidPasswordError,
+  InvalidTaxvatError
+} from '../shared/errors'
 import {
   clearTaxvat,
-  isEmailValid,
-  hasPasswordAnyEmptySpace,
-  isTaxvatInBlacklist,
-  removeExtremitiesWhiteSpaces,
-  hasTaxvatCorrectLength,
-  hasTaxvatOnlyDigits,
-  isTaxvatFirstDigitValid,
-  isTaxvatSecondDigitValid,
   getEmailAccount,
   getEmailAddress,
   getEmailDomainsFromAddress,
-  removeMultipleWhiteSpacesToSingleWhiteSpace,
-  getOnlyNumbersFromValue,
   getOnlyCapitalLettersFromValue,
   getOnlyLowerCaseLettersFromValue,
+  getOnlyNumbersFromValue,
   getOnlySpecialCharactersFromValue,
-  normalizeValueToPascalCase
+  hasPasswordAnyEmptySpace,
+  hasTaxvatCorrectLength,
+  hasTaxvatOnlyDigits,
+  isEmailValid,
+  isTaxvatFirstDigitValid,
+  isTaxvatInBlacklist,
+  isTaxvatSecondDigitValid,
+  normalizeValueToPascalCase,
+  removeExtremitiesWhiteSpaces,
+  removeMultipleWhiteSpacesToSingleWhiteSpace
 } from '../shared/utils'
 
 export class UserEntity {
-  private readonly name: string
-  private readonly lastname: string
-  private readonly taxvat: string
-  private readonly email: string
-  private readonly password: string
+  private readonly name: string;
+  private readonly lastname: string;
+  private readonly taxvat: string;
+  private readonly email: string;
+  private readonly password: string;
 
-  private constructor (name: string, lastname: string, taxvat: string, email: string, password: string) {
+  private constructor (
+    name: string,
+    lastname: string,
+    taxvat: string,
+    email: string,
+    password: string
+  ) {
     this.name = name
     this.lastname = lastname
     this.taxvat = taxvat
@@ -64,7 +76,9 @@ export class UserEntity {
     if (!name) {
       return false
     }
-    const cleanName = removeMultipleWhiteSpacesToSingleWhiteSpace(removeExtremitiesWhiteSpaces(name))
+    const cleanName = removeMultipleWhiteSpacesToSingleWhiteSpace(
+      removeExtremitiesWhiteSpaces(name)
+    )
     if (cleanName.length < 2 || cleanName.length > 255) {
       return false
     }
@@ -75,7 +89,9 @@ export class UserEntity {
     if (!lastname) {
       return false
     }
-    const cleanLastname = removeMultipleWhiteSpacesToSingleWhiteSpace(removeExtremitiesWhiteSpaces(lastname))
+    const cleanLastname = removeMultipleWhiteSpacesToSingleWhiteSpace(
+      removeExtremitiesWhiteSpaces(lastname)
+    )
     if (cleanLastname.length < 2 || cleanLastname.length > 255) {
       return false
     }
@@ -101,7 +117,10 @@ export class UserEntity {
       return false
     }
 
-    if (!isTaxvatFirstDigitValid(clearedTaxvat) && !isTaxvatSecondDigitValid(clearedTaxvat)) {
+    if (
+      !isTaxvatFirstDigitValid(clearedTaxvat) &&
+      !isTaxvatSecondDigitValid(clearedTaxvat)
+    ) {
       return false
     }
 
@@ -123,9 +142,11 @@ export class UserEntity {
     if (account.length > 64) {
       return false
     }
-    if (getEmailDomainsFromAddress(address).some(function (part) {
-      return part.length > 63
-    })) {
+    if (
+      getEmailDomainsFromAddress(address).some(function (part) {
+        return part.length > 63
+      })
+    ) {
       return false
     }
     return true
@@ -151,14 +172,21 @@ export class UserEntity {
     if (onlyLowerCaseLetters.length < 1) {
       return false
     }
-    const onlySpecialCharacters: string = getOnlySpecialCharactersFromValue(pass)
+    const onlySpecialCharacters: string =
+      getOnlySpecialCharactersFromValue(pass)
     if (onlySpecialCharacters.length < 1) {
       return false
     }
     return true
   }
 
-  private static validate (name: string, lastname: string, taxvat: string, email: string, password: string): Either<Error, true> {
+  private static validate (
+    name: string,
+    lastname: string,
+    taxvat: string,
+    email: string,
+    password: string
+  ): Either<Error, true> {
     if (!UserEntity.validateName(name)) {
       return left(new InvalidNameError(name))
     }
@@ -177,24 +205,32 @@ export class UserEntity {
     return right(true)
   }
 
-  static create (name: string, lastname: string, taxvat: string, email: string, password: string): Either<Error, UserEntity> {
+  static create (
+    name: string,
+    lastname: string,
+    taxvat: string,
+    email: string,
+    password: string
+  ): Either<Error, UserEntity> {
     const either = UserEntity.validate(name, lastname, taxvat, email, password)
     if (either.isRight()) {
-      return right(new UserEntity(
-        normalizeValueToPascalCase(
-          removeMultipleWhiteSpacesToSingleWhiteSpace(
-            removeExtremitiesWhiteSpaces(name)
-          )
-        ),
-        normalizeValueToPascalCase(
-          removeMultipleWhiteSpacesToSingleWhiteSpace(
-            removeExtremitiesWhiteSpaces(lastname)
-          )
-        ),
-        clearTaxvat(taxvat),
-        email,
-        password
-      ))
+      return right(
+        new UserEntity(
+          normalizeValueToPascalCase(
+            removeMultipleWhiteSpacesToSingleWhiteSpace(
+              removeExtremitiesWhiteSpaces(name)
+            )
+          ),
+          normalizeValueToPascalCase(
+            removeMultipleWhiteSpacesToSingleWhiteSpace(
+              removeExtremitiesWhiteSpaces(lastname)
+            )
+          ),
+          clearTaxvat(taxvat),
+          email,
+          password
+        )
+      )
     }
     return left(either.value)
   }

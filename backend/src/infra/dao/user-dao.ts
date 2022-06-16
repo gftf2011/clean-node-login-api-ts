@@ -1,12 +1,12 @@
 /**
+ * Infra
+ */
+import { DbClientManager, IUserDao } from '../contracts'
+
+/**
  * Use Cases
  */
 import { UserDto as User } from '../../use-cases/ports'
-
-/**
- * Infrastructure
- */
-import { IUserDao, DbClientManager } from '../contracts'
 
 export class UserDao implements IUserDao {
   constructor (private readonly dbClientManager: DbClientManager) {}

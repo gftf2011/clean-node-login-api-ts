@@ -31,6 +31,17 @@
   },
   "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme",
   "devDependencies": {
-    "@types/amqplib": "^0.8.2"
+    "@types/amqplib": "^0.8.2",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-import-resolver-typescript": "^2.7.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "prettier": "^2.7.0"
   }
 }

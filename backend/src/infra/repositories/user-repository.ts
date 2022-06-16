@@ -4,7 +4,7 @@
 import { IUserRepository, UserDto as User } from '../../use-cases/ports'
 
 /**
- * Infrastructure
+ * Infra
  */
 import { IUserDao } from '../contracts'
 

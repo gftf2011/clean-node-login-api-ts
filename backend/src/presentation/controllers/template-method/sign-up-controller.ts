@@ -1,4 +1,9 @@
 /**
+ * Presentation
+ */
+import { HttpRequest, HttpResponse } from '../../ports'
+
+/**
  * Use Cases
  */
 import { ISignUpUseCase } from '../../../use-cases/ports'
@@ -6,7 +11,6 @@ import { ISignUpUseCase } from '../../../use-cases/ports'
 /**
  * Presentation
  */
-import { HttpRequest, HttpResponse } from '../../ports'
 import { WebController } from './web-controller'
 import { created } from '../../helpers/http-helper'
 

@@ -1,9 +1,12 @@
-import crypto from 'crypto'
-
 /**
  * Use Cases
  */
 import { IEncryptService } from '../../../use-cases/ports'
+
+/**
+ * Driver
+ */
+import crypto from 'crypto'
 
 const CIPHER: string = 'aes-256-cbc'
 const ENCRYPT_KEY = process.env.CODE_ENCRYPT_KEY

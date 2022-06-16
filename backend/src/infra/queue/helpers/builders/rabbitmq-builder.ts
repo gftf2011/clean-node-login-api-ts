@@ -1,7 +1,7 @@
 /**
  * Driver
  */
-import { Connection, connect, Options } from 'amqplib'
+import { Connection, Options, connect } from 'amqplib'
 
 /**
  * Entities

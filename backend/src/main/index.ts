@@ -4,6 +4,7 @@ import { loader } from '../main/loader'
 
 import { server } from '../main/server'
 
+// eslint-disable-next-line sort-imports
 import cluster from 'cluster'
 import os from 'os'
 import process from 'process'

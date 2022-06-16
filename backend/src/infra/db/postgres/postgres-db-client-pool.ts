@@ -1,14 +1,14 @@
 /**
- * Drivers
- */
-import { Pool } from 'pg'
-
-/**
  * Infra
  */
 import { DbClient, DbClientPool } from '../../contracts'
-import { PgClientBuilder } from '../helpers/builders/pg-builder'
 import { DbDirector } from '../helpers/builders/db-director'
+import { PgClientBuilder } from '../helpers/builders/pg-builder'
+
+/**
+ * Drivers
+ */
+import { Pool } from 'pg'
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>

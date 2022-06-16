@@ -1,28 +1,28 @@
 /**
+ * Use Cases
+ */
+import {
+  AuthenticatedAccountDto,
+  BasicUserDto,
+  IEncryptService,
+  IHashService,
+  ISignUpUseCase,
+  ITokenService,
+  IUserRepository,
+  QueuePublishManager,
+  UserDto
+} from './ports'
+
+/**
  * Shared
  */
 import { Either, left, right } from '../shared'
-import { UserAlreadyExistsError, ServerError } from '../shared/errors'
+import { ServerError, UserAlreadyExistsError } from '../shared/errors'
 
 /**
  * Entites
  */
 import { UserEntity } from '../entities'
-
-/**
- * Use Cases
- */
-import {
-  IUserRepository,
-  UserDto,
-  BasicUserDto,
-  ISignUpUseCase,
-  IHashService,
-  IEncryptService,
-  ITokenService,
-  AuthenticatedAccountDto,
-  QueuePublishManager
-} from './ports'
 
 /**
   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
