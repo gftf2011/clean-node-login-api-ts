@@ -13,8 +13,8 @@ export abstract class WebController implements Controller {
 
   /**
    * @desc handles the user input
-   * @param {HttpRequest} request - data input which comes from the `client`
-   * @returns {Promise<HttpResponse>} data output after operation
+   * @param {Request} request - data input which comes from the `client`
+   * @returns {Promise<void>}
    */
   public async handle (request: Request): Promise<void> {
     try {
@@ -31,7 +31,7 @@ export abstract class WebController implements Controller {
 
   /**
    * @desc check which parameters are missing
-   * @param {HttpRequest} request - data input which comes from the `client`
+   * @param {Request} request - data input which comes from the `client`
    * @param {string[]} requiredParams - required parameters which must be sent
    * @returns {string[]} array of missing parameters
    */
