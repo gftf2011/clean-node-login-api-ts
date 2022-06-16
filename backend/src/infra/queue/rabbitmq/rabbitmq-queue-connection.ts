@@ -4,6 +4,7 @@ import { Channel, Connection } from 'amqplib'
  * Infra
  */
 import { QueueChannel, QueueConnection } from '../../contracts'
+import { QueueDirector } from '../helpers/builders/queue-director'
 import { RabbitmqQueueBuilder } from '../helpers/builders/rabbitmq-builder'
 
 /**
@@ -21,10 +22,9 @@ export class RabbitmqQueueConnection implements QueueConnection {
     if (!RabbitmqQueueConnection.instance || !RabbitmqQueueConnection.channel) {
       const builder = new RabbitmqQueueBuilder()
 
-      builder.setHost(process.env.RABBITMQ_HOST)
-      builder.setPass(process.env.RABBITMQ_PASSWORD)
-      builder.setPort(process.env.RABBITMQ_PORT)
-      builder.setUser(process.env.RABBITMQ_USER)
+      const director = new QueueDirector()
+
+      director.setBuilder(builder)
 
       let connection: Connection
 
@@ -33,7 +33,7 @@ export class RabbitmqQueueConnection implements QueueConnection {
        */
       while (!connection) {
         try {
-          connection = await builder.build()
+          connection = await director.getQueueConnection()
         } catch (err) {
           connection = null
         }

@@ -1,7 +1,7 @@
 export interface IQueueBuilder {
-  setHost: (host: string) => void
-  setPort: (port: string) => void
-  setUser: (user: string) => void
-  setPass: (pass: string) => void
+  setHost: () => void
+  setPort: () => void
+  setUser: () => void
+  setPass: () => void
   build: () => Promise<any>
 }

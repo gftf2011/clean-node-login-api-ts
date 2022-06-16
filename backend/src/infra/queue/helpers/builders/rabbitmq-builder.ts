@@ -19,20 +19,20 @@ export class RabbitmqQueueBuilder implements IQueueBuilder {
     this.product = {}
   }
 
-  public setHost (host: string): void {
-    this.product.hostname = host
+  public setHost (): void {
+    this.product.hostname = process.env.RABBITMQ_HOST
   }
 
-  public setPort (port: string): void {
-    this.product.port = +port
+  public setPort (): void {
+    this.product.port = +process.env.RABBITMQ_PORT
   }
 
-  public setUser (user: string): void {
-    this.product.username = user
+  public setUser (): void {
+    this.product.username = process.env.RABBITMQ_USER
   }
 
-  public setPass (pass: string): void {
-    this.product.password = pass
+  public setPass (): void {
+    this.product.password = process.env.RABBITMQ_PASSWORD
   }
 
   public async build (): Promise<Connection> {
