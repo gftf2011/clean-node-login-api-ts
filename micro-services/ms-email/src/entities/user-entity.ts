@@ -14,9 +14,9 @@ import {
 } from '../shared/utils'
 
 export class UserEntity {
-  private readonly name: string;
-  private readonly lastname: string;
-  private readonly email: string;
+  private readonly name: string
+  private readonly lastname: string
+  private readonly email: string
 
   private constructor (
     name: string,

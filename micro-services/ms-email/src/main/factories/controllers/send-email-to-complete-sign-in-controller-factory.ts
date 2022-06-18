@@ -2,14 +2,19 @@
  * Presentation
  */
 import { Controller } from '../../../presentation/ports'
-
-/**
- * Presentation
- */
 import { SendEmailToCompleteSignInController } from '../../../presentation/controllers'
 
+/**
+ * Use Cases
+ */
+import { SendEmailToCompleteSignInUseCase } from '../../../use-cases'
+
 export const makeSendEmailToCompleteSignInController = (): Controller => {
-  const sendEmailToCompleteSignInController = new SendEmailToCompleteSignInController()
+  const sendEmailToCompleteSignInUseCase = new SendEmailToCompleteSignInUseCase()
+
+  const sendEmailToCompleteSignInController = new SendEmailToCompleteSignInController(
+    sendEmailToCompleteSignInUseCase
+  )
 
   return sendEmailToCompleteSignInController
 }
