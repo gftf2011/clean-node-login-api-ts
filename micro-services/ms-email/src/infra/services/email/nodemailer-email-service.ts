@@ -1,7 +1,7 @@
 /**
- * Driver
+ * Shared
  */
-import * as nodemailer from 'nodemailer'
+import { Either, left, right } from '../../../shared'
 
 /**
  * Use Cases
@@ -9,28 +9,34 @@ import * as nodemailer from 'nodemailer'
 import { EmailOptions, EmailService } from '../../../use-cases/ports'
 
 /**
- * Shared
+ * Infra
  */
-import { Either } from '../../../shared'
+import { EmailDirector } from './helpers/builders/email-director'
+import { NodemailerTransporterBuilder } from './helpers/builders/nodemailer-builder'
 
 export class NodemailerEmailService implements EmailService {
   async send (options: EmailOptions): Promise<Either<Error, EmailOptions>> {
-    const transporter = nodemailer.createTransport({
-      host: options.host,
-      port: options.port,
-      auth: {
-        user: options.username,
-        pass: options.password
-      }
-    })
-    await transporter.sendMail({
-      from: options.from,
-      to: options.to,
-      subject: options.subject,
-      text: options.text,
-      html: options.html,
-      attachments: options.attachments
-    })
-    return {} as any
+    try {
+      const { from, to, subject, text, html, attachments } = options
+
+      const builder = new NodemailerTransporterBuilder()
+
+      const director = new EmailDirector()
+      director.setBuilder(builder)
+
+      const transporter = director.getEmailTransporter()
+
+      await transporter.sendMail({
+        from,
+        to,
+        subject,
+        text,
+        html,
+        attachments
+      })
+      return right(options)
+    } catch (error) {
+      return left(error as Error)
+    }
   }
 }
