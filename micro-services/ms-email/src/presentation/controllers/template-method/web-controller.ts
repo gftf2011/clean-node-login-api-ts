@@ -14,20 +14,26 @@ export abstract class WebController implements Controller {
   /**
    * @desc handles the user input
    * @param {Request} request - data input which comes from the `client`
-   * @returns {Promise<void>}
+   * @returns {Promise<boolean | Error>} data output if operation was handled successfully
    */
-  public async handle (request: Request): Promise<void> {
+  public async handle (request: Request): Promise<boolean | Error> {
     try {
       const missingParams: string[] = WebController.getMissingParams(request, this.requiredParams)
-      if (missingParams.length === 0) {
-        await this.perform(request)
+      if (missingParams.length !== 0) {
+        return false
       }
+      return await this.perform(request)
     } catch (error) {
-      console.log(error)
+      return error as Error
     }
   }
 
-  public abstract perform (request: Request): Promise<void>
+  /**
+   * @desc performs a custom operation after given the user input
+   * @param {Request} request - data input which comes from the `client`
+   * @returns {Promise<boolean>} data output if operation was performed successfully
+   */
+  public abstract perform (request: Request): Promise<boolean>
 
   /**
    * @desc check which parameters are missing

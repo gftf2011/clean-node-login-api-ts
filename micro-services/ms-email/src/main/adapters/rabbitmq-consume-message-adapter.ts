@@ -1,9 +1,9 @@
+import { Channel, ConsumeMessage } from 'amqplib'
+
 import { Controller, Request } from '../../presentation/ports'
 
-import { ConsumeMessage } from 'amqplib'
-
-export const adaptConsumeMessage = (controller: Controller) => {
-  return async (msg: ConsumeMessage | null) => {
+export const adaptConsumeMessage = (channel: Channel, controller: Controller) => {
+  return async (msg: ConsumeMessage | null): Promise<void> => {
     const request: Request = {
       content: {}
     }
@@ -12,6 +12,15 @@ export const adaptConsumeMessage = (controller: Controller) => {
       request.content = JSON.parse(msg.content.toString())
     }
 
-    await controller.handle(request)
+    const response = await controller.handle(request)
+    if (response instanceof Error) {
+      channel.nack(msg, false, true)
+      return
+    }
+    if (response) {
+      channel.ack(msg, false)
+      return
+    }
+    channel.nack(msg, false, false)
   }
 }

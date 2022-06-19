@@ -6,5 +6,5 @@ import { makeSendEmailToCompleteSignInController } from '../factories/controller
 
 export default async (channel: Channel): Promise<void> => {
   await channel.assertQueue('send-email-to-complete-sign-in', { durable: true })
-  await channel.consume('send-email-to-complete-sign-in', adaptConsumeMessage(makeSendEmailToCompleteSignInController()), { noAck: false })
+  await channel.consume('send-email-to-complete-sign-in', adaptConsumeMessage(channel, makeSendEmailToCompleteSignInController()), { noAck: false })
 }

@@ -32,9 +32,10 @@ export class SendEmailToCompleteSignInController extends WebController {
   /**
    * @desc sends an email to verify user sign-in action
    * @param {Request} request - request that contains information about the 'clinet'
-   * @returns {Promise<void>}
+   * @returns {Promise<boolean>} data output if email message was sent
    */
-  public async perform (request: Request): Promise<void> {
-    this.sendEmailToCompleteSignInUseCase.perform(request.content)
+  public async perform (request: Request): Promise<boolean> {
+    await this.sendEmailToCompleteSignInUseCase.perform(request.content)
+    return true
   }
 }
