@@ -85,7 +85,8 @@ export class SignUpUseCase implements ISignUpUseCase {
       name: userOrError.value.getName(),
       lastname: userOrError.value.getLastname(),
       taxvat: this.encryptService.encode(userOrError.value.getTaxvat()),
-      password: strongHashedPassword
+      password: strongHashedPassword,
+      confirmed: false
     }
 
     const accessTokenId = process.env.JWT_ACCESS_TOKEN_ID
@@ -126,7 +127,7 @@ export class SignUpUseCase implements ISignUpUseCase {
       return left(accessTokenOrError.value)
     }
 
-    await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userCreated))
+    await this.queueManager.publish('welcome-email', JSON.stringify(userCreated))
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,

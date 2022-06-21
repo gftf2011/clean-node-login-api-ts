@@ -3,5 +3,7 @@ export interface IEmailTransporterBuilder {
   setPort: () => void
   setUser: () => void
   setPass: () => void
+  setOauthClient: () => Promise<void>
+  setSecure: () => void
   build: () => any
 }

@@ -1,7 +1,7 @@
 /**
  * Use Cases
  */
-import { ISendEmailToCompleteSignInUseCase } from '../../../use-cases/ports'
+import { IWelcomeEmailUseCase } from '../../../use-cases/ports'
 
 /**
  * Presentation
@@ -14,8 +14,8 @@ import { WebController } from './web-controller'
  * @desc Contains the base algorithm and the concrete implementation from the perform method
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
  */
-export class SendEmailToCompleteSignInController extends WebController {
-  private readonly sendEmailToCompleteSignInUseCase: ISendEmailToCompleteSignInUseCase
+export class WelcomeEmailController extends WebController {
+  private readonly welcomeEmailUseCase: IWelcomeEmailUseCase
 
   /**
    * @desc values overrides - ['email', 'name', 'lastname']
@@ -23,10 +23,10 @@ export class SendEmailToCompleteSignInController extends WebController {
   public override requiredParams: string[] = ['email', 'name', 'lastname']
 
   constructor (
-    sendEmailToCompleteSignInUseCase: ISendEmailToCompleteSignInUseCase
+    welcomeEmailUseCase: IWelcomeEmailUseCase
   ) {
     super()
-    this.sendEmailToCompleteSignInUseCase = sendEmailToCompleteSignInUseCase
+    this.welcomeEmailUseCase = welcomeEmailUseCase
   }
 
   /**
@@ -35,7 +35,7 @@ export class SendEmailToCompleteSignInController extends WebController {
    * @returns {Promise<boolean>} data output if email message was sent
    */
   public async perform (request: Request): Promise<boolean> {
-    await this.sendEmailToCompleteSignInUseCase.perform(request.content)
+    await this.welcomeEmailUseCase.perform(request.content)
     return true
   }
 }

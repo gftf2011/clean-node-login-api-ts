@@ -5,6 +5,7 @@ export interface UserDto {
   taxvat: string
   email: string
   password: string
+  confirmed: boolean
 }
 
 export type BasicUserDto = Omit<UserDto, 'id'>

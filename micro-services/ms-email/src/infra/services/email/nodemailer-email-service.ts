@@ -1,4 +1,9 @@
 /**
+ * Driver
+ */
+import * as nodemailer from 'nodemailer'
+
+/**
  * Shared
  */
 import { Either, left, right } from '../../../shared'
@@ -9,32 +14,48 @@ import { Either, left, right } from '../../../shared'
 import { EmailOptions, EmailService } from '../../../use-cases/ports'
 
 /**
- * Infra
+ * Driver
  */
-import { EmailDirector } from './helpers/builders/email-director'
-import { NodemailerTransporterBuilder } from './helpers/builders/nodemailer-builder'
+import { google } from 'googleapis'
 
 export class NodemailerEmailService implements EmailService {
-  async send (options: EmailOptions): Promise<Either<Error, EmailOptions>> {
+  async send (options: EmailOptions): Promise<Either<Error, any>> {
     try {
-      const { from, to, subject, text, html, attachments } = options
+      const { from, to, subject, html } = options
 
-      const builder = new NodemailerTransporterBuilder()
+      const clientId = process.env.NODEMAILER_OAUTH_CLIENT_ID
+      const clientSecret = process.env.NODEMAILER_OAUTH_CLIENT_SECRET
+      const redirectUri = process.env.NODEMAILER_OAUTH_REDIRECT_URL
 
-      const director = new EmailDirector()
-      director.setBuilder(builder)
+      const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri)
 
-      const transporter = director.getEmailTransporter()
+      oAuth2Client.setCredentials({
+        refresh_token: process.env.NODEMAILER_OAUTH_REFRESH_TOKEN
+      })
 
-      await transporter.sendMail({
+      const accessToken = await oAuth2Client.getAccessToken()
+
+      const transporter = nodemailer.createTransport({
+        port: +process.env.NODEMAILER_PORT,
+        host: process.env.NODEMAILER_HOST,
+        secure: true,
+        auth: {
+          clientId,
+          clientSecret,
+          user: process.env.NODEMAILER_USER,
+          accessToken: accessToken.token,
+          refreshToken: process.env.NODEMAILER_OAUTH_REFRESH_TOKEN,
+          type: 'OAuth2'
+        }
+      })
+
+      const response = await transporter.sendMail({
         from,
         to,
         subject,
-        text,
-        html,
-        attachments
+        html
       })
-      return right(options)
+      return right(response)
     } catch (error) {
       return left(error as Error)
     }

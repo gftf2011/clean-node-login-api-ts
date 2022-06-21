@@ -58,6 +58,7 @@ psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   lastname VARCHAR (255) NOT NULL,
   email VARCHAR (255) UNIQUE NOT NULL,
   password VARCHAR (256) NOT NULL,
+  confirmed BOOLEAN NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT users_name_check CHECK (LENGTH(CAST(name AS TEXT)) > 1),
   CONSTRAINT users_lastname_check CHECK (LENGTH(CAST(lastname AS TEXT)) > 1),
