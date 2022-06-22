@@ -9,12 +9,20 @@ import { DbClientManager, IUserDao } from '../contracts'
 import { UserDto as User } from '../../use-cases/ports'
 
 export class UserDao implements IUserDao {
-  constructor (private readonly dbClientManager: DbClientManager) {}
+  constructor(private readonly dbClientManager: DbClientManager) {}
 
-  async create (user: User): Promise<User> {
-    const statement: string = 'INSERT INTO users_schema.users(name, lastname, taxvat, email, password, confirmed) VALUES($1, $2, $3, $4, $5, $6) RETURNING *'
+  async create(user: User): Promise<User> {
+    const statement: string =
+      'INSERT INTO users_schema.users(name, lastname, taxvat, email, password, confirmed) VALUES($1, $2, $3, $4, $5, $6) RETURNING *'
 
-    const values: any[] = [user.name, user.lastname, user.taxvat, user.email, user.password, user.confirmed]
+    const values: any[] = [
+      user.name,
+      user.lastname,
+      user.taxvat,
+      user.email,
+      user.password,
+      user.confirmed,
+    ]
 
     const response = await this.dbClientManager.query(statement, values)
     const parsedResponse: User = {
@@ -24,13 +32,14 @@ export class UserDao implements IUserDao {
       name: response.rows[0].name,
       password: response.rows[0].password,
       taxvat: response.rows[0].taxvat,
-      confirmed: response.rows[0].confirmed
+      confirmed: response.rows[0].confirmed,
     }
     return parsedResponse
   }
 
-  async findUserByEmail (email: string): Promise<User> {
-    const statement: string = 'SELECT * FROM users_schema.users WHERE email LIKE $1'
+  async findUserByEmail(email: string): Promise<User> {
+    const statement: string =
+      'SELECT * FROM users_schema.users WHERE email LIKE $1'
 
     const values: any[] = [email]
 
@@ -43,7 +52,7 @@ export class UserDao implements IUserDao {
           name: response.rows[0].name,
           password: response.rows[0].password,
           taxvat: response.rows[0].taxvat,
-          confirmed: response.rows[0].confirmed
+          confirmed: response.rows[0].confirmed,
         }
       : undefined
     return parsedResponse

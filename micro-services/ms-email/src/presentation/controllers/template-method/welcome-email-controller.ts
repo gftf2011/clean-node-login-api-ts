@@ -22,9 +22,7 @@ export class WelcomeEmailController extends WebController {
    */
   public override requiredParams: string[] = ['email', 'name', 'lastname']
 
-  constructor (
-    welcomeEmailUseCase: IWelcomeEmailUseCase
-  ) {
+  constructor(welcomeEmailUseCase: IWelcomeEmailUseCase) {
     super()
     this.welcomeEmailUseCase = welcomeEmailUseCase
   }
@@ -34,7 +32,7 @@ export class WelcomeEmailController extends WebController {
    * @param {Request} request - request that contains information about the 'clinet'
    * @returns {Promise<boolean>} data output if email message was sent
    */
-  public async perform (request: Request): Promise<boolean> {
+  public async perform(request: Request): Promise<boolean> {
     await this.welcomeEmailUseCase.perform(request.content)
     return true
   }

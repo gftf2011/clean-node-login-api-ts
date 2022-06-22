@@ -17,5 +17,8 @@ export interface EmailTemplate {
 }
 
 export interface EmailService {
-  send: (options: EmailOptions) => Promise<Either<Error, any>>
+  send: (
+    accessToken: string,
+    options: EmailOptions
+  ) => Promise<Either<Error, any>>
 }

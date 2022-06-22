@@ -1,12 +1,15 @@
 /**
+ * Infra
+ */
+import {
+  GoogleOAuth2Service,
+  NodemailerEmailService,
+} from '../../../infra/services'
+
+/**
  * Presentation
  */
 import { Controller } from '../../../presentation/ports'
-
-/**
- * Infra
- */
-import { NodemailerEmailService } from '../../../infra/services'
 
 /**
  * Presentation
@@ -28,11 +31,15 @@ export const makeSendWelcomeEmailController = (): Controller => {
 
   const nodemailerEmailService = new NodemailerEmailService()
 
-  const welcomeEmailUseCase = new WelcomeEmailUseCase(nodemailerEmailService, welcomeEmailTemplate)
+  const googleOAuth2Service = new GoogleOAuth2Service()
 
-  const welcomeEmailController = new WelcomeEmailController(
-    welcomeEmailUseCase
+  const welcomeEmailUseCase = new WelcomeEmailUseCase(
+    nodemailerEmailService,
+    welcomeEmailTemplate,
+    googleOAuth2Service
   )
+
+  const welcomeEmailController = new WelcomeEmailController(welcomeEmailUseCase)
 
   return welcomeEmailController
 }

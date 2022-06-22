@@ -16,9 +16,9 @@ export class RabbitmqQueueConnection implements QueueConnection {
   private static instance: RabbitmqQueueConnection
   private static channel: QueueChannel
 
-  private constructor () {}
+  private constructor() {}
 
-  static async connect (): Promise<void> {
+  static async connect(): Promise<void> {
     if (!RabbitmqQueueConnection.instance || !RabbitmqQueueConnection.channel) {
       const builder = new RabbitmqQueueBuilder()
 
@@ -49,19 +49,19 @@ export class RabbitmqQueueConnection implements QueueConnection {
 
         closeAll: async () => {
           await connection.close()
-        }
+        },
       }
     }
   }
 
-  public static getInstance (): RabbitmqQueueConnection {
+  public static getInstance(): RabbitmqQueueConnection {
     if (!RabbitmqQueueConnection.instance) {
       RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
     }
     return RabbitmqQueueConnection.instance
   }
 
-  public getChannel (): QueueChannel {
+  public getChannel(): QueueChannel {
     return RabbitmqQueueConnection.channel
   }
 }

@@ -31,7 +31,7 @@ export class SignInController extends WebController {
    */
   public override requiredParams: string[] = ['email', 'password']
 
-  constructor (signInUseCase: ISignInUseCase) {
+  constructor(signInUseCase: ISignInUseCase) {
     super()
     this.signInUseCase = signInUseCase
   }
@@ -41,8 +41,11 @@ export class SignInController extends WebController {
    * @param {HttpRequest} request - request that contains information about the 'clinet'
    * @returns {Promise<HttpResponse>} data output after sign-in operation
    */
-  public async perform (request: HttpRequest): Promise<HttpResponse> {
-    const response = await this.signInUseCase.perform(request.body, request.headers.host)
+  public async perform(request: HttpRequest): Promise<HttpResponse> {
+    const response = await this.signInUseCase.perform(
+      request.body,
+      request.headers.host
+    )
 
     if (response.isLeft()) {
       throw response.value

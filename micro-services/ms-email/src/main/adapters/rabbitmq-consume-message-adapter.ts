@@ -18,10 +18,13 @@ import { Error500 } from '../../shared/errors'
  * @desc Rabbit MQ message consumer adapter
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/adapter Adapter} design pattern
  */
-export const adaptConsumeMessage = (channel: Channel, controller: Controller) => {
+export const adaptConsumeMessage = (
+  channel: Channel,
+  controller: Controller
+) => {
   return async (msg: ConsumeMessage | null): Promise<void> => {
     const request: Request = {
-      content: {}
+      content: {},
     }
 
     if (msg !== null) {

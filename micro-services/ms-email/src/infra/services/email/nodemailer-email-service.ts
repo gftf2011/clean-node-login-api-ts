@@ -18,26 +18,15 @@ import { EmailOptions, EmailService } from '../../../use-cases/ports'
  */
 import { MailServiceError } from '../../../shared/errors'
 
-/**
- * Driver
- */
-import { google } from 'googleapis'
-
 export class NodemailerEmailService implements EmailService {
-  async send (options: EmailOptions): Promise<Either<Error, any>> {
+  async send(
+    accessToken: string,
+    options: EmailOptions
+  ): Promise<Either<Error, any>> {
     const { from, to, subject, html } = options
 
     const clientId = process.env.NODEMAILER_OAUTH_CLIENT_ID
     const clientSecret = process.env.NODEMAILER_OAUTH_CLIENT_SECRET
-    const redirectUri = process.env.NODEMAILER_OAUTH_REDIRECT_URL
-
-    const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri)
-
-    oAuth2Client.setCredentials({
-      refresh_token: process.env.NODEMAILER_OAUTH_REFRESH_TOKEN
-    })
-
-    const accessToken = await oAuth2Client.getAccessToken()
 
     try {
       const transporter = nodemailer.createTransport({
@@ -48,17 +37,17 @@ export class NodemailerEmailService implements EmailService {
           clientId,
           clientSecret,
           user: process.env.NODEMAILER_USER,
-          accessToken: accessToken.token,
+          accessToken,
           refreshToken: process.env.NODEMAILER_OAUTH_REFRESH_TOKEN,
-          type: 'OAuth2'
-        }
+          type: 'OAuth2',
+        },
       })
 
       const response = await transporter.sendMail({
         from,
         to,
         subject,
-        html
+        html,
       })
       return right(response)
     } catch (error) {

@@ -26,7 +26,11 @@ interface CustomJwtPayload extends jwt.JwtPayload {
 }
 
 export class JwtTokenService implements ITokenService {
-  sign <T> (payload: T, options: TokenOptions, expirationTime: number): Either<Error, string> {
+  sign<T>(
+    payload: T,
+    options: TokenOptions,
+    expirationTime: number
+  ): Either<Error, string> {
     if (!JWT_SECRET || !JWT_ALGORITHM) {
       return left(new ServerError())
     }
@@ -37,24 +41,27 @@ export class JwtTokenService implements ITokenService {
     const registeredClaims = {
       subject: options.subject,
       issuer: options.issuer,
-      jwtId: options.jwtId
+      jwtId: options.jwtId,
     }
 
     const jsonWebToken: string = jwt.sign({ data: payload }, JWT_SECRET, {
       expiresIn: expirationTime,
       header: {
         typ: 'JWT',
-        alg: JWT_ALGORITHM
+        alg: JWT_ALGORITHM,
       },
       subject: registeredClaims.subject,
       issuer: registeredClaims.issuer,
-      jwtid: registeredClaims.jwtId
+      jwtid: registeredClaims.jwtId,
     })
 
     return right(`${jsonWebToken}`)
   }
 
-  verify (token: string, options: TokenOptions): Either<Error, CustomJwtPayload> {
+  verify(
+    token: string,
+    options: TokenOptions
+  ): Either<Error, CustomJwtPayload> {
     if (!JWT_SECRET || !JWT_ALGORITHM) {
       return left(new ServerError())
     }
@@ -62,7 +69,7 @@ export class JwtTokenService implements ITokenService {
     const registeredClaims = {
       subject: options.subject,
       issuer: options.issuer,
-      jwtId: options.jwtId
+      jwtId: options.jwtId,
     }
 
     try {
@@ -70,7 +77,7 @@ export class JwtTokenService implements ITokenService {
         algorithms: [JWT_ALGORITHM],
         subject: registeredClaims.subject,
         issuer: registeredClaims.issuer,
-        jwtid: registeredClaims.jwtId
+        jwtid: registeredClaims.jwtId,
       }) as CustomJwtPayload
 
       return right(response)

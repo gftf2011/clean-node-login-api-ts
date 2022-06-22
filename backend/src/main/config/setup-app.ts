@@ -1,4 +1,3 @@
-
 import express from 'express'
 import setupMiddlewares from '../config/setup-middlewares'
 import setupRoutes from '../config/setup-routes'

@@ -12,7 +12,13 @@ import process from 'process'
 if (cluster.isPrimary && Boolean(process.env.MULTI_THREAD)) {
   os.cpus().forEach(() => cluster.fork())
 } else {
-  loader().then(() => {
-    server.listen(process.env.PORT, () => console.log(`Server ${process.pid} running at http://localhost:${process.env.PORT}`))
-  }).catch(console.error)
+  loader()
+    .then(() => {
+      server.listen(process.env.PORT, () =>
+        console.log(
+          `Server ${process.pid} running at http://localhost:${process.env.PORT}`
+        )
+      )
+    })
+    .catch(console.error)
 }

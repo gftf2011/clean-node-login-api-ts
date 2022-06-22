@@ -1,9 +1,19 @@
 /**
  * Infra
  */
-import { CryptoEncryptService, CryptoHashService, JwtTokenService } from '../../../infra/services'
-import { PostgresDbClientManager, PostgresDbClientPool } from '../../../infra/db'
-import { RabbitmqQueueConnection, RabbitmqQueuePublishManager } from '../../../infra/queue'
+import {
+  CryptoEncryptService,
+  CryptoHashService,
+  JwtTokenService,
+} from '../../../infra/services'
+import {
+  PostgresDbClientManager,
+  PostgresDbClientPool,
+} from '../../../infra/db'
+import {
+  RabbitmqQueueConnection,
+  RabbitmqQueuePublishManager,
+} from '../../../infra/queue'
 
 /**
  * Presentation
@@ -48,11 +58,20 @@ export const makeSignInController = (): Controller => {
   const cryptoHashService = new CryptoHashService()
   const jwtTokenService = new JwtTokenService()
 
-  const signInUseCase = new SignInUseCase(userRepository, cryptoEncryptService, cryptoHashService, jwtTokenService, queueManager)
+  const signInUseCase = new SignInUseCase(
+    userRepository,
+    cryptoEncryptService,
+    cryptoHashService,
+    jwtTokenService,
+    queueManager
+  )
 
   const signInController = new SignInController(signInUseCase)
 
-  const decorator = new DbTransactionDecorator(signInController, postgresClientManager)
+  const decorator = new DbTransactionDecorator(
+    signInController,
+    postgresClientManager
+  )
 
   return decorator
 }

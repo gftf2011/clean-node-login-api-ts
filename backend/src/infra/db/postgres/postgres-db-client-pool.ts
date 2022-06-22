@@ -19,9 +19,9 @@ export class PostgresDbClientPool implements DbClientPool {
   private static pool: Pool
   private static instance: PostgresDbClientPool
 
-  private constructor () {}
+  private constructor() {}
 
-  static connect (): void {
+  static connect(): void {
     if (!PostgresDbClientPool.pool) {
       const builder = new PgClientBuilder()
 
@@ -32,14 +32,14 @@ export class PostgresDbClientPool implements DbClientPool {
     }
   }
 
-  static getInstance (): DbClientPool {
+  static getInstance(): DbClientPool {
     if (!PostgresDbClientPool.instance) {
       PostgresDbClientPool.instance = new PostgresDbClientPool()
     }
     return PostgresDbClientPool.instance
   }
 
-  public async getClient (): Promise<DbClient> {
+  public async getClient(): Promise<DbClient> {
     return await PostgresDbClientPool.pool.connect()
   }
 }

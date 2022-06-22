@@ -2,7 +2,11 @@
  * Shared
  */
 import { Either, left, right } from '../shared'
-import { InvalidEmailError, InvalidLastnameError, InvalidNameError } from '../shared/errors'
+import {
+  InvalidEmailError,
+  InvalidLastnameError,
+  InvalidNameError,
+} from '../shared/errors'
 import {
   getEmailAccount,
   getEmailAddress,
@@ -10,7 +14,7 @@ import {
   isEmailValid,
   normalizeValueToPascalCase,
   removeExtremitiesWhiteSpaces,
-  removeMultipleWhiteSpacesToSingleWhiteSpace
+  removeMultipleWhiteSpacesToSingleWhiteSpace,
 } from '../shared/utils'
 
 export class UserEntity {
@@ -18,30 +22,26 @@ export class UserEntity {
   private readonly lastname: string
   private readonly email: string
 
-  private constructor (
-    name: string,
-    lastname: string,
-    email: string
-  ) {
+  private constructor(name: string, lastname: string, email: string) {
     this.name = name
     this.lastname = lastname
     this.email = email
     Object.freeze(this)
   }
 
-  getName (): string {
+  getName(): string {
     return this.name
   }
 
-  getLastname (): string {
+  getLastname(): string {
     return this.lastname
   }
 
-  getEmail (): string {
+  getEmail(): string {
     return this.email
   }
 
-  private static validateName (name: string): boolean {
+  private static validateName(name: string): boolean {
     if (!name) {
       return false
     }
@@ -54,7 +54,7 @@ export class UserEntity {
     return true
   }
 
-  private static validateLastname (lastname: string): boolean {
+  private static validateLastname(lastname: string): boolean {
     if (!lastname) {
       return false
     }
@@ -67,7 +67,7 @@ export class UserEntity {
     return true
   }
 
-  private static validateEmail (email: string): boolean {
+  private static validateEmail(email: string): boolean {
     if (!email) {
       return false
     }
@@ -92,7 +92,7 @@ export class UserEntity {
     return true
   }
 
-  private static validate (
+  private static validate(
     name: string,
     lastname: string,
     email: string
@@ -109,7 +109,7 @@ export class UserEntity {
     return right(true)
   }
 
-  static create (
+  static create(
     name: string,
     lastname: string,
     email: string

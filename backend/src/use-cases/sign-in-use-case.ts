@@ -1,7 +1,16 @@
 /**
  * Use Cases
  */
-import { AccountDto, AuthenticatedAccountDto, IEncryptService, IHashService, ISignInUseCase, ITokenService, IUserRepository, QueuePublishManager } from './ports'
+import {
+  AccountDto,
+  AuthenticatedAccountDto,
+  IEncryptService,
+  IHashService,
+  ISignInUseCase,
+  ITokenService,
+  IUserRepository,
+  QueuePublishManager,
+} from './ports'
 
 /**
  * Shared
@@ -10,11 +19,11 @@ import { Either, left, right } from '../shared'
 import { ServerError, UnauthorizedError } from '../shared/errors'
 
 /**
-  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-  * @desc Contains the logic to perform a sign-in operation
-  */
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Contains the logic to perform a sign-in operation
+ */
 export class SignInUseCase implements ISignInUseCase {
-  constructor (
+  constructor(
     private readonly userRepository: IUserRepository,
     private readonly encryptService: IEncryptService,
     private readonly hashService: IHashService,
@@ -28,7 +37,10 @@ export class SignInUseCase implements ISignInUseCase {
    * @param {string} host - the application host
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-in
    */
-  async perform (request: AccountDto, host: string): Promise<Either<Error, AuthenticatedAccountDto>> {
+  async perform(
+    request: AccountDto,
+    host: string
+  ): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
       !process.env.CODE_SALT &&
       !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
@@ -58,7 +70,10 @@ export class SignInUseCase implements ISignInUseCase {
     /**
      * encrypt encrypted password with code default salt hash value
      */
-    const strongHashedPassword = this.hashService.encode(hashedPassword, defaultSalt)
+    const strongHashedPassword = this.hashService.encode(
+      hashedPassword,
+      defaultSalt
+    )
 
     if (strongHashedPassword !== userExists.password) {
       return left(new UnauthorizedError())
@@ -72,23 +87,23 @@ export class SignInUseCase implements ISignInUseCase {
 
     const refreshTokenOrError = this.tokenService.sign(
       {
-        id: userExists.id
+        id: userExists.id,
       },
       {
         subject: process.env.APP_SECRET,
         issuer: host,
-        jwtId: refreshTokenId
+        jwtId: refreshTokenId,
       },
       refreshTokenExpiresIn
     )
     const accessTokenOrError = this.tokenService.sign(
       {
-        email: this.encryptService.encode(userExists.email)
+        email: this.encryptService.encode(userExists.email),
       },
       {
         subject: userExists.id,
         issuer: host,
-        jwtId: accessTokenId
+        jwtId: accessTokenId,
       },
       accessTokenExpiresIn
     )
@@ -104,7 +119,7 @@ export class SignInUseCase implements ISignInUseCase {
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
-      refreshToken: refreshTokenOrError.value
+      refreshToken: refreshTokenOrError.value,
     }
 
     return right(authenticatedAccount)

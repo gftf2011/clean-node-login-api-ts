@@ -1,7 +1,11 @@
 /**
  * Presentation
  */
-import { Controller, HttpRequest, HttpResponse } from '../../../../presentation/ports'
+import {
+  Controller,
+  HttpRequest,
+  HttpResponse,
+} from '../../../../presentation/ports'
 
 /**
  * Infra
@@ -9,9 +13,12 @@ import { Controller, HttpRequest, HttpResponse } from '../../../../presentation/
 import { DbClientManager } from '../../../contracts'
 
 export class DbTransactionDecorator implements Controller {
-  constructor (private readonly decoratee: Controller, private readonly dbClientManager: DbClientManager) {}
+  constructor(
+    private readonly decoratee: Controller,
+    private readonly dbClientManager: DbClientManager
+  ) {}
 
-  public async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
+  public async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       await this.dbClientManager.createClient()
       await this.dbClientManager.openTransaction()

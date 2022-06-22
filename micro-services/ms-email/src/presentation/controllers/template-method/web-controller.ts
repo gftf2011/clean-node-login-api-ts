@@ -16,9 +16,12 @@ export abstract class WebController implements Controller {
    * @param {Request} request - data input which comes from the `client`
    * @returns {Promise<boolean | Error>} data output if operation was handled successfully
    */
-  public async handle (request: Request): Promise<boolean | Error> {
+  public async handle(request: Request): Promise<boolean | Error> {
     try {
-      const missingParams: string[] = WebController.getMissingParams(request, this.requiredParams)
+      const missingParams: string[] = WebController.getMissingParams(
+        request,
+        this.requiredParams
+      )
       if (missingParams.length !== 0) {
         return false
       }
@@ -34,7 +37,7 @@ export abstract class WebController implements Controller {
    * @param {Request} request - data input which comes from the `client`
    * @returns {Promise<boolean>} data output if operation was performed successfully
    */
-  public abstract perform (request: Request): Promise<boolean>
+  public abstract perform(request: Request): Promise<boolean>
 
   /**
    * @desc check which parameters are missing
@@ -42,7 +45,10 @@ export abstract class WebController implements Controller {
    * @param {string[]} requiredParams - required parameters which must be sent
    * @returns {string[]} array of missing parameters
    */
-  public static getMissingParams (request: Request, requiredParams: string[]): string[] {
+  public static getMissingParams(
+    request: Request,
+    requiredParams: string[]
+  ): string[] {
     const missingParams: string[] = []
     requiredParams.forEach((name) => {
       if (!Object.keys(request.content).includes(name)) {

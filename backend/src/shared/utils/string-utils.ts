@@ -33,7 +33,9 @@ export const getEmailDomainsFromAddress = (address: string): string[] => {
   return address.split(EMAIL_DOMAIN_SEPARATOR)
 }
 
-export const removeMultipleWhiteSpacesToSingleWhiteSpace = (value: string): string => {
+export const removeMultipleWhiteSpacesToSingleWhiteSpace = (
+  value: string
+): string => {
   return value.replace(MULTI_WHITE_SPACES_REGEX, SINGLE_WHITE_SPACE_SEPARATOR)
 }
 
@@ -59,7 +61,10 @@ export const normalizeValueToPascalCase = (value: string): string => {
   const formattedPieces: string[] = valuePieces.map((piece: string) => {
     const newPiece: string = piece.toLocaleLowerCase()
     if (newPiece.length > 1) {
-      return `${newPiece.charAt(0).toLocaleUpperCase()}${newPiece.substring(1, newPiece.length)}`
+      return `${newPiece.charAt(0).toLocaleUpperCase()}${newPiece.substring(
+        1,
+        newPiece.length
+      )}`
     }
     return newPiece.toLocaleUpperCase()
   })

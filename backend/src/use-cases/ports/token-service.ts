@@ -10,6 +10,10 @@ export interface TokenOptions {
 }
 
 export interface ITokenService {
-  sign: <T>(payload: T, options: TokenOptions, expirationTime: number) => Either<Error, string>
+  sign: <T>(
+    payload: T,
+    options: TokenOptions,
+    expirationTime: number
+  ) => Either<Error, string>
   verify: (token: string, options: TokenOptions) => Either<Error, any>
 }

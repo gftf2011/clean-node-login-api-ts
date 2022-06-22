@@ -8,5 +8,9 @@ export default async (channel: Channel): Promise<void> => {
   await channel.assertExchange('sign-up', 'direct', { durable: false })
   const { queue } = await channel.assertQueue('', { exclusive: true })
   await channel.bindQueue(queue, 'sign-up', 'welcome-email')
-  await channel.consume(queue, adaptConsumeMessage(channel, makeSendWelcomeEmailController()), { noAck: false })
+  await channel.consume(
+    queue,
+    adaptConsumeMessage(channel, makeSendWelcomeEmailController()),
+    { noAck: false }
+  )
 }

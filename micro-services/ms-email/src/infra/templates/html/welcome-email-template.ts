@@ -4,7 +4,7 @@
 import { BasicUserDto, EmailTemplate } from '../../../use-cases/ports'
 
 export class WelcomeEmailTemplate implements EmailTemplate {
-  html (data: object): string {
+  html(data: object): string {
     const { name } = data as BasicUserDto
     return `<div style="max-width: 600px">
          <main style="
@@ -83,7 +83,7 @@ export class WelcomeEmailTemplate implements EmailTemplate {
        </div>`
   }
 
-  attachments (): object[] {
+  attachments(): object[] {
     return []
   }
 }

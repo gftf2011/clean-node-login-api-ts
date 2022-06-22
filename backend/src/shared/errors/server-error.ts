@@ -1,7 +1,7 @@
 import { Error500 } from './error-500'
 
 export class ServerError extends Error500 {
-  constructor () {
+  constructor() {
     super('Server is not responding')
     this.name = ServerError.name
   }
