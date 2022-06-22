@@ -14,14 +14,21 @@ import { NodemailerEmailService } from '../../../infra/services'
 import { WelcomeEmailController } from '../../../presentation/controllers'
 
 /**
+ * Main
+ */
+import { WelcomeEmailTemplate } from '../../config/email'
+
+/**
  * Use Cases
  */
 import { WelcomeEmailUseCase } from '../../../use-cases'
 
 export const makeSendWelcomeEmailController = (): Controller => {
+  const welcomeEmailTemplate = new WelcomeEmailTemplate()
+
   const nodemailerEmailService = new NodemailerEmailService()
 
-  const welcomeEmailUseCase = new WelcomeEmailUseCase(nodemailerEmailService)
+  const welcomeEmailUseCase = new WelcomeEmailUseCase(nodemailerEmailService, welcomeEmailTemplate)
 
   const welcomeEmailController = new WelcomeEmailController(
     welcomeEmailUseCase

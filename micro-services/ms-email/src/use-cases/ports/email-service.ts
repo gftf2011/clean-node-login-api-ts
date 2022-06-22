@@ -8,6 +8,12 @@ export interface EmailOptions {
   readonly to: string
   readonly subject: string
   readonly html: string
+  readonly attachments?: object[]
+}
+
+export interface EmailTemplate {
+  html: (data: object) => string
+  attachments: () => object[]
 }
 
 export interface EmailService {
