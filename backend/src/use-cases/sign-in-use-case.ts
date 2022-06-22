@@ -100,7 +100,7 @@ export class SignInUseCase implements ISignInUseCase {
       return left(accessTokenOrError.value)
     }
 
-    await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userExists))
+    // await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userExists))
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,

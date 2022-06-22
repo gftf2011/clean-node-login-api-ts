@@ -42,9 +42,9 @@ export class RabbitmqQueueConnection implements QueueConnection {
       const channel: Channel = await connection.createChannel()
 
       RabbitmqQueueConnection.channel = {
-        send: async (queue: string, content: Buffer) => {
-          await channel.assertQueue(queue, { durable: true })
-          channel.sendToQueue(queue, content)
+        send: async (exchange: string, bindingKey: string, content: Buffer) => {
+          await channel.assertExchange(exchange, 'direct', { durable: false })
+          channel.publish(exchange, bindingKey, content)
         },
 
         closeAll: async () => {

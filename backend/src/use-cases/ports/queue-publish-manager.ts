@@ -1,4 +1,4 @@
 export interface QueuePublishManager {
-  publish: (queue: string, content: string) => Promise<void>
+  publish: (exchange: string, bindingKey: string, content: string) => Promise<void>
   close: () => Promise<void>
 }

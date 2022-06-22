@@ -127,7 +127,7 @@ export class SignUpUseCase implements ISignUpUseCase {
       return left(accessTokenOrError.value)
     }
 
-    await this.queueManager.publish('welcome-email', JSON.stringify(userCreated))
+    await this.queueManager.publish('sign-up', 'welcome-email', JSON.stringify(userCreated))
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
