@@ -14,9 +14,9 @@ import { NodemailerEmailService } from '../../../infra/services'
 import { WelcomeEmailController } from '../../../presentation/controllers'
 
 /**
- * Main
+ * Infra
  */
-import { WelcomeEmailTemplate } from '../../config/email'
+import { WelcomeEmailTemplate } from '../../../infra/templates'
 
 /**
  * Use Cases
