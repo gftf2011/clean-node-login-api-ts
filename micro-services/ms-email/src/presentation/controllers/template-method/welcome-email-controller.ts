@@ -33,7 +33,12 @@ export class WelcomeEmailController extends WebController {
    * @returns {Promise<boolean>} data output if email message was sent
    */
   public async perform(request: Request): Promise<boolean> {
-    await this.welcomeEmailUseCase.perform(request.content)
+    const response = await this.welcomeEmailUseCase.perform(request.content)
+
+    if (response.isLeft()) {
+      throw response.value
+    }
+
     return true
   }
 }

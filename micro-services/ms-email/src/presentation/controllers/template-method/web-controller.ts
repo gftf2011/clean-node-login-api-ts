@@ -27,7 +27,6 @@ export abstract class WebController implements Controller {
       }
       return await this.perform(request)
     } catch (error) {
-      console.log(error)
       return error as Error
     }
   }

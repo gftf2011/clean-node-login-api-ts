@@ -2,13 +2,19 @@
  * Use Cases
  */
 import {
+  BasicUserDto,
   EmailOptions,
   EmailService,
   EmailTemplate,
   IWelcomeEmailUseCase,
   OAuth2Service,
-  UserDto,
 } from './ports'
+
+/**
+ * Shared
+ */
+import { Either, left, right } from '../shared'
+import { ServerError } from '../shared/errors'
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -21,14 +27,19 @@ export class WelcomeEmailUseCase implements IWelcomeEmailUseCase {
     private readonly oAuthService: OAuth2Service
   ) {}
 
-  async perform(request: UserDto): Promise<void> {
+  /**
+   * @desc Performs the main logic to send the user`s welcoming email
+   * @param {BasicUserDto} request - user data from input
+   * @returns {Promise<Either<Error, any>>} output from email service response
+   */
+  async perform(request: BasicUserDto): Promise<Either<Error, any>> {
     if (
       !process.env.NODEMAILER_OAUTH_CLIENT_ID ||
       !process.env.NODEMAILER_OAUTH_CLIENT_SECRET ||
       !process.env.NODEMAILER_OAUTH_REDIRECT_URL ||
       !process.env.NODEMAILER_OAUTH_REFRESH_TOKEN
     ) {
-      return
+      return left(new ServerError())
     }
 
     const clientId = process.env.NODEMAILER_OAUTH_CLIENT_ID
@@ -50,6 +61,7 @@ export class WelcomeEmailUseCase implements IWelcomeEmailUseCase {
       html: this.emailTemplate.html(request),
       attachments: this.emailTemplate.attachments(),
     }
-    await this.emailService.send(accessToken, mailOptions)
+    const response = await this.emailService.send(accessToken, mailOptions)
+    return right(response)
   }
 }
