@@ -42,7 +42,7 @@ mongo << EOF
       email: 1
     },
     {
-      name: 'users_email_unique_constraint',
+      name: 'users_email_unique_index_constraint',
       unique: true
     }
   )
