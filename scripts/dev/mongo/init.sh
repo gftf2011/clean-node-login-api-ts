@@ -36,4 +36,14 @@ mongo << EOF
       db: 'clean_node_login_api_ts_mongo_dev_db'
     }]
   })
+
+  db.users.createIndex(
+    {
+      email: 1
+    },
+    {
+      name: 'users_email_unique_constraint',
+      unique: true
+    }
+  )
 EOF
