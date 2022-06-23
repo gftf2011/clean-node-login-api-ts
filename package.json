@@ -12,7 +12,7 @@
     "docker:clear": "docker-compose down && npm run docker:delete:volumes",
     "docker:delete:volumes": "docker volume prune -f",
     "build:docker:dev": "rm -rf docker-compose.yml && cat docker/dev/docker-compose.yml >> docker-compose.yml",
-    "build:script:dev": "chmod +x ./scripts/dev/postgres/init.sh",
+    "build:script:dev": "chmod +x ./scripts/dev/postgres/init.sh && chmod +x ./scripts/dev/mongo/init.sh",
     "prerun:docker:dev": "npm run docker:clear || true",
     "run:docker:dev": "npm run build:script:dev && npm run build:docker:dev",
     "postrun:docker:dev": "npm run docker:up",
