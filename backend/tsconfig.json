@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src",                                    /* Specify the base directory to resolve non-relative module names. */
+    "rootDirs": ["src", "test"],                         /* Allow multiple folders to be treated as one when resolving modules. */
+    "outDir": "dist",                                    /* Specify an output folder for all emitted files. */
+  },
+  "include": ["src", "tests"],
+  "exclude": ["node_modules", "dist"]
+}

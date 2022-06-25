@@ -1,23 +1,24 @@
 {
-  "name": "clean-node-login-api-ts",
+  "name": "clean-node-login-api-ts-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/main/index.js",
+  "workspaces": [
+    "backend",
+    "micro-services/ms-email"
+  ],
   "scripts": {
     "docker:up": "docker-compose up -d --remove-orphans",
     "docker:down": "docker-compose down",
     "docker:clear": "docker-compose down && npm run docker:delete:volumes",
     "docker:delete:volumes": "docker volume prune -f",
-    "build:dev": "rm -rf .env && cat ./env/dev/.env >> .env",
     "build:docker:dev": "rm -rf docker-compose.yml && cat docker/dev/docker-compose.yml >> docker-compose.yml",
-    "build:script:dev": "chmod +x ./scripts/dev/postgres/init.sh",
-    "build": "rimraf dist && tsc -p tsconfig.json",
-    "start": "node dist/main/index.js",
-    "prerun:docker:dev": "npm run docker:clear",
-    "run:docker:dev": "npm run build:dev && npm run build:script:dev && npm run build:docker:dev",
+    "build:script:dev": "chmod +x ./scripts/dev/postgres/init.sh && chmod +x ./scripts/dev/mongo/init.sh",
+    "prerun:docker:dev": "npm run docker:clear || true",
+    "run:docker:dev": "npm run build:script:dev && npm run build:docker:dev",
     "postrun:docker:dev": "npm run docker:up",
-    "prestart:dev": "npm run run:docker:dev",
-    "start:dev": "npm run build && npm run start"
+    "prestart:dev:backend": "npm run run:docker:dev",
+    "start:dev:backend": "npm run start:dev --workspace=backend",
+    "start:dev:microservice:email": "npm run start:dev --workspace=micro-services/ms-email"
   },
   "repository": {
     "type": "git",
@@ -31,28 +32,16 @@
   },
   "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme",
   "devDependencies": {
-    "@types/express": "^4.17.13",
-    "@types/jsonwebtoken": "^8.5.8",
-    "@types/node": "^17.0.21",
-    "@types/pg": "^8.6.5",
-    "@types/redis": "2.8.32",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "eslint": "^7.32.0",
-    "eslint-config-standard-with-typescript": "^21.0.1",
-    "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-node": "^11.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-import-resolver-typescript": "^2.7.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.2",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "typescript": "^4.6.2"
-  },
-  "dependencies": {
-    "dotenv": "^16.0.0",
-    "express": "^4.17.3",
-    "jsonwebtoken": "^8.5.1",
-    "module-alias": "^2.2.2",
-    "pg": "^8.7.3",
-    "redis": "3.1.2"
-  },
-  "_moduleAliases": {
-    "@": "dist"
+    "prettier": "^2.7.0"
   }
 }
