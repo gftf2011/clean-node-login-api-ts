@@ -1,17 +1,22 @@
 /**
  * Infra
  */
-import { DbClient, DbClientPool } from '../../contracts'
-import { DbDirector } from '../helpers/builders/db-director'
+import {
+  DbClient,
+  DbClientPool,
+  DbSession,
+  DbTransactionSession,
+} from '../../contracts'
 
 /**
  * Drivers
  */
-import { MongoClient } from 'mongodb'
+import { MongoClient, ReadPreference } from 'mongodb'
 
 /**
  * Infra
  */
+import { DbDirector } from '../helpers/builders/db-director'
 import { MongoClientBuilder } from '../helpers/builders/mongo-builder'
 
 /**
@@ -19,7 +24,7 @@ import { MongoClientBuilder } from '../helpers/builders/mongo-builder'
  * @desc Garantees that only one instance from the object will exists in project
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/singleton Singleton} design pattern
  */
-export class MongoDbClientPool {
+export class MongoDbClientPool implements DbClientPool, DbTransactionSession {
   private static pool: MongoClient
   private static instance: MongoDbClientPool
 
@@ -45,5 +50,15 @@ export class MongoDbClientPool {
 
   public async getClient(): Promise<DbClient> {
     return MongoDbClientPool.pool.connect()
+  }
+
+  public async getSession(): Promise<DbSession> {
+    return MongoDbClientPool.pool.startSession({
+      defaultTransactionOptions: {
+        readPreference: new ReadPreference(ReadPreference.PRIMARY),
+        readConcern: { level: 'local' },
+        writeConcern: { w: 'majority' },
+      },
+    })
   }
 }
