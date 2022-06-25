@@ -10,9 +10,11 @@ import {
   DbTransactionSession,
 } from '../../contracts'
 import { DbQueryRunnerContext } from '../helpers/strategy/db-query-runner-context'
+import { MongoDbFindOneQueryRunnerStrategy } from '../helpers/strategy/mongo-db-find-one-query-runner-strategy'
+import { MongoDbInsertOneQueryRunnerStrategy } from '../helpers/strategy/mongo-db-insert-one-query-runner-strategy'
 
 export class MongoDbClientManager implements DbClientManager {
-  private _client: DbClient
+  private client: DbClient
 
   private session: DbSession
 
@@ -23,15 +25,28 @@ export class MongoDbClientManager implements DbClientManager {
   ) {}
 
   public async createClient(): Promise<void> {
-    this._client = await this.pool.getClient()
+    this.client = await this.pool.getClient()
   }
 
   public async openTransaction(): Promise<void> {
     this.session = await this.transaction.getSession()
   }
 
-  public async query(tableOrCollection: string, ...args: any): Promise<any> {
-    const context = new DbQueryRunnerContext(this.queryRunner)
+  public async query(
+    operation: 'INSERT_ONE' | 'FIND_ONE',
+    tableOrCollection: string,
+    ...args: any
+  ): Promise<any> {
+    let context
+    if (operation === 'INSERT_ONE') {
+      context = new DbQueryRunnerContext(
+        new MongoDbInsertOneQueryRunnerStrategy(this.client)
+      )
+    } else if (operation === 'FIND_ONE') {
+      context = new DbQueryRunnerContext(
+        new MongoDbFindOneQueryRunnerStrategy(this.client)
+      )
+    }
     return context.executeQuery(tableOrCollection, ...args)
   }
 

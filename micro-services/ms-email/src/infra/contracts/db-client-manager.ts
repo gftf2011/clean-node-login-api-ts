@@ -1,5 +1,9 @@
 export interface DbClientManager {
-  query: (tableOrCollection: string, ...args: any) => Promise<any>
+  query: (
+    operation: 'INSERT_ONE' | 'FIND_ONE',
+    tableOrCollection: string,
+    ...args: any
+  ) => Promise<any>
   createClient: () => Promise<void>
   openTransaction: () => Promise<void>
   closeTransaction: () => Promise<void>
