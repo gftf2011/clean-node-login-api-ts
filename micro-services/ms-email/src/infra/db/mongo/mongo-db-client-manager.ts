@@ -5,7 +5,6 @@ import {
   DbClient,
   DbClientManager,
   DbClientPool,
-  DbQueryRunner,
   DbSession,
   DbTransactionSession,
 } from '../../contracts'
@@ -20,8 +19,7 @@ export class MongoDbClientManager implements DbClientManager {
 
   constructor(
     private readonly pool: DbClientPool,
-    private readonly transaction: DbTransactionSession,
-    private readonly queryRunner: DbQueryRunner
+    private readonly transaction: DbTransactionSession
   ) {}
 
   public async createClient(): Promise<void> {

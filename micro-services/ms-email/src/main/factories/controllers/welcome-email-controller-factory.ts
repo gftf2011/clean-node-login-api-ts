@@ -1,15 +1,27 @@
 /**
  * Infra
  */
+import { DbClientPool, DbTransactionSession } from '../../../infra/contracts'
 import {
   GoogleOAuth2Service,
   NodemailerEmailService,
 } from '../../../infra/services'
 
 /**
+ * Infra
+ */
+import { MongoDbClientManager, MongoDbClientPool } from '../../../infra/db'
+
+/**
  * Presentation
  */
 import { Controller } from '../../../presentation/ports'
+
+/**
+ * Infra
+ */
+import { UserDao } from '../../../infra/dao'
+import { UserRepository } from '../../../infra/repositories'
 
 /**
  * Presentation
@@ -27,6 +39,17 @@ import { WelcomeEmailTemplate } from '../../../infra/templates'
 import { WelcomeEmailUseCase } from '../../../use-cases'
 
 export const makeSendWelcomeEmailController = (): Controller => {
+  const mongoDbClientPoolAndTransaction = MongoDbClientPool.getInstance()
+  const mongoDbClientPool: DbClientPool = mongoDbClientPoolAndTransaction
+  const mongoDbTransactionSession: DbTransactionSession =
+    mongoDbClientPoolAndTransaction
+  const mongoDbClientManager = new MongoDbClientManager(
+    mongoDbClientPool,
+    mongoDbTransactionSession
+  )
+  const userDao = new UserDao(mongoDbClientManager)
+  const userRepository = new UserRepository(userDao)
+
   const welcomeEmailTemplate = new WelcomeEmailTemplate()
 
   const nodemailerEmailService = new NodemailerEmailService()
@@ -36,7 +59,8 @@ export const makeSendWelcomeEmailController = (): Controller => {
   const welcomeEmailUseCase = new WelcomeEmailUseCase(
     nodemailerEmailService,
     welcomeEmailTemplate,
-    googleOAuth2Service
+    googleOAuth2Service,
+    userRepository
   )
 
   const welcomeEmailController = new WelcomeEmailController(welcomeEmailUseCase)

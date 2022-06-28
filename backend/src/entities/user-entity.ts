@@ -7,7 +7,7 @@ import {
   InvalidLastnameError,
   InvalidNameError,
   InvalidPasswordError,
-  InvalidTaxvatError
+  InvalidTaxvatError,
 } from '../shared/errors'
 import {
   clearTaxvat,
@@ -27,17 +27,17 @@ import {
   isTaxvatSecondDigitValid,
   normalizeValueToPascalCase,
   removeExtremitiesWhiteSpaces,
-  removeMultipleWhiteSpacesToSingleWhiteSpace
+  removeMultipleWhiteSpacesToSingleWhiteSpace,
 } from '../shared/utils'
 
 export class UserEntity {
-  private readonly name: string;
-  private readonly lastname: string;
-  private readonly taxvat: string;
-  private readonly email: string;
-  private readonly password: string;
+  private readonly name: string
+  private readonly lastname: string
+  private readonly taxvat: string
+  private readonly email: string
+  private readonly password: string
 
-  private constructor (
+  private constructor(
     name: string,
     lastname: string,
     taxvat: string,
@@ -52,27 +52,27 @@ export class UserEntity {
     Object.freeze(this)
   }
 
-  getName (): string {
+  getName(): string {
     return this.name
   }
 
-  getLastname (): string {
+  getLastname(): string {
     return this.lastname
   }
 
-  getTaxvat (): string {
+  getTaxvat(): string {
     return this.taxvat
   }
 
-  getEmail (): string {
+  getEmail(): string {
     return this.email
   }
 
-  getPassword (): string {
+  getPassword(): string {
     return this.password
   }
 
-  private static validateName (name: string): boolean {
+  private static validateName(name: string): boolean {
     if (!name) {
       return false
     }
@@ -85,7 +85,7 @@ export class UserEntity {
     return true
   }
 
-  private static validateLastname (lastname: string): boolean {
+  private static validateLastname(lastname: string): boolean {
     if (!lastname) {
       return false
     }
@@ -98,7 +98,7 @@ export class UserEntity {
     return true
   }
 
-  private static validateTaxvat (taxvat: string): boolean {
+  private static validateTaxvat(taxvat: string): boolean {
     if (!taxvat) {
       return false
     }
@@ -127,7 +127,7 @@ export class UserEntity {
     return true
   }
 
-  private static validateEmail (email: string): boolean {
+  private static validateEmail(email: string): boolean {
     if (!email) {
       return false
     }
@@ -152,7 +152,7 @@ export class UserEntity {
     return true
   }
 
-  private static validatePassword (password: string): boolean {
+  private static validatePassword(password: string): boolean {
     const pass: string = password
     if (!pass || pass.length < 11) {
       return false
@@ -180,7 +180,7 @@ export class UserEntity {
     return true
   }
 
-  private static validate (
+  private static validate(
     name: string,
     lastname: string,
     taxvat: string,
@@ -205,7 +205,7 @@ export class UserEntity {
     return right(true)
   }
 
-  static create (
+  static create(
     name: string,
     lastname: string,
     taxvat: string,

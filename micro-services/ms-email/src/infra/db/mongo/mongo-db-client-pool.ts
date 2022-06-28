@@ -41,7 +41,7 @@ export class MongoDbClientPool implements DbClientPool, DbTransactionSession {
     }
   }
 
-  static getInstance(): DbClientPool {
+  static getInstance(): DbClientPool & DbTransactionSession {
     if (!MongoDbClientPool.instance) {
       MongoDbClientPool.instance = new MongoDbClientPool()
     }
