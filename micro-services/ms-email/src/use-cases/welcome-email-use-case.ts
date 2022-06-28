@@ -73,15 +73,18 @@ export class WelcomeEmailUseCase implements IWelcomeEmailUseCase {
     const redirectUri = process.env.NODEMAILER_OAUTH_REDIRECT_URL
     const refreshToken = process.env.NODEMAILER_OAUTH_REFRESH_TOKEN
 
-    const [accessToken, userCreated] = await Promise.all([
-      this.oAuthService.getAccessToken(
-        clientId,
-        clientSecret,
-        redirectUri,
-        refreshToken
-      ),
-      this.userRepository.create(user),
-    ])
+    const accessToken = await this.oAuthService.getAccessToken(
+      clientId,
+      clientSecret,
+      redirectUri,
+      refreshToken
+    )
+
+    const userCreated = await this.userRepository.create(user)
+
+    if (!userCreated) {
+      return left(new ServerError())
+    }
 
     const mailOptions: EmailOptions = {
       from: 'Gabriel Ferrari Tarallo Ferraz | Acme <noreply@acme.com>',

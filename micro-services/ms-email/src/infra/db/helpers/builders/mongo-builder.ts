@@ -55,6 +55,7 @@ export class MongoClientBuilder implements IDbClientBuilder {
       `mongodb://${this.product.user}:${this.product.pass}@${this.product.host}:${this.product.port}/${this.product.db}`,
       {
         maxPoolSize: this.product.max,
+        authMechanism: 'SCRAM-SHA-256',
       }
     )
     this.reset()

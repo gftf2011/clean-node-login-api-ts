@@ -28,10 +28,8 @@ export class UserDao implements IUserDao {
     )
 
     const parsedResponse: User = {
-      id: response.insertedId,
-      email: response.email,
-      lastname: response.lastname,
-      name: response.name,
+      id: response.insertedId.valueOf(),
+      ...user,
     }
 
     return parsedResponse

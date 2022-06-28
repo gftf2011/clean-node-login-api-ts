@@ -24,10 +24,11 @@ export class MongoDbClientManager implements DbClientManager {
 
   public async createClient(): Promise<void> {
     this.client = await this.pool.getClient()
+    this.session = await this.transaction.getSession()
   }
 
   public async openTransaction(): Promise<void> {
-    this.session = await this.transaction.getSession()
+    this.session.startTransaction()
   }
 
   public async query(

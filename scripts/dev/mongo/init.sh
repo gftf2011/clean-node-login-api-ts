@@ -1,7 +1,7 @@
 set -e
 
 mongo << EOF
-  db = db.getSiblingDB('clean_node_login_api_ts_mongo_dev_db')
+  use clean_node_login_api_ts_mongo_dev_db
 
   db.createCollection('users')
 

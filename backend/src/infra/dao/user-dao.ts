@@ -25,6 +25,7 @@ export class UserDao implements IUserDao {
     ]
 
     const response = await this.dbClientManager.query(statement, values)
+
     const parsedResponse: User = {
       id: response.rows[0].id,
       email: response.rows[0].email,

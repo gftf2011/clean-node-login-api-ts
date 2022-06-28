@@ -20,6 +20,7 @@ import { Controller } from '../../../presentation/ports'
 /**
  * Infra
  */
+import { DbTransactionDecorator } from '../../../infra/db/helpers/decorators/db-transaction-decorator'
 import { UserDao } from '../../../infra/dao'
 import { UserRepository } from '../../../infra/repositories'
 
@@ -65,5 +66,10 @@ export const makeSendWelcomeEmailController = (): Controller => {
 
   const welcomeEmailController = new WelcomeEmailController(welcomeEmailUseCase)
 
-  return welcomeEmailController
+  const decorator = new DbTransactionDecorator(
+    welcomeEmailController,
+    mongoDbClientManager
+  )
+
+  return decorator
 }
