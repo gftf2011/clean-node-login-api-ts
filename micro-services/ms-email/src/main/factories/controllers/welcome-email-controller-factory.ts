@@ -28,11 +28,7 @@ import { UserRepository } from '../../../infra/repositories'
  * Presentation
  */
 import { WelcomeEmailController } from '../../../presentation/controllers'
-
-/**
- * Infra
- */
-import { WelcomeEmailTemplate } from '../../../infra/templates'
+import { WelcomeEmailTemplate } from '../../../presentation/views'
 
 /**
  * Use Cases

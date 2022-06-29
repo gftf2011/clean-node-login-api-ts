@@ -16,7 +16,7 @@ import {
  * Shared
  */
 import { Either, left, right } from '../shared'
-import { ServerError } from '../shared/errors'
+import { ServerError, UserAlreadyExistsError } from '../shared/errors'
 
 /**
  * Entities
@@ -60,6 +60,12 @@ export class WelcomeEmailUseCase implements IWelcomeEmailUseCase {
 
     if (userOrError.isLeft()) {
       return left(userOrError.value)
+    }
+
+    const userExists = await this.userRepository.findUserByEmail(email)
+
+    if (userExists) {
+      return left(new UserAlreadyExistsError())
     }
 
     const user: UserDto = {

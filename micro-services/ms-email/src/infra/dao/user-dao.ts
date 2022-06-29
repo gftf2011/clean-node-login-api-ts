@@ -34,4 +34,29 @@ export class UserDao implements IUserDao {
 
     return parsedResponse
   }
+
+  async findUserByEmail(email: string): Promise<User> {
+    const tableOrCollection: string = 'users'
+
+    const documentsAndFilters = {
+      filters: { email },
+    }
+
+    const response = await this.dbClientManager.query(
+      'FIND_ONE',
+      tableOrCollection,
+      documentsAndFilters
+    )
+
+    const parsedResponse: User = response
+      ? {
+          id: response._id.valueOf(),
+          email: response.email,
+          name: response.name,
+          lastname: response.lastname,
+        }
+      : null
+
+    return parsedResponse
+  }
 }
