@@ -33,6 +33,7 @@ export class SignInUseCase implements ISignInUseCase {
 
   /**
    * @desc performs the sign-up action
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
    * @param {AccountDto} request - request that contains an account information
    * @param {string} host - the application host
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-in

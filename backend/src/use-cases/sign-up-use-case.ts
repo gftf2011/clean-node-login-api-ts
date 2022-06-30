@@ -39,6 +39,7 @@ export class SignUpUseCase implements ISignUpUseCase {
 
   /**
    * @desc performs the sign-up action
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
    * @param {BasicUserDto} request - request that contains an user information
    * @param {string} host - the application host
    * @returns {Promise<Either<Error, AuthenticatedAccountDto>>} data output after sign-up
