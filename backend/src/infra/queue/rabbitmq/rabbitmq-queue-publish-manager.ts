@@ -22,6 +22,6 @@ export class RabbitmqQueuePublishManager implements QueuePublishManager {
   }
 
   async close(): Promise<void> {
-    await this.queueConnection.getChannel().closeAll()
+    await this.queueConnection.getChannel().close()
   }
 }

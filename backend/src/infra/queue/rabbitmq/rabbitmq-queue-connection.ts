@@ -47,8 +47,8 @@ export class RabbitmqQueueConnection implements QueueConnection {
           channel.publish(exchange, bindingKey, content)
         },
 
-        closeAll: async () => {
-          await connection.close()
+        close: async () => {
+          await channel.close()
         },
       }
     }
