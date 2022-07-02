@@ -12,13 +12,13 @@ import process from 'process'
 if (cluster.isPrimary && Boolean(process.env.MULTI_THREAD)) {
   os.cpus().forEach(() => cluster.fork())
 } else {
-  loader().then(() => {
-    server()
-      .then(() => {
+  loader()
+    .then(() => {
+      server.listen(process.env.PORT, () =>
         console.log(
-          `Queue consumer listening at ${process.env.RABBITMQ_CONNECTION_URL}`
+          `Server ${process.pid} running at http://localhost:${process.env.PORT}`
         )
-      })
-      .catch(console.error)
-  })
+      )
+    })
+    .catch(console.error)
 }

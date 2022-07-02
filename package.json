@@ -1,9 +1,10 @@
 {
-  "name": "clean-node-login-api-ts-backend",
+  "name": "clean-node-login-api-ts",
   "version": "1.0.0",
   "description": "",
   "workspaces": [
     "backend",
+    "backend-for-frontend/web",
     "micro-services/ms-email"
   ],
   "scripts": {

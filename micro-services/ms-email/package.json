@@ -1,5 +1,5 @@
 {
-  "name": "@clean-node-login-api-ts-backend/ms-email",
+  "name": "@clean-node-login-api-ts/micro-services/ms-email",
   "version": "1.0.0",
   "description": "",
   "main": "dist/main/index.js",

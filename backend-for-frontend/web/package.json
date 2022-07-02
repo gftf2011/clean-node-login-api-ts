@@ -1,0 +1,20 @@
+{
+  "name": "@clean-node-login-api-ts/backend-for-frontend/web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main/index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gftf2011/clean-node-login-api-ts.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
+  },
+  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme"
+}

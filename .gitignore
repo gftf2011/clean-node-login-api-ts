@@ -116,3 +116,4 @@ docker-compose.yml
 # env folder
 !backend/env/dev/.env
 !micro-services/ms-email/env/dev/.env
+!backend-for-frontend/web/env/dev/.env
