@@ -6,7 +6,7 @@ import { HttpRequest, HttpResponse } from '../../ports'
 /**
  * Use Cases
  */
-import { ISignUpUseCase } from '../../../use-cases/ports'
+import { ISignInUseCase } from '../../../use-cases/ports'
 
 /**
  * Presentation
@@ -19,36 +19,30 @@ import { created } from '../../helpers/http-helper'
  * @desc Contains the base algorithm and the concrete implementation from the perform method
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
  */
-export class SignUpController extends WebController {
-  private readonly signUpUseCase: ISignUpUseCase
+export class SignInController extends WebController {
+  private readonly signInUseCase: ISignInUseCase
 
   /**
    * @desc values overrides - ['host']
    */
   public override requiredHeaderParams: string[] = ['host']
   /**
-   * @desc values overrides - ['email', 'password', 'taxvat', 'name', 'lastname']
+   * @desc values overrides - ['email', 'password']
    */
-  public override requiredParams: string[] = [
-    'email',
-    'password',
-    'taxvat',
-    'name',
-    'lastname',
-  ]
+  public override requiredParams: string[] = ['email', 'password']
 
-  constructor(signUpUseCase: ISignUpUseCase) {
+  constructor(signInUseCase: ISignInUseCase) {
     super()
-    this.signUpUseCase = signUpUseCase
+    this.signInUseCase = signInUseCase
   }
 
   /**
-   * @desc performs an sign-up action
+   * @desc performs an sign-In action
    * @param {HttpRequest} request - request that contains information about the 'client'
-   * @returns {Promise<HttpResponse>} data output after sign-up operation
+   * @returns {Promise<HttpResponse>} data output after sign-in operation
    */
   public async perform(request: HttpRequest): Promise<HttpResponse> {
-    const response = await this.signUpUseCase.perform(
+    const response = await this.signInUseCase.perform(
       request.body,
       request.headers.host
     )
