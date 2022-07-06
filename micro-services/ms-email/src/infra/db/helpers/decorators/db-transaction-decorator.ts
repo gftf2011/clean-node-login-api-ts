@@ -23,7 +23,6 @@ export class DbTransactionDecorator implements Controller {
       await this.dbClientManager.closeTransaction()
       return response
     } catch (err) {
-      console.log(err)
       await this.dbClientManager.rollback()
       await this.dbClientManager.closeTransaction()
       throw err

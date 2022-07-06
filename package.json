@@ -4,7 +4,7 @@
   "description": "",
   "workspaces": [
     "backend",
-    "backend-for-frontend/web",
+    "backend-for-frontend/web/onboard-bff",
     "micro-services/ms-email"
   ],
   "scripts": {
@@ -17,8 +17,9 @@
     "prerun:docker:dev": "npm run docker:clear || true",
     "run:docker:dev": "npm run build:script:dev && npm run build:docker:dev",
     "postrun:docker:dev": "npm run docker:up",
-    "prestart:dev:backend": "npm run run:docker:dev",
+    "start:up": "npm run run:docker:dev",
     "start:dev:backend": "npm run start:dev --workspace=backend",
+    "start:dev:web:bff": "npm run start:dev --workspace=backend-for-frontend/web/onboard-bff",
     "start:dev:microservice:email": "npm run start:dev --workspace=micro-services/ms-email"
   },
   "repository": {

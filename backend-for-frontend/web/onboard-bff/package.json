@@ -1,20 +1,8 @@
 {
-  "name": "@clean-node-login-api-ts/ms-email",
+  "name": "@clean-node-login-api-ts/onboard-web-bff",
   "version": "1.0.0",
   "description": "",
   "main": "dist/main/index.js",
-  "devDependencies": {
-    "@types/amqplib": "^0.8.2",
-    "@types/mongodb": "^4.0.7",
-    "@types/nodemailer": "^6.4.4"
-  },
-  "dependencies": {
-    "amqplib": "^0.10.0",
-    "dotenv": "^16.0.1",
-    "googleapis": "^103.0.0",
-    "mongodb": "^4.7.0",
-    "nodemailer": "^6.7.5"
-  },
   "scripts": {
     "build:dev": "rm -rf .env && cat ./env/dev/.env >> .env",
     "build": "rimraf dist && tsc -p tsconfig.json",
@@ -30,5 +18,11 @@
   "bugs": {
     "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
   },
-  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme"
+  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme",
+  "dependencies": {
+    "axios": "^0.27.2"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0"
+  }
 }
