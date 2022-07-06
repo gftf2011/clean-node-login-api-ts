@@ -1,7 +1,7 @@
 /**
  * Use Cases
  */
-import { AuthenticatedAccountDto, BasicUserDto } from '../ports'
+import { AuthenticatedAccountDto, BasicUserDto } from '.'
 
 /**
  * Shared

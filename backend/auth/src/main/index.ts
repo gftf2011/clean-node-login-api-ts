@@ -1,8 +1,8 @@
-import '../main/bootstrap'
+import './bootstrap'
 
-import { loader } from '../main/loader'
+import { loader } from './loader'
 
-import { server } from '../main/server'
+import { server } from './server'
 
 // eslint-disable-next-line sort-imports
 import cluster from 'cluster'
