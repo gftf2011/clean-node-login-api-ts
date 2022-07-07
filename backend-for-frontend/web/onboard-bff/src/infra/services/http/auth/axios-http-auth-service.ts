@@ -82,9 +82,12 @@ export class AxiosHttpAuthService implements IHttpAuthService {
     user: User,
     host: string
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
+    if (!process.env.AUTH_BACKEND_SERVICE_URL) {
+      return left(new ServerError())
+    }
     try {
       const response = await axios.post<AuthenticatedAccountDto>(
-        'http://0.0.0.0:3333/api/sign-up',
+        `${process.env.AUTH_BACKEND_SERVICE_URL}/sign-up`,
         user,
         {
           headers: {
@@ -103,9 +106,12 @@ export class AxiosHttpAuthService implements IHttpAuthService {
     account: Account,
     host: string
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
+    if (!process.env.AUTH_BACKEND_SERVICE_URL) {
+      return left(new ServerError())
+    }
     try {
       const response = await axios.post<AuthenticatedAccountDto>(
-        'http://0.0.0.0:3333/api/sign-in',
+        `${process.env.AUTH_BACKEND_SERVICE_URL}/sign-in`,
         account,
         {
           headers: {
