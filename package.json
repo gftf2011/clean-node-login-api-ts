@@ -2,11 +2,6 @@
   "name": "clean-node-login-api-ts",
   "version": "1.0.0",
   "description": "",
-  "workspaces": [
-    "backend",
-    "backend-for-frontend/web",
-    "micro-services/ms-email"
-  ],
   "scripts": {
     "docker:up": "docker-compose up -d --remove-orphans",
     "docker:down": "docker-compose down",
@@ -17,9 +12,7 @@
     "prerun:docker:dev": "npm run docker:clear || true",
     "run:docker:dev": "npm run build:script:dev && npm run build:docker:dev",
     "postrun:docker:dev": "npm run docker:up",
-    "prestart:dev:backend": "npm run run:docker:dev",
-    "start:dev:backend": "npm run start:dev --workspace=backend",
-    "start:dev:microservice:email": "npm run start:dev --workspace=micro-services/ms-email"
+    "start:dev:up": "npm run run:docker:dev"
   },
   "repository": {
     "type": "git",
@@ -31,18 +24,5 @@
   "bugs": {
     "url": "https://github.com/gftf2011/clean-node-login-api-ts/issues"
   },
-  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme",
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.28.0",
-    "@typescript-eslint/parser": "^5.28.0",
-    "eslint": "^8.17.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-import-resolver-typescript": "^2.7.1",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.2.2",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-promise": "^6.0.0",
-    "prettier": "^2.7.0"
-  }
+  "homepage": "https://github.com/gftf2011/clean-node-login-api-ts#readme"
 }
