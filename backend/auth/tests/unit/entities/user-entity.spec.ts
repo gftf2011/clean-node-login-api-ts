@@ -124,7 +124,7 @@ describe('User Entity', () => {
     expect(userOrError).toEqual(left(new InvalidNameError(name)));
   });
 
-  it('should not create user if "name" property has more than 255 characters - (too much characters)', () => {
+  it('should not create user if "name" property has more than 255 characters - (too many characters)', () => {
     const name = faker.lorem.word(256);
     const lastname = faker.lorem.word(2);
     const taxvat = cpf.generate();
@@ -227,6 +227,26 @@ describe('User Entity', () => {
   it('should not create user if "lastname" property has only one character - (too few characters)', () => {
     const name = faker.lorem.word(2);
     const lastname = faker.lorem.word(1);
+    const taxvat = cpf.generate();
+    const email = faker.internet.email();
+    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 2 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 2 }))
+      .toUpperCase()}@`;
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidLastnameError(lastname)));
+  });
+
+  it('should not create user if "lastname" property has more than 255 characters - (too many characters)', () => {
+    const name = faker.lorem.word(2);
+    const lastname = faker.lorem.word(256);
     const taxvat = cpf.generate();
     const email = faker.internet.email();
     const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
