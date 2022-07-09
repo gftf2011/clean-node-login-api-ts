@@ -92,7 +92,7 @@ export class AxiosHttpAuthService implements IHttpAuthService {
             host,
           },
           validateStatus: status => {
-            return status < 300; // Resolve only if the status code is less than 500
+            return status < 300; // Resolve only if the status code is less than 300
           },
         },
       );
@@ -119,7 +119,7 @@ export class AxiosHttpAuthService implements IHttpAuthService {
             host,
           },
           validateStatus: status => {
-            return status < 300; // Resolve only if the status code is less than 500
+            return status < 300; // Resolve only if the status code is less than 300
           },
         },
       );
