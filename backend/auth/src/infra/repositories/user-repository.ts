@@ -8,6 +8,12 @@ import { IUserRepository, UserDto as User } from '../../use-cases/ports'
  */
 import { IUserDao } from '../contracts'
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Provides an abstraction, contract interface, of data gathering
+ * It uses the {@link https://deviq.com/design-patterns/repository-pattern Repository} design pattern
+ * @obs Here the approaching method used was the repository guided by business logic
+ */
 export class UserRepository implements IUserRepository {
   private readonly userDAO: IUserDao
 
