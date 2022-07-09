@@ -11,6 +11,7 @@ import faker from 'faker';
 import {
   InvalidLastnameError,
   InvalidNameError,
+  InvalidTaxvatError,
 } from '../../../src/shared/errors';
 
 /**
@@ -262,5 +263,25 @@ describe('User Entity', () => {
       password,
     );
     expect(userOrError).toEqual(left(new InvalidLastnameError(lastname)));
+  });
+
+  it('should not create user if "taxvat" property is undefined', () => {
+    const name = faker.lorem.word(2);
+    const lastname = faker.lorem.word(2);
+    const taxvat: string = undefined;
+    const email = faker.internet.email();
+    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 2 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 2 }))
+      .toUpperCase()}@`;
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
 });
