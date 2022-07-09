@@ -1,0 +1,13 @@
+node_modules/
+
+backend/auth/.env
+backend/auth/.env.example
+backend/auth/dist/
+
+backend/email/.env
+backend/email/.env.example
+backend/email/dist/
+
+backend-for-frontend/web/onboard-bff/.env
+backend-for-frontend/web/onboard-bff/.env.example
+backend-for-frontend/web/onboard-bff/dist/

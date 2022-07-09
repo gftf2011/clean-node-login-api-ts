@@ -1,6 +1,37 @@
 version: '3.7'
 
 services:
+  web-bff-onboard:
+    container_name: web-bff-onboard-dev
+    build: 
+      context: .
+      dockerfile: ./docker/dev/images/web-bff-onboard/Dockerfile
+    restart: always
+    ports:
+      - 3334:3334
+
+  auth-ms-backend:
+    container_name: auth-ms-backend-dev
+    build: 
+      context: .
+      dockerfile: ./docker/dev/images/auth-ms-backend/Dockerfile
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+    ports:
+      - 3333:3333
+
+  email-ms-backend:
+    container_name: email-ms-backend-dev
+    build: 
+      context: .
+      dockerfile: ./docker/dev/images/email-ms-backend/Dockerfile
+    restart: always
+    depends_on:
+      - mongo
+      - rabbitmq
+
   postgres:
     build: ./docker/dev/images/postgresql
     container_name: postgres-dev
