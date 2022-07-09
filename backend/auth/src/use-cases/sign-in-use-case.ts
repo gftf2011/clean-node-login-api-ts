@@ -10,13 +10,13 @@ import {
   ITokenService,
   IUserRepository,
   QueuePublishManager,
-} from './ports'
+} from './ports';
 
 /**
  * Shared
  */
-import { Either, left, right } from '../shared'
-import { ServerError, UnauthorizedError } from '../shared/errors'
+import { Either, left, right } from '../shared';
+import { ServerError, UnauthorizedError } from '../shared/errors';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -28,7 +28,7 @@ export class SignInUseCase implements ISignInUseCase {
     private readonly encryptService: IEncryptService,
     private readonly hashService: IHashService,
     private readonly tokenService: ITokenService,
-    private readonly queueManager: QueuePublishManager
+    private readonly queueManager: QueuePublishManager,
   ) {}
 
   /**
@@ -40,7 +40,7 @@ export class SignInUseCase implements ISignInUseCase {
    */
   async perform(
     request: AccountDto,
-    host: string
+    host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
       !process.env.CODE_SALT &&
@@ -50,41 +50,41 @@ export class SignInUseCase implements ISignInUseCase {
       !process.env.JWT_REFRESH_TOKEN_ID &&
       !process.env.APP_SECRET
     ) {
-      return left(new ServerError())
+      return left(new ServerError());
     }
 
-    const { email, password } = request
+    const { email, password } = request;
 
-    const userExists = await this.userRepository.findUserByEmail(email)
+    const userExists = await this.userRepository.findUserByEmail(email);
 
     if (!userExists) {
-      return left(new UnauthorizedError())
+      return left(new UnauthorizedError());
     }
 
-    const decryptedTaxvat = this.encryptService.decode(userExists.taxvat)
-    const customSalt = `${email}${decryptedTaxvat}`
-    const defaultSalt = process.env.CODE_SALT
+    const decryptedTaxvat = this.encryptService.decode(userExists.taxvat);
+    const customSalt = `${email}${decryptedTaxvat}`;
+    const defaultSalt = process.env.CODE_SALT;
     /**
      * encrypt password with user custom salt hash value
      */
-    const hashedPassword = this.hashService.encode(password, customSalt)
+    const hashedPassword = this.hashService.encode(password, customSalt);
     /**
      * encrypt encrypted password with code default salt hash value
      */
     const strongHashedPassword = this.hashService.encode(
       hashedPassword,
-      defaultSalt
-    )
+      defaultSalt,
+    );
 
     if (strongHashedPassword !== userExists.password) {
-      return left(new UnauthorizedError())
+      return left(new UnauthorizedError());
     }
 
-    const accessTokenId = process.env.JWT_ACCESS_TOKEN_ID
-    const refreshTokenId = process.env.JWT_REFRESH_TOKEN_ID
+    const accessTokenId = process.env.JWT_ACCESS_TOKEN_ID;
+    const refreshTokenId = process.env.JWT_REFRESH_TOKEN_ID;
 
-    const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN
-    const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
+    const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN;
+    const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN;
 
     const refreshTokenOrError = this.tokenService.sign(
       {
@@ -95,8 +95,8 @@ export class SignInUseCase implements ISignInUseCase {
         issuer: host,
         jwtId: refreshTokenId,
       },
-      refreshTokenExpiresIn
-    )
+      refreshTokenExpiresIn,
+    );
     const accessTokenOrError = this.tokenService.sign(
       {
         email: this.encryptService.encode(userExists.email),
@@ -106,14 +106,14 @@ export class SignInUseCase implements ISignInUseCase {
         issuer: host,
         jwtId: accessTokenId,
       },
-      accessTokenExpiresIn
-    )
+      accessTokenExpiresIn,
+    );
 
     if (refreshTokenOrError.isLeft()) {
-      return left(refreshTokenOrError.value)
+      return left(refreshTokenOrError.value);
     }
     if (accessTokenOrError.isLeft()) {
-      return left(accessTokenOrError.value)
+      return left(accessTokenOrError.value);
     }
 
     // await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userExists))
@@ -121,8 +121,8 @@ export class SignInUseCase implements ISignInUseCase {
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
       refreshToken: refreshTokenOrError.value,
-    }
+    };
 
-    return right(authenticatedAccount)
+    return right(authenticatedAccount);
   }
 }

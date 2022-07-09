@@ -1,1 +1,1 @@
-export * from './crypto-encrypt-service'
+export * from './crypto-encrypt-service';

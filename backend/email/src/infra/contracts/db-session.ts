@@ -1,1 +1,1 @@
-export type DbSession = any
+export type DbSession = any;

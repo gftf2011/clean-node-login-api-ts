@@ -1,5 +1,7 @@
-import { Controller, HttpRequest } from '../../presentation/ports'
-import { Request, Response } from 'express'
+import { Request, Response } from 'express';
+
+// eslint-disable-next-line sort-imports
+import { Controller, HttpRequest } from '../../presentation/ports';
 
 export const adaptRoute = (controller: Controller) => {
   return async (req: Request, res: Response) => {
@@ -8,8 +10,8 @@ export const adaptRoute = (controller: Controller) => {
       headers: {
         host: req.headers.host,
       },
-    }
-    const httpResponse = await controller.handle(httpRequest)
-    res.status(httpResponse.statusCode).json(httpResponse.body)
-  }
-}
+    };
+    const httpResponse = await controller.handle(httpRequest);
+    res.status(httpResponse.statusCode).json(httpResponse.body);
+  };
+};

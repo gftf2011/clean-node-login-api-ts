@@ -1,4 +1,4 @@
-import { HttpResponse } from '../ports'
+import { HttpResponse } from '../ports';
 
 /**
  * @desc the 'ok' method indicating success in retrieve the data
@@ -14,7 +14,7 @@ import { HttpResponse } from '../ports'
 export const ok = (data: any): HttpResponse => ({
   statusCode: 200,
   body: data,
-})
+});
 
 /**
  * @desc the 'create' method indicating success in retrieve the data
@@ -30,7 +30,7 @@ export const ok = (data: any): HttpResponse => ({
 export const created = (data: any): HttpResponse => ({
   statusCode: 201,
   body: data,
-})
+});
 
 /**
  * @desc the 'unauthorized' method indicates that it was not possible identify the request user
@@ -46,7 +46,7 @@ export const created = (data: any): HttpResponse => ({
 export const unauthorized = (error: Error): HttpResponse => ({
   statusCode: 401,
   body: error,
-})
+});
 
 /**
  * @desc the 'forbidden' method indicates that the user was identified but it does not have the access permission
@@ -62,7 +62,7 @@ export const unauthorized = (error: Error): HttpResponse => ({
 export const forbidden = (error: Error): HttpResponse => ({
   statusCode: 403,
   body: error,
-})
+});
 
 /**
  * @desc the 'badRequest' method indicates the server could not process the request because of client error
@@ -78,7 +78,7 @@ export const forbidden = (error: Error): HttpResponse => ({
 export const badRequest = (error: Error): HttpResponse => ({
   statusCode: 400,
   body: error,
-})
+});
 
 /**
  * @desc the 'serverError' method indicates the server could not process the request because of unexpected error
@@ -94,4 +94,4 @@ export const badRequest = (error: Error): HttpResponse => ({
 export const serverError = (error: Error): HttpResponse => ({
   statusCode: 500,
   body: error,
-})
+});

@@ -1,7 +1,7 @@
 /**
  * Presentation
  */
-import { Controller, Request } from '../../ports'
+import { Controller, Request } from '../../ports';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -9,7 +9,7 @@ import { Controller, Request } from '../../ports'
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
  */
 export abstract class WebController implements Controller {
-  public requiredParams: string[] = []
+  public requiredParams: string[] = [];
 
   /**
    * @desc handles the user input
@@ -20,15 +20,14 @@ export abstract class WebController implements Controller {
     try {
       const missingParams: string[] = WebController.getMissingParams(
         request,
-        this.requiredParams
-      )
+        this.requiredParams,
+      );
       if (missingParams.length !== 0) {
-        return false
+        return false;
       }
-      return await this.perform(request)
+      return await this.perform(request);
     } catch (error) {
-      console.log(error)
-      return error as Error
+      return error as Error;
     }
   }
 
@@ -37,7 +36,7 @@ export abstract class WebController implements Controller {
    * @param {Request} request - data input which comes from the `client`
    * @returns {Promise<boolean>} data output if operation was performed successfully
    */
-  public abstract perform(request: Request): Promise<boolean>
+  public abstract perform(request: Request): Promise<boolean>;
 
   /**
    * @desc check which parameters are missing
@@ -47,14 +46,14 @@ export abstract class WebController implements Controller {
    */
   public static getMissingParams(
     request: Request,
-    requiredParams: string[]
+    requiredParams: string[],
   ): string[] {
-    const missingParams: string[] = []
-    requiredParams.forEach((name) => {
+    const missingParams: string[] = [];
+    requiredParams.forEach(name => {
       if (!Object.keys(request.content).includes(name)) {
-        missingParams.push(name)
+        missingParams.push(name);
       }
-    })
-    return missingParams
+    });
+    return missingParams;
   }
 }

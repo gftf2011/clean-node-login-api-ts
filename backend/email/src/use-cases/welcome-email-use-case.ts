@@ -10,18 +10,18 @@ import {
   IWelcomeEmailUseCase,
   OAuth2Service,
   UserDto,
-} from './ports'
+} from './ports';
 
 /**
  * Shared
  */
-import { Either, left, right } from '../shared'
-import { ServerError, UserAlreadyExistsError } from '../shared/errors'
+import { Either, left, right } from '../shared';
+import { ServerError, UserAlreadyExistsError } from '../shared/errors';
 
 /**
  * Entities
  */
-import { UserEntity } from '../entities'
+import { UserEntity } from '../entities';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -32,7 +32,7 @@ export class WelcomeEmailUseCase implements IWelcomeEmailUseCase {
     private readonly emailService: EmailService,
     private readonly emailTemplate: EmailTemplate,
     private readonly oAuthService: OAuth2Service,
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
   ) {}
 
   /**
@@ -47,49 +47,49 @@ export class WelcomeEmailUseCase implements IWelcomeEmailUseCase {
       !process.env.NODEMAILER_OAUTH_REDIRECT_URL ||
       !process.env.NODEMAILER_OAUTH_REFRESH_TOKEN
     ) {
-      return left(new ServerError())
+      return left(new ServerError());
     }
 
-    const { email, lastname, name } = request
+    const { email, lastname, name } = request;
 
     const userOrError: Either<Error, UserEntity> = UserEntity.create(
       name,
       lastname,
-      email
-    )
+      email,
+    );
 
     if (userOrError.isLeft()) {
-      return left(userOrError.value)
+      return left(userOrError.value);
     }
 
-    const userExists = await this.userRepository.findUserByEmail(email)
+    const userExists = await this.userRepository.findUserByEmail(email);
 
     if (userExists) {
-      return left(new UserAlreadyExistsError())
+      return left(new UserAlreadyExistsError());
     }
 
     const user: UserDto = {
       email: userOrError.value.getEmail(),
       name: userOrError.value.getName(),
       lastname: userOrError.value.getLastname(),
-    }
+    };
 
-    const clientId = process.env.NODEMAILER_OAUTH_CLIENT_ID
-    const clientSecret = process.env.NODEMAILER_OAUTH_CLIENT_SECRET
-    const redirectUri = process.env.NODEMAILER_OAUTH_REDIRECT_URL
-    const refreshToken = process.env.NODEMAILER_OAUTH_REFRESH_TOKEN
+    const clientId = process.env.NODEMAILER_OAUTH_CLIENT_ID;
+    const clientSecret = process.env.NODEMAILER_OAUTH_CLIENT_SECRET;
+    const redirectUri = process.env.NODEMAILER_OAUTH_REDIRECT_URL;
+    const refreshToken = process.env.NODEMAILER_OAUTH_REFRESH_TOKEN;
 
     const accessToken = await this.oAuthService.getAccessToken(
       clientId,
       clientSecret,
       redirectUri,
-      refreshToken
-    )
+      refreshToken,
+    );
 
-    const userCreated = await this.userRepository.create(user)
+    const userCreated = await this.userRepository.create(user);
 
     if (!userCreated) {
-      return left(new ServerError())
+      return left(new ServerError());
     }
 
     const mailOptions: EmailOptions = {
@@ -98,15 +98,15 @@ export class WelcomeEmailUseCase implements IWelcomeEmailUseCase {
       subject: 'Welcome to Acme!',
       html: this.emailTemplate.html(request),
       attachments: this.emailTemplate.attachments(),
-    }
+    };
 
     /**
      * The email service must be called after the repository call
      * to prevent the email will not be sent to the user after checking
      * he was created in the database
      */
-    const response = await this.emailService.send(accessToken, mailOptions)
+    const response = await this.emailService.send(accessToken, mailOptions);
 
-    return right(response)
+    return right(response);
   }
 }

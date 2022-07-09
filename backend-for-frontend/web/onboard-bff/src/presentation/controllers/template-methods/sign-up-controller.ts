@@ -1,18 +1,18 @@
 /**
  * Presentation
  */
-import { HttpRequest, HttpResponse } from '../../ports'
+import { HttpRequest, HttpResponse } from '../../ports';
 
 /**
  * Use Cases
  */
-import { ISignUpUseCase } from '../../../use-cases/ports'
+import { ISignUpUseCase } from '../../../use-cases/ports';
 
 /**
  * Presentation
  */
-import { WebController } from './web-controller'
-import { created } from '../../helpers/http-helper'
+import { WebController } from './web-controller';
+import { created } from '../../helpers/http-helper';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -20,12 +20,13 @@ import { created } from '../../helpers/http-helper'
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
  */
 export class SignUpController extends WebController {
-  private readonly signUpUseCase: ISignUpUseCase
+  private readonly signUpUseCase: ISignUpUseCase;
 
   /**
    * @desc values overrides - ['host']
    */
-  public override requiredHeaderParams: string[] = ['host']
+  public override requiredHeaderParams: string[] = ['host'];
+
   /**
    * @desc values overrides - ['email', 'password', 'taxvat', 'name', 'lastname']
    */
@@ -35,11 +36,11 @@ export class SignUpController extends WebController {
     'taxvat',
     'name',
     'lastname',
-  ]
+  ];
 
   constructor(signUpUseCase: ISignUpUseCase) {
-    super()
-    this.signUpUseCase = signUpUseCase
+    super();
+    this.signUpUseCase = signUpUseCase;
   }
 
   /**
@@ -50,13 +51,13 @@ export class SignUpController extends WebController {
   public async perform(request: HttpRequest): Promise<HttpResponse> {
     const response = await this.signUpUseCase.perform(
       request.body,
-      request.headers.host
-    )
+      request.headers.host,
+    );
 
     if (response.isLeft()) {
-      throw response.value
+      throw response.value;
     }
 
-    return created(response.value)
+    return created(response.value);
   }
 }

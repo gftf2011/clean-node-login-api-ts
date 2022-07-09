@@ -1,1 +1,1 @@
-export type DbClient = any
+export type DbClient = any;

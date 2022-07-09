@@ -1,1 +1,1 @@
-export * from './welcome-email-use-case'
+export * from './welcome-email-use-case';

@@ -1,3 +1,3 @@
-import app from '../config/setup-app'
+import app from '../config/setup-app';
 
-export const server = app
+export const server = app;

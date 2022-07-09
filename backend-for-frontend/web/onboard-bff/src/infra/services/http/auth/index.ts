@@ -1,1 +1,1 @@
-export * from './axios-http-auth-service'
+export * from './axios-http-auth-service';

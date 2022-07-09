@@ -1,11 +1,11 @@
-import { Channel, Connection } from 'amqplib'
+import { Channel, Connection } from 'amqplib';
 
 /**
  * Infra
  */
-import { QueueChannel, QueueConnection } from '../../contracts'
-import { QueueDirector } from '../helpers/builders/queue-director'
-import { RabbitmqQueueBuilder } from '../helpers/builders/rabbitmq-builder'
+import { QueueChannel, QueueConnection } from '../../contracts';
+import { QueueDirector } from '../helpers/builders/queue-director';
+import { RabbitmqQueueBuilder } from '../helpers/builders/rabbitmq-builder';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -13,55 +13,56 @@ import { RabbitmqQueueBuilder } from '../helpers/builders/rabbitmq-builder'
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/singleton Singleton} design pattern
  */
 export class RabbitmqQueueConnection implements QueueConnection {
-  private static instance: RabbitmqQueueConnection
-  private static channel: QueueChannel
+  private static instance: RabbitmqQueueConnection;
+
+  private static channel: QueueChannel;
 
   private constructor() {}
 
   static async connect(): Promise<void> {
     if (!RabbitmqQueueConnection.instance || !RabbitmqQueueConnection.channel) {
-      const builder = new RabbitmqQueueBuilder()
+      const builder = new RabbitmqQueueBuilder();
 
-      const director = new QueueDirector()
+      const director = new QueueDirector();
 
-      director.setBuilder(builder)
+      director.setBuilder(builder);
 
-      let connection: Connection
+      let connection: Connection;
 
       /**
        * Retry connection logic, queue connection is not immediate
        */
       while (!connection) {
         try {
-          connection = await director.getQueueConnection()
+          connection = await director.getQueueConnection();
         } catch (err) {
-          connection = null
+          connection = null;
         }
       }
 
-      const channel: Channel = await connection.createChannel()
+      const channel: Channel = await connection.createChannel();
 
       RabbitmqQueueConnection.channel = {
         send: async (exchange: string, bindingKey: string, content: Buffer) => {
-          await channel.assertExchange(exchange, 'direct', { durable: false })
-          channel.publish(exchange, bindingKey, content)
+          await channel.assertExchange(exchange, 'direct', { durable: false });
+          channel.publish(exchange, bindingKey, content);
         },
 
         close: async () => {
-          await channel.close()
+          await channel.close();
         },
-      }
+      };
     }
   }
 
   public static getInstance(): RabbitmqQueueConnection {
     if (!RabbitmqQueueConnection.instance) {
-      RabbitmqQueueConnection.instance = new RabbitmqQueueConnection()
+      RabbitmqQueueConnection.instance = new RabbitmqQueueConnection();
     }
-    return RabbitmqQueueConnection.instance
+    return RabbitmqQueueConnection.instance;
   }
 
   public getChannel(): QueueChannel {
-    return RabbitmqQueueConnection.channel
+    return RabbitmqQueueConnection.channel;
   }
 }

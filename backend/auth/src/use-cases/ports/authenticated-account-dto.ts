@@ -1,4 +1,4 @@
 export interface AuthenticatedAccountDto {
-  accessToken: string
-  refreshToken: string
+  accessToken: string;
+  refreshToken: string;
 }

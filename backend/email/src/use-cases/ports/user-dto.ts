@@ -1,8 +1,8 @@
 export interface UserDto {
-  id?: string
-  name: string
-  lastname: string
-  email: string
+  id?: string;
+  name: string;
+  lastname: string;
+  email: string;
 }
 
-export type BasicUserDto = Omit<UserDto, 'id'>
+export type BasicUserDto = Omit<UserDto, 'id'>;

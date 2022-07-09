@@ -1,12 +1,12 @@
 /**
  * Infra
  */
-import { QueueConnection } from '../../contracts'
+import { QueueConnection } from '../../contracts';
 
 /**
  * Use Cases
  */
-import { QueuePublishManager } from '../../../use-cases/ports/queue-publish-manager'
+import { QueuePublishManager } from '../../../use-cases/ports/queue-publish-manager';
 
 export class RabbitmqQueuePublishManager implements QueuePublishManager {
   constructor(private readonly queueConnection: QueueConnection) {}
@@ -14,14 +14,14 @@ export class RabbitmqQueuePublishManager implements QueuePublishManager {
   async publish(
     exchange: string,
     bindingKey: string,
-    content: string
+    content: string,
   ): Promise<void> {
     await this.queueConnection
       .getChannel()
-      .send(exchange, bindingKey, Buffer.from(content))
+      .send(exchange, bindingKey, Buffer.from(content));
   }
 
   async close(): Promise<void> {
-    await this.queueConnection.getChannel().close()
+    await this.queueConnection.getChannel().close();
   }
 }

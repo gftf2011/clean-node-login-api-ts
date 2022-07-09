@@ -1,2 +1,2 @@
-export * from './string-utils'
-export * from './boolean-utils'
+export * from './string-utils';
+export * from './boolean-utils';

@@ -3,6 +3,6 @@ export interface OAuth2Service {
     clientId: string,
     clientSecret: string,
     redirectUri: string,
-    refreshToken: string
-  ) => Promise<string>
+    refreshToken: string,
+  ) => Promise<string>;
 }

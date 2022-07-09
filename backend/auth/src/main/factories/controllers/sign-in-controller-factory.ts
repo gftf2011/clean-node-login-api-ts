@@ -5,73 +5,73 @@ import {
   CryptoEncryptService,
   CryptoHashService,
   JwtTokenService,
-} from '../../../infra/services'
+} from '../../../infra/services';
 import {
   PostgresDbClientManager,
   PostgresDbClientPool,
-} from '../../../infra/db'
+} from '../../../infra/db';
 import {
   RabbitmqQueueConnection,
   RabbitmqQueuePublishManager,
-} from '../../../infra/queue'
+} from '../../../infra/queue';
 
 /**
  * Presentation
  */
-import { Controller } from '../../../presentation/ports'
+import { Controller } from '../../../presentation/ports';
 
 /**
  * Infra
  */
-import { DbTransactionDecorator } from '../../../infra/db/helpers/decorators/db-transaction-decorator'
+import { DbTransactionDecorator } from '../../../infra/db/helpers/decorators/db-transaction-decorator';
 
 /**
  * Presentation
  */
-import { SignInController } from '../../../presentation/controllers'
+import { SignInController } from '../../../presentation/controllers';
 
 /**
  * Use Cases
  */
-import { SignInUseCase } from '../../../use-cases'
+import { SignInUseCase } from '../../../use-cases';
 
 /**
  * Infra
  */
-import { UserDao } from '../../../infra/dao'
-import { UserRepository } from '../../../infra/repositories'
+import { UserDao } from '../../../infra/dao';
+import { UserRepository } from '../../../infra/repositories';
 
 export const makeSignInController = (): Controller => {
-  const queue = RabbitmqQueueConnection.getInstance()
+  const queue = RabbitmqQueueConnection.getInstance();
 
-  const queueManager = new RabbitmqQueuePublishManager(queue)
+  const queueManager = new RabbitmqQueuePublishManager(queue);
 
-  const postgresPool = PostgresDbClientPool.getInstance()
+  const postgresPool = PostgresDbClientPool.getInstance();
 
-  const postgresClientManager = new PostgresDbClientManager(postgresPool)
+  const postgresClientManager = new PostgresDbClientManager(postgresPool);
 
-  const userDao = new UserDao(postgresClientManager)
+  const userDao = new UserDao(postgresClientManager);
 
-  const userRepository = new UserRepository(userDao)
+  const userRepository = new UserRepository(userDao);
 
-  const cryptoEncryptService = new CryptoEncryptService()
-  const cryptoHashService = new CryptoHashService()
-  const jwtTokenService = new JwtTokenService()
+  const cryptoEncryptService = new CryptoEncryptService();
+  const cryptoHashService = new CryptoHashService();
+  const jwtTokenService = new JwtTokenService();
 
   const signInUseCase = new SignInUseCase(
     userRepository,
     cryptoEncryptService,
     cryptoHashService,
     jwtTokenService,
-    queueManager
-  )
+    queueManager,
+  );
 
-  const signInController = new SignInController(signInUseCase)
+  const signInController = new SignInController(signInUseCase);
 
   const decorator = new DbTransactionDecorator(
     signInController,
-    postgresClientManager
-  )
+    postgresClientManager,
+  );
 
-  return decorator
-}
+  return decorator;
+};

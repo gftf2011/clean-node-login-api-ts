@@ -1,1 +1,1 @@
-export * from './google-oauth2-service'
+export * from './google-oauth2-service';

@@ -8,45 +8,49 @@
  * It does not have any businnes logic for now. The decision was made dealing with the {@link https://developer.ibm.com/patterns/create-backend-for-frontend-application-architecture/ B.F.F.} - Backend For Frontend context
  */
 export class UserEntity {
-  private readonly name: string
-  private readonly lastname: string
-  private readonly taxvat: string
-  private readonly email: string
-  private readonly password: string
+  private readonly name: string;
+
+  private readonly lastname: string;
+
+  private readonly taxvat: string;
+
+  private readonly email: string;
+
+  private readonly password: string;
 
   private constructor(
     name: string,
     lastname: string,
     taxvat: string,
     email: string,
-    password: string
+    password: string,
   ) {
-    this.name = name
-    this.lastname = lastname
-    this.taxvat = taxvat
-    this.email = email
-    this.password = password
-    Object.freeze(this)
+    this.name = name;
+    this.lastname = lastname;
+    this.taxvat = taxvat;
+    this.email = email;
+    this.password = password;
+    Object.freeze(this);
   }
 
   getName(): string {
-    return this.name
+    return this.name;
   }
 
   getLastname(): string {
-    return this.lastname
+    return this.lastname;
   }
 
   getTaxvat(): string {
-    return this.taxvat
+    return this.taxvat;
   }
 
   getEmail(): string {
-    return this.email
+    return this.email;
   }
 
   getPassword(): string {
-    return this.password
+    return this.password;
   }
 
   static create(
@@ -54,8 +58,8 @@ export class UserEntity {
     lastname: string,
     taxvat: string,
     email: string,
-    password: string
+    password: string,
   ): UserEntity {
-    return new UserEntity(name, lastname, taxvat, email, password)
+    return new UserEntity(name, lastname, taxvat, email, password);
   }
 }

@@ -1,12 +1,12 @@
 /**
  * Use Cases
  */
-import { IUserRepository, UserDto as User } from '../../use-cases/ports'
+import { IUserRepository, UserDto as User } from '../../use-cases/ports';
 
 /**
  * Infra
  */
-import { IUserDao } from '../contracts'
+import { IUserDao } from '../contracts';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -15,18 +15,16 @@ import { IUserDao } from '../contracts'
  * @obs Here the approaching method used was the repository guided by business logic
  */
 export class UserRepository implements IUserRepository {
-  private readonly userDAO: IUserDao
-
-  constructor(userDAO: IUserDao) {
-    this.userDAO = userDAO
+  constructor(private readonly userDAO: IUserDao) {
+    this.userDAO = userDAO;
   }
 
   async create(user: User): Promise<User> {
-    const userResponse = await this.userDAO.create(user)
-    return userResponse
+    const userResponse = await this.userDAO.create(user);
+    return userResponse;
   }
 
   async findUserByEmail(email: string): Promise<User> {
-    return await this.userDAO.findUserByEmail(email)
+    return this.userDAO.findUserByEmail(email);
   }
 }

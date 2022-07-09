@@ -1,12 +1,13 @@
+/* eslint-disable max-classes-per-file */
 /**
  * @desc Left parameter from Either, usued to tell Either value is an Error
  * @author Otavio Lemos <otaviolemos@gmail.com>
  */
 export class Left<L, A> {
-  readonly value: L
+  readonly value: L;
 
   constructor(value: L) {
-    this.value = value
+    this.value = value;
   }
 
   /**
@@ -15,7 +16,7 @@ export class Left<L, A> {
    * @returns {true} output telling if class is Left
    */
   isLeft(): this is Left<L, A> {
-    return true
+    return true;
   }
 
   /**
@@ -24,7 +25,7 @@ export class Left<L, A> {
    * @returns {false} output telling if class is Right
    */
   isRight(): this is Right<L, A> {
-    return false
+    return false;
   }
 }
 
@@ -33,10 +34,10 @@ export class Left<L, A> {
  * @author Otavio Lemos <otaviolemos@gmail.com>
  */
 export class Right<L, A> {
-  readonly value: A
+  readonly value: A;
 
   constructor(value: A) {
-    this.value = value
+    this.value = value;
   }
 
   /**
@@ -45,7 +46,7 @@ export class Right<L, A> {
    * @returns {false} output telling if class is Left
    */
   isLeft(): this is Left<L, A> {
-    return false
+    return false;
   }
 
   /**
@@ -54,7 +55,7 @@ export class Right<L, A> {
    * @returns {true} output telling if class is Right
    */
   isRight(): this is Right<L, A> {
-    return true
+    return true;
   }
 }
 
@@ -62,7 +63,7 @@ export class Right<L, A> {
  * @desc Either type, used to tell if the value either is an Error - Left, or the expected one - Right
  * @author Otavio Lemos <otaviolemos@gmail.com>
  */
-export type Either<L, A> = Left<L, A> | Right<L, A>
+export type Either<L, A> = Left<L, A> | Right<L, A>;
 
 /**
  * @author Otavio Lemos <otaviolemos@gmail.com>
@@ -70,8 +71,8 @@ export type Either<L, A> = Left<L, A> | Right<L, A>
  * It uses the {@link https://www.tutorialspoint.com/design_pattern/factory_pattern.htm Factory} design pattern
  */
 export const left = <L, A>(l: L): Either<L, A> => {
-  return new Left<L, A>(l)
-}
+  return new Left<L, A>(l);
+};
 
 /**
  * @author Otavio Lemos <otaviolemos@gmail.com>
@@ -79,5 +80,5 @@ export const left = <L, A>(l: L): Either<L, A> => {
  * It uses the {@link https://www.tutorialspoint.com/design_pattern/factory_pattern.htm Factory} design pattern
  */
 export const right = <L, A>(a: A): Either<L, A> => {
-  return new Right<L, A>(a)
-}
+  return new Right<L, A>(a);
+};

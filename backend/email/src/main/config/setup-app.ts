@@ -1,20 +1,20 @@
-import { Connection, connect } from 'amqplib'
-import setupQueues from '../config/setup-queues'
+import { Connection, connect } from 'amqplib';
+import setupQueues from './setup-queues';
 
 const app = async () => {
-  let connection: Connection
+  let connection: Connection;
 
   /**
    * Retry connection logic, queue connection is not immediate
    */
   while (!connection) {
     try {
-      connection = await connect(process.env.RABBITMQ_CONNECTION_URL)
+      connection = await connect(process.env.RABBITMQ_CONNECTION_URL);
     } catch (err) {
-      connection = null
+      connection = null;
     }
   }
-  setupQueues(connection)
-}
+  setupQueues(connection);
+};
 
-export default app
+export default app;

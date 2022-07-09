@@ -1,19 +1,19 @@
 /**
  * Infra
  */
-import { DbClientManager, IUserDao } from '../contracts'
+import { DbClientManager, IUserDao } from '../contracts';
 
 /**
  * Use Cases
  */
-import { UserDto as User } from '../../use-cases/ports'
+import { UserDto as User } from '../../use-cases/ports';
 
 export class UserDao implements IUserDao {
   constructor(private readonly dbClientManager: DbClientManager) {}
 
   async create(user: User): Promise<User> {
-    const statement: string =
-      'INSERT INTO users_schema.users(name, lastname, taxvat, email, password, confirmed) VALUES($1, $2, $3, $4, $5, $6) RETURNING *'
+    const statement =
+      'INSERT INTO users_schema.users(name, lastname, taxvat, email, password, confirmed) VALUES($1, $2, $3, $4, $5, $6) RETURNING *';
 
     const values: any[] = [
       user.name,
@@ -22,9 +22,9 @@ export class UserDao implements IUserDao {
       user.email,
       user.password,
       user.confirmed,
-    ]
+    ];
 
-    const response = await this.dbClientManager.query(statement, values)
+    const response = await this.dbClientManager.query(statement, values);
 
     const parsedResponse: User = {
       id: response.rows[0].id,
@@ -34,17 +34,16 @@ export class UserDao implements IUserDao {
       password: response.rows[0].password,
       taxvat: response.rows[0].taxvat,
       confirmed: response.rows[0].confirmed,
-    }
-    return parsedResponse
+    };
+    return parsedResponse;
   }
 
   async findUserByEmail(email: string): Promise<User> {
-    const statement: string =
-      'SELECT * FROM users_schema.users WHERE email LIKE $1'
+    const statement = 'SELECT * FROM users_schema.users WHERE email LIKE $1';
 
-    const values: any[] = [email]
+    const values: any[] = [email];
 
-    const response = await this.dbClientManager.query(statement, values)
+    const response = await this.dbClientManager.query(statement, values);
     const parsedResponse: User = response.rows[0]
       ? {
           id: response.rows[0].id,
@@ -55,7 +54,7 @@ export class UserDao implements IUserDao {
           taxvat: response.rows[0].taxvat,
           confirmed: response.rows[0].confirmed,
         }
-      : undefined
-    return parsedResponse
+      : undefined;
+    return parsedResponse;
   }
 }

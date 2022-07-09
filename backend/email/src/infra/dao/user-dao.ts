@@ -4,49 +4,49 @@
 import {
   BasicUserDto as BasicUser,
   UserDto as User,
-} from '../../use-cases/ports'
+} from '../../use-cases/ports';
 
 /**
  * Infra
  */
-import { DbClientManager, IUserDao } from '../contracts'
+import { DbClientManager, IUserDao } from '../contracts';
 
 export class UserDao implements IUserDao {
   constructor(private readonly dbClientManager: DbClientManager) {}
 
   async create(user: BasicUser): Promise<User> {
-    const tableOrCollection: string = 'users'
+    const tableOrCollection = 'users';
 
     const documentsAndFilters = {
       documents: [user],
-    }
+    };
 
     const response = await this.dbClientManager.query(
       'INSERT_ONE',
       tableOrCollection,
-      documentsAndFilters
-    )
+      documentsAndFilters,
+    );
 
     const parsedResponse: User = {
       id: response.insertedId.valueOf(),
       ...user,
-    }
+    };
 
-    return parsedResponse
+    return parsedResponse;
   }
 
   async findUserByEmail(email: string): Promise<User> {
-    const tableOrCollection: string = 'users'
+    const tableOrCollection = 'users';
 
     const documentsAndFilters = {
       filters: { email },
-    }
+    };
 
     const response = await this.dbClientManager.query(
       'FIND_ONE',
       tableOrCollection,
-      documentsAndFilters
-    )
+      documentsAndFilters,
+    );
 
     const parsedResponse: User = response
       ? {
@@ -55,8 +55,8 @@ export class UserDao implements IUserDao {
           name: response.name,
           lastname: response.lastname,
         }
-      : null
+      : null;
 
-    return parsedResponse
+    return parsedResponse;
   }
 }

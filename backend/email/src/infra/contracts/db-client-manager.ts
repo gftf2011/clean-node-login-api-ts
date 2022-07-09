@@ -3,10 +3,10 @@ export interface DbClientManager {
     operation: 'INSERT_ONE' | 'FIND_ONE',
     tableOrCollection: string,
     ...args: any
-  ) => Promise<any>
-  createClient: () => Promise<void>
-  openTransaction: () => Promise<void>
-  closeTransaction: () => Promise<void>
-  commit: () => Promise<void>
-  rollback: () => Promise<void>
+  ) => Promise<any>;
+  createClient: () => Promise<void>;
+  openTransaction: () => Promise<void>;
+  closeTransaction: () => Promise<void>;
+  commit: () => Promise<void>;
+  rollback: () => Promise<void>;
 }

@@ -1,13 +1,13 @@
 /**
  * Use Cases
  */
-import { IWelcomeEmailUseCase } from '../../../use-cases/ports'
+import { IWelcomeEmailUseCase } from '../../../use-cases/ports';
 
 /**
  * Presentation
  */
-import { Request } from '../../ports'
-import { WebController } from './web-controller'
+import { Request } from '../../ports';
+import { WebController } from './web-controller';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -15,16 +15,16 @@ import { WebController } from './web-controller'
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
  */
 export class WelcomeEmailController extends WebController {
-  private readonly welcomeEmailUseCase: IWelcomeEmailUseCase
+  private readonly welcomeEmailUseCase: IWelcomeEmailUseCase;
 
   /**
    * @desc values overrides - ['email', 'name', 'lastname']
    */
-  public override requiredParams: string[] = ['email', 'name', 'lastname']
+  public override requiredParams: string[] = ['email', 'name', 'lastname'];
 
   constructor(welcomeEmailUseCase: IWelcomeEmailUseCase) {
-    super()
-    this.welcomeEmailUseCase = welcomeEmailUseCase
+    super();
+    this.welcomeEmailUseCase = welcomeEmailUseCase;
   }
 
   /**
@@ -33,12 +33,12 @@ export class WelcomeEmailController extends WebController {
    * @returns {Promise<boolean>} data output if email message was sent
    */
   public async perform(request: Request): Promise<boolean> {
-    const response = await this.welcomeEmailUseCase.perform(request.content)
+    const response = await this.welcomeEmailUseCase.perform(request.content);
 
     if (response.isLeft()) {
-      throw response.value
+      throw response.value;
     }
 
-    return true
+    return true;
   }
 }

@@ -1,5 +1,5 @@
-import { DbSession } from './db-session'
+import { DbSession } from './db-session';
 
 export interface DbTransactionSession {
-  getSession: () => Promise<DbSession>
+  getSession: () => Promise<DbSession>;
 }

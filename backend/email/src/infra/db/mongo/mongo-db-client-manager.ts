@@ -7,28 +7,28 @@ import {
   DbClientPool,
   DbSession,
   DbTransactionSession,
-} from '../../contracts'
-import { DbQueryRunnerContext } from '../helpers/strategy/db-query-runner-context'
-import { MongoDbFindOneQueryRunnerStrategy } from '../helpers/strategy/mongo-db-find-one-query-runner-strategy'
-import { MongoDbInsertOneQueryRunnerStrategy } from '../helpers/strategy/mongo-db-insert-one-query-runner-strategy'
+} from '../../contracts';
+import { DbQueryRunnerContext } from '../helpers/strategy/db-query-runner-context';
+import { MongoDbFindOneQueryRunnerStrategy } from '../helpers/strategy/mongo-db-find-one-query-runner-strategy';
+import { MongoDbInsertOneQueryRunnerStrategy } from '../helpers/strategy/mongo-db-insert-one-query-runner-strategy';
 
 export class MongoDbClientManager implements DbClientManager {
-  private client: DbClient
+  private client: DbClient;
 
-  private session: DbSession
+  private session: DbSession;
 
   constructor(
     private readonly pool: DbClientPool,
-    private readonly transaction: DbTransactionSession
+    private readonly transaction: DbTransactionSession,
   ) {}
 
   public async createClient(): Promise<void> {
-    this.client = await this.pool.getClient()
-    this.session = await this.transaction.getSession()
+    this.client = await this.pool.getClient();
+    this.session = await this.transaction.getSession();
   }
 
   public async openTransaction(): Promise<void> {
-    this.session.startTransaction()
+    this.session.startTransaction();
   }
 
   public async query(
@@ -36,28 +36,28 @@ export class MongoDbClientManager implements DbClientManager {
     tableOrCollection: string,
     ...args: any
   ): Promise<any> {
-    let context
+    let context;
     if (operation === 'INSERT_ONE') {
       context = new DbQueryRunnerContext(
-        new MongoDbInsertOneQueryRunnerStrategy(this.client)
-      )
+        new MongoDbInsertOneQueryRunnerStrategy(this.client),
+      );
     } else if (operation === 'FIND_ONE') {
       context = new DbQueryRunnerContext(
-        new MongoDbFindOneQueryRunnerStrategy(this.client)
-      )
+        new MongoDbFindOneQueryRunnerStrategy(this.client),
+      );
     }
-    return context.executeQuery(tableOrCollection, ...args)
+    return context.executeQuery(tableOrCollection, ...args);
   }
 
   public async closeTransaction(): Promise<void> {
-    await this.session.endSession()
+    await this.session.endSession();
   }
 
   public async commit(): Promise<void> {
-    await this.session.commitTransaction()
+    await this.session.commitTransaction();
   }
 
   public async rollback(): Promise<void> {
-    await this.session.abortTransaction()
+    await this.session.abortTransaction();
   }
 }

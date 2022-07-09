@@ -6,12 +6,12 @@ import {
   AuthenticatedAccountDto,
   IHttpAuthService,
   ISignInUseCase,
-} from './ports'
+} from './ports';
 
 /**
  * Shared
  */
-import { Either, left, right } from '../shared'
+import { Either, left, right } from '../shared';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -29,17 +29,17 @@ export class SignInUseCase implements ISignInUseCase {
    */
   async perform(
     request: AccountDto,
-    host: string
+    host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
     const authenticatedAccountOrError = await this.httpAuthService.signIn(
       request,
-      host
-    )
+      host,
+    );
 
     if (authenticatedAccountOrError.isLeft()) {
-      return left(authenticatedAccountOrError.value)
+      return left(authenticatedAccountOrError.value);
     }
 
-    return right(authenticatedAccountOrError.value)
+    return right(authenticatedAccountOrError.value);
   }
 }

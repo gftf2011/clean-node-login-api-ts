@@ -1,16 +1,16 @@
 /**
  * Use Cases
  */
-import { AccountDto, AuthenticatedAccountDto } from '.'
+import { AccountDto, AuthenticatedAccountDto } from '.';
 
 /**
  * Shared
  */
-import { Either } from '../../shared/either'
+import { Either } from '../../shared/either';
 
 export interface ISignInUseCase {
   perform: (
     request: AccountDto,
-    host: string
-  ) => Promise<Either<Error, AuthenticatedAccountDto>>
+    host: string,
+  ) => Promise<Either<Error, AuthenticatedAccountDto>>;
 }

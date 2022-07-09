@@ -11,18 +11,18 @@ import {
   IUserRepository,
   QueuePublishManager,
   UserDto,
-} from './ports'
+} from './ports';
 
 /**
  * Shared
  */
-import { Either, left, right } from '../shared'
-import { ServerError, UserAlreadyExistsError } from '../shared/errors'
+import { Either, left, right } from '../shared';
+import { ServerError, UserAlreadyExistsError } from '../shared/errors';
 
 /**
  * Entites
  */
-import { UserEntity } from '../entities'
+import { UserEntity } from '../entities';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -34,7 +34,7 @@ export class SignUpUseCase implements ISignUpUseCase {
     private readonly hashService: IHashService,
     private readonly encryptService: IEncryptService,
     private readonly tokenService: ITokenService,
-    private readonly queueManager: QueuePublishManager
+    private readonly queueManager: QueuePublishManager,
   ) {}
 
   /**
@@ -46,7 +46,7 @@ export class SignUpUseCase implements ISignUpUseCase {
    */
   async perform(
     request: BasicUserDto,
-    host: string
+    host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
       !process.env.CODE_SALT &&
@@ -56,44 +56,44 @@ export class SignUpUseCase implements ISignUpUseCase {
       !process.env.JWT_REFRESH_TOKEN_ID &&
       !process.env.APP_SECRET
     ) {
-      return left(new ServerError())
+      return left(new ServerError());
     }
 
-    const { email, password, lastname, name, taxvat } = request
+    const { email, password, lastname, name, taxvat } = request;
 
     const userOrError: Either<Error, UserEntity> = UserEntity.create(
       name,
       lastname,
       taxvat,
       email,
-      password
-    )
+      password,
+    );
 
     if (userOrError.isLeft()) {
-      return left(userOrError.value)
+      return left(userOrError.value);
     }
 
     const userExists = await this.userRepository.findUserByEmail(
-      userOrError.value.getEmail()
-    )
+      userOrError.value.getEmail(),
+    );
 
     if (userExists) {
-      return left(new UserAlreadyExistsError())
+      return left(new UserAlreadyExistsError());
     }
 
-    const customSalt = `${userOrError.value.getEmail()}${userOrError.value.getTaxvat()}`
-    const defaultSalt = process.env.CODE_SALT
+    const customSalt = `${userOrError.value.getEmail()}${userOrError.value.getTaxvat()}`;
+    const defaultSalt = process.env.CODE_SALT;
     /**
      * encrypt password with user custom salt hash value
      */
-    const hashedPassword = this.hashService.encode(password, customSalt)
+    const hashedPassword = this.hashService.encode(password, customSalt);
     /**
      * encrypt encrypted password with code default salt hash value
      */
     const strongHashedPassword = this.hashService.encode(
       hashedPassword,
-      defaultSalt
-    )
+      defaultSalt,
+    );
 
     const user: UserDto = {
       email: userOrError.value.getEmail(),
@@ -102,15 +102,15 @@ export class SignUpUseCase implements ISignUpUseCase {
       taxvat: this.encryptService.encode(userOrError.value.getTaxvat()),
       password: strongHashedPassword,
       confirmed: false,
-    }
+    };
 
-    const accessTokenId = process.env.JWT_ACCESS_TOKEN_ID
-    const refreshTokenId = process.env.JWT_REFRESH_TOKEN_ID
+    const accessTokenId = process.env.JWT_ACCESS_TOKEN_ID;
+    const refreshTokenId = process.env.JWT_REFRESH_TOKEN_ID;
 
-    const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN
-    const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
+    const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN;
+    const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN;
 
-    const userCreated = await this.userRepository.create(user)
+    const userCreated = await this.userRepository.create(user);
 
     const refreshTokenOrError = this.tokenService.sign(
       {
@@ -121,8 +121,8 @@ export class SignUpUseCase implements ISignUpUseCase {
         issuer: host,
         jwtId: refreshTokenId,
       },
-      refreshTokenExpiresIn
-    )
+      refreshTokenExpiresIn,
+    );
     const accessTokenOrError = this.tokenService.sign(
       {
         email: this.encryptService.encode(userCreated.email),
@@ -132,27 +132,27 @@ export class SignUpUseCase implements ISignUpUseCase {
         issuer: host,
         jwtId: accessTokenId,
       },
-      accessTokenExpiresIn
-    )
+      accessTokenExpiresIn,
+    );
 
     if (refreshTokenOrError.isLeft()) {
-      return left(refreshTokenOrError.value)
+      return left(refreshTokenOrError.value);
     }
     if (accessTokenOrError.isLeft()) {
-      return left(accessTokenOrError.value)
+      return left(accessTokenOrError.value);
     }
 
     await this.queueManager.publish(
       'sign-up',
       'welcome-email',
-      JSON.stringify(userCreated)
-    )
+      JSON.stringify(userCreated),
+    );
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
       refreshToken: refreshTokenOrError.value,
-    }
+    };
 
-    return right(authenticatedAccount)
+    return right(authenticatedAccount);
   }
 }

@@ -1,12 +1,12 @@
 /**
  * Driver
  */
-import { Channel, ConsumeMessage } from 'amqplib'
+import { Channel, ConsumeMessage } from 'amqplib';
 
 /**
  * Presentation
  */
-import { Controller, Request } from '../../presentation/ports'
+import { Controller, Request } from '../../presentation/ports';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -15,22 +15,22 @@ import { Controller, Request } from '../../presentation/ports'
  */
 export const adaptConsumeMessage = (
   channel: Channel,
-  controller: Controller
+  controller: Controller,
 ) => {
   return async (msg: ConsumeMessage | null): Promise<void> => {
     const request: Request = {
       content: {},
-    }
+    };
 
     if (msg !== null) {
-      request.content = JSON.parse(msg.content.toString())
+      request.content = JSON.parse(msg.content.toString());
     }
     /**
      * Command below used to tell RabbitMQ to not dispatch new messages to work queues
      * until de previous one is acknowledge
      */
-    await channel.prefetch(1)
-    await controller.handle(request)
-    channel.ack(msg, false)
-  }
-}
+    await channel.prefetch(1);
+    await controller.handle(request);
+    channel.ack(msg, false);
+  };
+};

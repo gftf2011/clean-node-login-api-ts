@@ -7,17 +7,17 @@ import {
   IHttpAuthService,
   ISignUpUseCase,
   UserDto,
-} from './ports'
+} from './ports';
 
 /**
  * Shared
  */
-import { Either, left, right } from '../shared'
+import { Either, left, right } from '../shared';
 
 /**
  * Entites
  */
-import { UserEntity } from '../entities'
+import { UserEntity } from '../entities';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -35,17 +35,17 @@ export class SignUpUseCase implements ISignUpUseCase {
    */
   async perform(
     request: BasicUserDto,
-    host: string
+    host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
-    const { email, password, lastname, name, taxvat } = request
+    const { email, password, lastname, name, taxvat } = request;
 
     const userOrError: UserEntity = UserEntity.create(
       name,
       lastname,
       taxvat,
       email,
-      password
-    )
+      password,
+    );
 
     const user: UserDto = {
       email: userOrError.getEmail(),
@@ -53,17 +53,17 @@ export class SignUpUseCase implements ISignUpUseCase {
       lastname: userOrError.getLastname(),
       taxvat: userOrError.getTaxvat(),
       password: userOrError.getPassword(),
-    }
+    };
 
     const authenticatedAccountOrError = await this.httpAuthService.signUp(
       user,
-      host
-    )
+      host,
+    );
 
     if (authenticatedAccountOrError.isLeft()) {
-      return left(authenticatedAccountOrError.value)
+      return left(authenticatedAccountOrError.value);
     }
 
-    return right(authenticatedAccountOrError.value)
+    return right(authenticatedAccountOrError.value);
   }
 }

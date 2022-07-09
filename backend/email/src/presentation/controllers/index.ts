@@ -1,1 +1,1 @@
-export * from './template-method'
+export * from './template-method';

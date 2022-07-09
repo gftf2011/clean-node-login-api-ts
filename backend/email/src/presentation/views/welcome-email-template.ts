@@ -1,11 +1,11 @@
 /**
  * Use Cases
  */
-import { BasicUserDto, EmailTemplate } from '../../use-cases/ports'
+import { BasicUserDto, EmailTemplate } from '../../use-cases/ports';
 
 export class WelcomeEmailTemplate implements EmailTemplate {
   html(data: object): string {
-    const { name } = data as BasicUserDto
+    const { name } = data as BasicUserDto;
     return `<div style="max-width: 600px">
           <main style="
             font-family: 'Helvetica', sans-serif;
@@ -80,10 +80,10 @@ export class WelcomeEmailTemplate implements EmailTemplate {
               Please do not reply it 😎 !
             </p>
           </main>
-        </div>`
+        </div>`;
   }
 
   attachments(): object[] {
-    return []
+    return [];
   }
 }

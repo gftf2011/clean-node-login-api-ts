@@ -1,13 +1,13 @@
 /**
  * Shared
  */
-import { Either } from '../../shared'
+import { Either } from '../../shared';
 
 /**
  * Use Cases
  */
-import { UserDto } from './user-dto'
+import { UserDto } from './user-dto';
 
 export interface IWelcomeEmailUseCase {
-  perform: (request: UserDto) => Promise<Either<Error, any>>
+  perform: (request: UserDto) => Promise<Either<Error, any>>;
 }

@@ -1,1 +1,1 @@
-export * from './rabbitmq-consume-message-adapter'
+export * from './rabbitmq-consume-message-adapter';

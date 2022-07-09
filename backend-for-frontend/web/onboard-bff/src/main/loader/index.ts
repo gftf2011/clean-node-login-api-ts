@@ -1,1 +1,1 @@
-export const loader = async (): Promise<any> => {}
+export const loader = async (): Promise<any> => {};

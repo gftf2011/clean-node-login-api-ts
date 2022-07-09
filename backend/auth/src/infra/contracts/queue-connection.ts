@@ -1,5 +1,5 @@
-import { QueueChannel } from './queue-channel'
+import { QueueChannel } from './queue-channel';
 
 export interface QueueConnection {
-  getChannel: () => QueueChannel
+  getChannel: () => QueueChannel;
 }

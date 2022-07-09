@@ -1,25 +1,25 @@
 /**
  * Infra
  */
-import { AxiosHttpAuthService } from '../../../infra/services'
+import { AxiosHttpAuthService } from '../../../infra/services';
 
 /**
  * Presentation
  */
-import { Controller } from '../../../presentation/ports'
-import { SignInController } from '../../../presentation/controllers'
+import { Controller } from '../../../presentation/ports';
+import { SignInController } from '../../../presentation/controllers';
 
 /**
  * Use Cases
  */
-import { SignInUseCase } from '../../../use-cases'
+import { SignInUseCase } from '../../../use-cases';
 
 export const makeSignInController = (): Controller => {
-  const axiosHttpAuthService = new AxiosHttpAuthService()
+  const axiosHttpAuthService = new AxiosHttpAuthService();
 
-  const signInUseCase = new SignInUseCase(axiosHttpAuthService)
+  const signInUseCase = new SignInUseCase(axiosHttpAuthService);
 
-  const signInController = new SignInController(signInUseCase)
+  const signInController = new SignInController(signInUseCase);
 
-  return signInController
-}
+  return signInController;
+};

@@ -1,2 +1,2 @@
-export * from './web-controller'
-export * from './welcome-email-controller'
+export * from './web-controller';
+export * from './welcome-email-controller';

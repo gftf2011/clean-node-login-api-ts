@@ -1,6 +1,6 @@
 export interface HttpRequest {
-  body?: any
+  body?: any;
   headers?: {
-    host: string
-  }
+    host: string;
+  };
 }

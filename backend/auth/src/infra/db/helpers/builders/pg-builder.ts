@@ -1,51 +1,51 @@
 /**
  * Driver
  */
-import { Pool, PoolConfig } from 'pg'
+import { Pool, PoolConfig } from 'pg';
 
 /**
  * Infra
  */
-import { IDbClientBuilder } from '../../../contracts'
+import { IDbClientBuilder } from '../../../contracts';
 
 export class PgClientBuilder implements IDbClientBuilder {
-  private product: PoolConfig
+  private product: PoolConfig;
 
   public constructor() {
-    this.reset()
+    this.reset();
   }
 
   private reset(): void {
-    this.product = {}
+    this.product = {};
   }
 
   public setHost(): void {
-    this.product.host = process.env.POSTGRES_HOST
+    this.product.host = process.env.POSTGRES_HOST;
   }
 
   public setPort(): void {
-    this.product.port = +process.env.POSTGRES_PORT
+    this.product.port = +process.env.POSTGRES_PORT;
   }
 
   public setUser(): void {
-    this.product.user = process.env.POSTGRES_USER
+    this.product.user = process.env.POSTGRES_USER;
   }
 
   public setPass(): void {
-    this.product.password = process.env.POSTGRES_PASSWORD
+    this.product.password = process.env.POSTGRES_PASSWORD;
   }
 
   public setDb(): void {
-    this.product.database = process.env.POSTGRES_DB
+    this.product.database = process.env.POSTGRES_DB;
   }
 
   public setMax(): void {
-    this.product.max = +process.env.POSTGRES_MAX
+    this.product.max = +process.env.POSTGRES_MAX;
   }
 
   public build(): Pool {
-    const result = new Pool(this.product)
-    this.reset()
-    return result
+    const result = new Pool(this.product);
+    this.reset();
+    return result;
   }
 }

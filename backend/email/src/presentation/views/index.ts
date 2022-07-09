@@ -1,1 +1,1 @@
-export * from './welcome-email-template'
+export * from './welcome-email-template';

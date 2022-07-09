@@ -1,7 +1,7 @@
 /**
  * Presentation
  */
-import { Controller, HttpRequest, HttpResponse } from '../../ports'
+import { Controller, HttpRequest, HttpResponse } from '../../ports';
 
 /**
  * Shared
@@ -12,7 +12,7 @@ import {
   Error403,
   MissingHeaderParamsError,
   MissingParamsError,
-} from '../../../shared/errors'
+} from '../../../shared/errors';
 
 /**
  * Presentation
@@ -22,7 +22,7 @@ import {
   forbidden,
   serverError,
   unauthorized,
-} from '../../helpers/http-helper'
+} from '../../helpers/http-helper';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -30,8 +30,9 @@ import {
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
  */
 export abstract class WebController implements Controller {
-  public requiredParams: string[] = []
-  public requiredHeaderParams: string[] = []
+  public requiredParams: string[] = [];
+
+  public requiredHeaderParams: string[] = [];
 
   /**
    * @desc handles throwable errors returned by the applicaion
@@ -40,15 +41,15 @@ export abstract class WebController implements Controller {
    */
   private static handleError(err: Error): HttpResponse {
     if (err instanceof Error400) {
-      return badRequest(err)
+      return badRequest(err);
     }
     if (err instanceof Error401) {
-      return unauthorized(err)
+      return unauthorized(err);
     }
     if (err instanceof Error403) {
-      return forbidden(err)
+      return forbidden(err);
     }
-    return serverError(err)
+    return serverError(err);
   }
 
   /**
@@ -60,24 +61,27 @@ export abstract class WebController implements Controller {
     try {
       const missingParams: string[] = WebController.getMissingParams(
         request,
-        this.requiredParams
-      )
+        this.requiredParams,
+      );
       if (missingParams.length !== 0) {
-        throw new MissingParamsError(missingParams)
+        throw new MissingParamsError(missingParams);
       }
       const missingHeaderParams: string[] =
-        WebController.getMissingHeaderParams(request, this.requiredHeaderParams)
+        WebController.getMissingHeaderParams(
+          request,
+          this.requiredHeaderParams,
+        );
       if (missingHeaderParams.length !== 0) {
-        throw new MissingHeaderParamsError(missingHeaderParams)
+        throw new MissingHeaderParamsError(missingHeaderParams);
       }
-      const response = await this.perform(request)
-      return response
+      const response = await this.perform(request);
+      return response;
     } catch (error) {
-      return WebController.handleError(error as Error)
+      return WebController.handleError(error as Error);
     }
   }
 
-  public abstract perform(request: HttpRequest): Promise<HttpResponse>
+  public abstract perform(request: HttpRequest): Promise<HttpResponse>;
 
   /**
    * @desc check which parameters are missing
@@ -87,15 +91,15 @@ export abstract class WebController implements Controller {
    */
   public static getMissingParams(
     request: HttpRequest,
-    requiredParams: string[]
+    requiredParams: string[],
   ): string[] {
-    const missingParams: string[] = []
-    requiredParams.forEach((name) => {
+    const missingParams: string[] = [];
+    requiredParams.forEach(name => {
       if (!Object.keys(request.body).includes(name)) {
-        missingParams.push(name)
+        missingParams.push(name);
       }
-    })
-    return missingParams
+    });
+    return missingParams;
   }
 
   /**
@@ -106,14 +110,14 @@ export abstract class WebController implements Controller {
    */
   public static getMissingHeaderParams(
     request: HttpRequest,
-    requiredHeaderParams: string[]
+    requiredHeaderParams: string[],
   ): string[] {
-    const missingParams: string[] = []
-    requiredHeaderParams.forEach((name) => {
+    const missingParams: string[] = [];
+    requiredHeaderParams.forEach(name => {
       if (!Object.keys(request.headers).includes(name)) {
-        missingParams.push(name)
+        missingParams.push(name);
       }
-    })
-    return missingParams
+    });
+    return missingParams;
   }
 }

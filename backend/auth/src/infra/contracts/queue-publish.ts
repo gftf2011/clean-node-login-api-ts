@@ -1,3 +1,3 @@
 export interface QueuePublish {
-  start: () => Promise<void>
+  start: () => Promise<void>;
 }
