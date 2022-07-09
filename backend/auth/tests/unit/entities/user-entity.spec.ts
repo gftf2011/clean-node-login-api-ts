@@ -25,16 +25,43 @@ import { UserEntity } from '../../../src/entities';
 import { left } from '../../../src/shared';
 
 describe('User Entity', () => {
-  it('should not create user if "name" property is undefined', () => {
-    const name: string = undefined;
-    const lastname = faker.lorem.word(2);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
+  const generateValidName = (): string => {
+    return faker.lorem.word(2);
+  };
+
+  const generateValidLastname = (): string => {
+    return faker.lorem.word(2);
+  };
+
+  const generateValidTaxvat = (): string => {
+    return cpf.generate();
+  };
+
+  const generateValidEmail = (): string => {
+    return faker.internet.email();
+  };
+
+  const generateValidPassword = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+    return `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
       .word(faker.datatype.number({ min: 1, max: 2 }))
       .toLowerCase()}${faker.lorem
       .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
+  it('should not create user if "name" property is undefined', () => {
+    const name: string = undefined;
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -47,14 +74,10 @@ describe('User Entity', () => {
 
   it('should not create user if "name" property is null', () => {
     const name: string = null;
-    const lastname = faker.lorem.word(2);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -67,14 +90,10 @@ describe('User Entity', () => {
 
   it('should not create user if "name" property is empty', () => {
     const name = '';
-    const lastname = faker.lorem.word(2);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -87,14 +106,10 @@ describe('User Entity', () => {
 
   it('should not create user if "name" property has only white spaces', () => {
     const name = '    ';
-    const lastname = faker.lorem.word(2);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -107,14 +122,10 @@ describe('User Entity', () => {
 
   it('should not create user if "name" property has only one character - (too few characters)', () => {
     const name = faker.lorem.word(1);
-    const lastname = faker.lorem.word(2);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -127,14 +138,10 @@ describe('User Entity', () => {
 
   it('should not create user if "name" property has more than 255 characters - (too many characters)', () => {
     const name = faker.lorem.word(256);
-    const lastname = faker.lorem.word(2);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -146,15 +153,11 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "lastname" property is undefined', () => {
-    const name = faker.lorem.word(2);
+    const name = generateValidName();
     const lastname: string = undefined;
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -166,15 +169,11 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "lastname" property is null', () => {
-    const name = faker.lorem.word(2);
+    const name = generateValidName();
     const lastname: string = null;
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -186,15 +185,11 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "lastname" property is empty', () => {
-    const name = faker.lorem.word(2);
+    const name = generateValidName();
     const lastname = '';
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -206,15 +201,11 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "lastname" property has only white spaces', () => {
-    const name = faker.lorem.word(2);
+    const name = generateValidName();
     const lastname = '    ';
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -226,15 +217,11 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "lastname" property has only one character - (too few characters)', () => {
-    const name = faker.lorem.word(2);
+    const name = generateValidName();
     const lastname = faker.lorem.word(1);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -246,15 +233,11 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "lastname" property has more than 255 characters - (too many characters)', () => {
-    const name = faker.lorem.word(2);
+    const name = generateValidName();
     const lastname = faker.lorem.word(256);
-    const taxvat = cpf.generate();
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -266,15 +249,11 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "taxvat" property is undefined', () => {
-    const name = faker.lorem.word(2);
-    const lastname = faker.lorem.word(2);
+    const name = generateValidName();
+    const lastname = generateValidLastname();
     const taxvat: string = undefined;
-    const email = faker.internet.email();
-    const password = `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toLowerCase()}${faker.lorem
-      .word(faker.datatype.number({ min: 1, max: 2 }))
-      .toUpperCase()}@`;
+    const email = generateValidEmail();
+    const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
       lastname,
