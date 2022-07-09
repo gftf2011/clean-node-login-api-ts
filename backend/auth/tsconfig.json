@@ -2,8 +2,8 @@
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
-    "baseUrl": "src",                                    /* Specify the base directory to resolve non-relative module names. */
-    "rootDirs": ["src", "test"],                         /* Allow multiple folders to be treated as one when resolving modules. */
+    // "baseUrl": ".",                                      /* Specify the base directory to resolve non-relative module names. */
+    "rootDirs": ["src", "tests"],                        /* Allow multiple folders to be treated as one when resolving modules. */
     "outDir": "dist",                                    /* Specify an output folder for all emitted files. */
 
     /* Projects */
@@ -102,6 +102,6 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
-  "include": ["src", "tests"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
