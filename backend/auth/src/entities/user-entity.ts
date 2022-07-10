@@ -309,7 +309,7 @@ export class UserEntity {
     }
 
     if (
-      !UserEntity.isTaxvatFirstDigitValid(clearedTaxvat) &&
+      !UserEntity.isTaxvatFirstDigitValid(clearedTaxvat) ||
       !UserEntity.isTaxvatSecondDigitValid(clearedTaxvat)
     ) {
       return false;

@@ -33,8 +33,8 @@ describe('User Entity', () => {
     return faker.lorem.word(2);
   };
 
-  const generateValidTaxvat = (): string => {
-    return cpf.generate();
+  const generateValidTaxvat = (formatted?: boolean): string => {
+    return cpf.generate(formatted);
   };
 
   const generateBlacklistedTaxvat = (): string => {
@@ -55,7 +55,7 @@ describe('User Entity', () => {
     ];
   };
 
-  const generateInvalidFirstDigitTaxvat = (): string => {
+  const generateInvalidFirstDigitTaxvat = (formatted?: boolean): string => {
     const cpfGenerated = cpf.generate();
     const secondValidationDigit = cpfGenerated.substring(
       cpfGenerated.length - 1,
@@ -76,7 +76,41 @@ describe('User Entity', () => {
       invalidFirstValidationDigit +
       secondValidationDigit;
 
-    return invalidTaxvat;
+    return formatted
+      ? `${invalidTaxvat.substring(0, 3)}.${invalidTaxvat.substring(
+          3,
+          6,
+        )}.${invalidTaxvat.substring(6, 9)}-${invalidTaxvat.substring(9, 11)}`
+      : invalidTaxvat;
+  };
+
+  const generateInvalidSecondDigitTaxvat = (formatted?: boolean): string => {
+    const cpfGenerated = cpf.generate();
+    const firstValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 2,
+      cpfGenerated.length - 1,
+    );
+    const secondValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 1,
+      cpfGenerated.length,
+    );
+
+    const invalidSecondValidationDigit =
+      +secondValidationDigit >= 9
+        ? +secondValidationDigit - 1
+        : +secondValidationDigit + 1;
+
+    const invalidTaxvat =
+      cpfGenerated.substring(0, cpfGenerated.length - 2) +
+      firstValidationDigit +
+      invalidSecondValidationDigit;
+
+    return formatted
+      ? `${invalidTaxvat.substring(0, 3)}.${invalidTaxvat.substring(
+          3,
+          6,
+        )}.${invalidTaxvat.substring(6, 9)}-${invalidTaxvat.substring(9, 11)}`
+      : invalidTaxvat;
   };
 
   const generateValidEmail = (): string => {
@@ -91,7 +125,10 @@ describe('User Entity', () => {
     const chosenSpecialSymbol = specialSymbols.charAt(
       Math.round((specialSymbols.length - 1) * Math.random()),
     );
-    return `${faker.datatype.number({ min: 8, max: 8 })}${faker.lorem
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${faker.lorem
       .word(faker.datatype.number({ min: 1, max: 2 }))
       .toLowerCase()}${faker.lorem
       .word(faker.datatype.number({ min: 1, max: 2 }))
@@ -374,6 +411,22 @@ describe('User Entity', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
     const taxvat = generateInvalidFirstDigitTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  });
+
+  it('should not create user if "taxvat" second validation digit is invalid', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateInvalidSecondDigitTaxvat();
     const email = generateValidEmail();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
