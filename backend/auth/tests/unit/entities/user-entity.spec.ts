@@ -55,6 +55,30 @@ describe('User Entity', () => {
     ];
   };
 
+  const generateInvalidFirstDigitTaxvat = (): string => {
+    const cpfGenerated = cpf.generate();
+    const secondValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 1,
+      cpfGenerated.length,
+    );
+    const firstValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 2,
+      cpfGenerated.length - 1,
+    );
+
+    const invalidFirstValidationDigit =
+      +firstValidationDigit >= 9
+        ? +firstValidationDigit - 1
+        : +firstValidationDigit + 1;
+
+    const invalidTaxvat =
+      cpfGenerated.substring(0, cpfGenerated.length - 2) +
+      invalidFirstValidationDigit +
+      secondValidationDigit;
+
+    return invalidTaxvat;
+  };
+
   const generateValidEmail = (): string => {
     return faker.internet.email();
   };
@@ -334,6 +358,22 @@ describe('User Entity', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
     const taxvat = generateBlacklistedTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  });
+
+  it('should not create user if "taxvat" first validation digit is invalid', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateInvalidFirstDigitTaxvat();
     const email = generateValidEmail();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
