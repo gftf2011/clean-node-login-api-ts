@@ -14,7 +14,7 @@ const NOT_SPECIAL_CHARACTER_REGEX = /([^!@#$%&?]*)/g;
 const MULTI_WHITE_SPACES_REGEX = /([ ]+)/g;
 
 export const clearTaxvat = (taxvat: string): string => {
-  return taxvat.replace(/[\\.-]*/g, '');
+  return taxvat.replace(/[\\.-]*/g, '').trim();
 };
 
 export const removeExtremitiesWhiteSpaces = (value: string): string => {
