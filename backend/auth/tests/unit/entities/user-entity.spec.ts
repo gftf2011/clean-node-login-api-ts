@@ -295,4 +295,20 @@ describe('User Entity', () => {
     );
     expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
+
+  it('should not create user if "taxvat" does not have correct length', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = `${faker.datatype.number({ min: 1, max: 10 })}`;
+    const email = generateValidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  });
 });
