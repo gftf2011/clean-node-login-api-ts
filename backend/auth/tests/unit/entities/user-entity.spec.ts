@@ -119,15 +119,19 @@ describe('User Entity', () => {
   };
 
   const generateLongInvalidEmail = (): string => {
-    return `${faker.datatype.string(64)}@${faker.datatype.string(
-      127,
-    )}.${faker.datatype.string(128)}`;
+    return `${'a'.repeat(64)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
   };
 
   const generateInvalidLongEmailAccount = (): string => {
-    return `${faker.datatype.string(65)}@${faker.datatype.string(
-      64,
-    )}.${faker.datatype.string(64)}`;
+    return `${'a'.repeat(65)}@${'d'.repeat(126)}.${'d'.repeat(126)}`;
+  };
+
+  const generateInvalidLongEmailDomain = (): string => {
+    return `${'a'.repeat(63)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
+  };
+
+  const generateInvalidEmailWithEndingDot = (): string => {
+    return `${'a'.repeat(63)}.@${'d'.repeat(127)}.${'d'.repeat(126)}`;
   };
 
   const generateValidPassword = (): string => {
@@ -569,6 +573,22 @@ describe('User Entity', () => {
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateInvalidLongEmailAccount();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" domain property has more than 255 characters - (too many characters)', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidLongEmailDomain();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
