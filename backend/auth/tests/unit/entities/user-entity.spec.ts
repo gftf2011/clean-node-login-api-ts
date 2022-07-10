@@ -118,6 +118,18 @@ describe('User Entity', () => {
     return faker.internet.email();
   };
 
+  const generateLongInvalidEmail = (): string => {
+    return `${faker.datatype.string(64)}@${faker.datatype.string(
+      127,
+    )}.${faker.datatype.string(128)}`;
+  };
+
+  const generateInvalidLongEmailAccount = (): string => {
+    return `${faker.datatype.string(65)}@${faker.datatype.string(
+      64,
+    )}.${faker.datatype.string(64)}`;
+  };
+
   const generateValidPassword = (): string => {
     const specialSymbols = '!@#$%&?';
     /**
@@ -525,6 +537,38 @@ describe('User Entity', () => {
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = '';
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" property has more than 320 characters - (too many characters)', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateLongInvalidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" account property has more than 64 characters - (too many characters)', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidLongEmailAccount();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
