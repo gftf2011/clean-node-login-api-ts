@@ -134,6 +134,10 @@ describe('User Entity', () => {
     return `${'a'.repeat(63)}.@${'d'.repeat(127)}.${'d'.repeat(126)}`;
   };
 
+  const generateInvalidEmailWithNoAccount = (): string => {
+    return `@${'d'.repeat(127)}.${'d'.repeat(127)}`;
+  };
+
   const generateValidPassword = (): string => {
     const specialSymbols = '!@#$%&?';
     /**
@@ -589,6 +593,38 @@ describe('User Entity', () => {
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateInvalidLongEmailDomain();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" account has an ending dot', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidEmailWithEndingDot();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" account has 0 characters - (too few characters)', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidEmailWithNoAccount();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
