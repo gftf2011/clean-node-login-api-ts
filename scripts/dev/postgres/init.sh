@@ -34,10 +34,10 @@ done < $file
 
 # Create Function to Check if email is in the Blacklist
 # ========================================
-psql $POSTGRES_DEV_DB -c "CREATE OR REPLACE FUNCTION is_user_email_domain_valid (email VARCHAR(255)) RETURNS BOOLEAN AS \$\$
+psql $POSTGRES_DEV_DB -c "CREATE OR REPLACE FUNCTION is_user_email_domain_valid (email VARCHAR(320)) RETURNS BOOLEAN AS \$\$
   DECLARE
     invalid_domains INT;
-    email_domain VARCHAR(255);
+    email_domain VARCHAR(320);
   BEGIN
     email_domain := split_part(email, '@', 2);
 
@@ -56,7 +56,7 @@ psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS users_schema.users(
   taxvat VARCHAR (32) NOT NULL,
   name VARCHAR (255) NOT NULL,
   lastname VARCHAR (255) NOT NULL,
-  email VARCHAR (255) UNIQUE NOT NULL,
+  email VARCHAR (320) UNIQUE NOT NULL,
   password VARCHAR (256) NOT NULL,
   confirmed BOOLEAN NOT NULL,
   PRIMARY KEY (id),

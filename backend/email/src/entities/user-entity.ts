@@ -73,7 +73,7 @@ export class UserEntity {
     if (!email) {
       return false;
     }
-    if (email.length > 255) {
+    if (email.length > 320) {
       return false;
     }
     if (!isEmailValid(email)) {
@@ -84,11 +84,10 @@ export class UserEntity {
     if (account.length > 64) {
       return false;
     }
-    if (
-      getEmailDomainsFromAddress(address).some(function (part) {
-        return part.length > 63;
-      })
-    ) {
+    if (address.length > 255) {
+      return false;
+    }
+    if (getEmailDomainsFromAddress(address).some(part => part.length > 127)) {
       return false;
     }
     return true;
