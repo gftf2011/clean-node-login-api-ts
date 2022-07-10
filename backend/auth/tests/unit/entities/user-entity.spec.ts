@@ -423,6 +423,22 @@ describe('User Entity', () => {
     expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
 
+  it('should not create user if "taxvat" first validation digit is invalid - (even formatted)', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateInvalidFirstDigitTaxvat(true);
+    const email = generateValidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  });
+
   it('should not create user if "taxvat" second validation digit is invalid', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
