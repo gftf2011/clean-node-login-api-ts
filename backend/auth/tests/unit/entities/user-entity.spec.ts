@@ -138,6 +138,12 @@ describe('User Entity', () => {
     return `@${'d'.repeat(127)}.${'d'.repeat(127)}`;
   };
 
+  const generateInvalidEmailAccountWithTwoDots = (): string => {
+    return `${'a'.repeat(31)}..${'a'.repeat(31)}@${'d'.repeat(
+      127,
+    )}.${'d'.repeat(127)}`;
+  };
+
   const generateValidPassword = (): string => {
     const specialSymbols = '!@#$%&?';
     /**
@@ -625,6 +631,22 @@ describe('User Entity', () => {
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateInvalidEmailWithNoAccount();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" account has 2 dots', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidEmailAccountWithTwoDots();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
