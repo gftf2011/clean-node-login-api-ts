@@ -9,6 +9,7 @@ import faker from 'faker';
  */
 // eslint-disable-next-line sort-imports
 import {
+  InvalidEmailError,
   InvalidLastnameError,
   InvalidNameError,
   InvalidTaxvatError,
@@ -486,4 +487,52 @@ describe('User Entity', () => {
     );
     expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
+
+  it('should not create user if "email" property is undefined', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email: string = undefined;
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  // it('should not create user if "taxvat" belongs to blacklist and first validation digit is zero', () => {
+  //   const name = generateValidName();
+  //   const lastname = generateValidLastname();
+  //   const taxvat = '01000001009';
+  //   const email = generateValidEmail();
+  //   const password = generateValidPassword();
+  //   const userOrError = UserEntity.create(
+  //     name,
+  //     lastname,
+  //     taxvat,
+  //     email,
+  //     password,
+  //   );
+  //   expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  // });
+
+  // it('should not create user if "taxvat" belongs to blacklist and second validation digit is zero', () => {
+  //   const name = generateValidName();
+  //   const lastname = generateValidLastname();
+  //   const taxvat = '00000000000';
+  //   const email = generateValidEmail();
+  //   const password = generateValidPassword();
+  //   const userOrError = UserEntity.create(
+  //     name,
+  //     lastname,
+  //     taxvat,
+  //     email,
+  //     password,
+  //   );
+  //   expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  // });
 });

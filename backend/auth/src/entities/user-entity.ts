@@ -269,10 +269,6 @@ export class UserEntity {
       return false;
     }
 
-    if (UserEntity.isTaxvatInBlacklist(clearedTaxvat)) {
-      return false;
-    }
-
     if (!UserEntity.hasTaxvatOnlyDigits(clearedTaxvat)) {
       return false;
     }
@@ -281,6 +277,10 @@ export class UserEntity {
       !UserEntity.isTaxvatFirstDigitValid(clearedTaxvat) ||
       !UserEntity.isTaxvatSecondDigitValid(clearedTaxvat)
     ) {
+      return false;
+    }
+
+    if (UserEntity.isTaxvatInBlacklist(clearedTaxvat)) {
       return false;
     }
 
