@@ -82,18 +82,6 @@ export class UserEntity {
   }
 
   /**
-   * @desc Utility method to tell if taxvat has correct extended length
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if taxvat has correct extended length
-   */
-  private static hasTaxvatCorrectExtendedLength(taxvat: string): boolean {
-    const TAXVAT_EXTENDED_LENGTH = 14;
-
-    return taxvat.length === TAXVAT_EXTENDED_LENGTH;
-  }
-
-  /**
    * @desc Utility method to tell if taxvat with correct length has only digits
    * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
    * @param {string} taxvat - user taxvat
@@ -104,18 +92,6 @@ export class UserEntity {
       /^([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})$/g;
 
     return TAXVAT_ONLY_NUMBERS_REGEX.test(taxvat);
-  }
-
-  /**
-   * @desc Utility method to tell if taxvat correctly formatted
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if taxvat is correctly formatted
-   */
-  private static isTaxvatFormattedCorrectly(taxvat: string): boolean {
-    const FORMATTED_TAXVAT = /^([0-9]{3})\.([0-9]{3})\.([0-9]{3})-([0-9]{2})$/g;
-
-    return FORMATTED_TAXVAT.test(taxvat);
   }
 
   /**
@@ -287,14 +263,7 @@ export class UserEntity {
       return false;
     }
 
-    let clearedTaxvat = taxvat;
-
-    if (
-      UserEntity.hasTaxvatCorrectExtendedLength(clearedTaxvat) &&
-      UserEntity.isTaxvatFormattedCorrectly(clearedTaxvat)
-    ) {
-      clearedTaxvat = UserEntity.clearTaxvat(clearedTaxvat);
-    }
+    const clearedTaxvat = UserEntity.clearTaxvat(taxvat);
 
     if (!UserEntity.hasTaxvatCorrectLength(clearedTaxvat)) {
       return false;

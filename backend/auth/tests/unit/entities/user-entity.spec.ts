@@ -470,4 +470,20 @@ describe('User Entity', () => {
     );
     expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
+
+  it('should not create user if "taxvat" if property has letters', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = faker.lorem.word(11);
+    const email = generateValidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  });
 });
