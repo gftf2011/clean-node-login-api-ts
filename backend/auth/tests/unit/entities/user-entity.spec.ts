@@ -263,4 +263,20 @@ describe('User Entity', () => {
     );
     expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
+
+  it('should not create user if "taxvat" property is null', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat: string = null;
+    const email = generateValidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  });
 });
