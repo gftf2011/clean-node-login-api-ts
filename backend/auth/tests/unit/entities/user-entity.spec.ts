@@ -154,8 +154,12 @@ describe('User Entity', () => {
     return `${'a'.repeat(64)}@`;
   };
 
-  const generateInvalidDomainEmailWithWithNoDotSeparator = (): string => {
+  const generateInvalidDomainEmailWithNoDotSeparator = (): string => {
     return `${'a'.repeat(64)}@${'d'.repeat(127)}`;
+  };
+
+  const generateInvalidDomainEmailWithTwoDotsSeparator = (): string => {
+    return `${'a'.repeat(64)}@${'d'.repeat(127)}..${'d'.repeat(126)}`;
   };
 
   const generateValidPassword = (): string => {
@@ -704,11 +708,27 @@ describe('User Entity', () => {
     expect(userOrError).toEqual(left(new InvalidEmailError(email)));
   });
 
-  it('should not create user if "email" if domain does not have a dot separator ', () => {
+  it('should not create user if "email" domain does not have a dot separator', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
-    const email = generateInvalidDomainEmailWithWithNoDotSeparator();
+    const email = generateInvalidDomainEmailWithNoDotSeparator();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" domain has 2 dot separators', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidDomainEmailWithTwoDotsSeparator();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
