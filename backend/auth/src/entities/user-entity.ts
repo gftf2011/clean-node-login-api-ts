@@ -17,7 +17,6 @@ import {
   getOnlyLowerCaseLettersFromValue,
   getOnlyNumbersFromValue,
   getOnlySpecialCharactersFromValue,
-  hasPasswordAnyEmptySpace,
   normalizeValueToPascalCase,
   removeExtremitiesWhiteSpaces,
   removeMultipleWhiteSpacesToSingleWhiteSpace,
@@ -230,6 +229,18 @@ export class UserEntity {
     return +String(validationDigits).charAt(1) === +resultString;
   }
 
+  /**
+   * @desc Utility method to know if password has white spaces
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} password - user password
+   * @returns {boolean} return if password has white spaces
+   */
+  private static hasPasswordAnyEmptySpace(password: string): boolean {
+    const PASSWORD_HAS_ANY_SPACE_REGEX = /([ ]+)/g;
+
+    return PASSWORD_HAS_ANY_SPACE_REGEX.test(password);
+  }
+
   private static validateName(name: string): boolean {
     if (!name) {
       return false;
@@ -315,7 +326,7 @@ export class UserEntity {
     if (!pass || pass.length < 11 || pass.length > 24) {
       return false;
     }
-    if (hasPasswordAnyEmptySpace(pass)) {
+    if (UserEntity.hasPasswordAnyEmptySpace(pass)) {
       return false;
     }
     const onlyNumbers: string = getOnlyNumbersFromValue(pass);

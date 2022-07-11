@@ -242,6 +242,42 @@ describe('User Entity', () => {
       .toUpperCase()}${chosenSpecialSymbol}`;
   };
 
+  const generateInvalidPasswordWithFewNumbers = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    return `${faker.datatype.number({
+      min: 1000000,
+      max: 9999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 2, max: 2 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
+  const generateInvalidPasswordWithNoCapitalLetters = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 2, max: 2 }))
+      .toLowerCase()}${chosenSpecialSymbol}`;
+  };
+
   it('should not create user if "name" property is undefined', () => {
     const name: string = undefined;
     const lastname = generateValidLastname();
@@ -291,7 +327,7 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "name" property has only white spaces', () => {
-    const name = '    ';
+    const name = ' ';
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
@@ -388,7 +424,7 @@ describe('User Entity', () => {
 
   it('should not create user if "lastname" property has only white spaces', () => {
     const name = generateValidName();
-    const lastname = '    ';
+    const lastname = ' ';
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
     const password = generateValidPassword();
@@ -904,6 +940,22 @@ describe('User Entity', () => {
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
     const password = generateInvalidPasswordWithWhiteSpace();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
+  });
+
+  it('should not create user if "password" has less than 8 numeric digits', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateInvalidPasswordWithFewNumbers();
     const userOrError = UserEntity.create(
       name,
       lastname,
