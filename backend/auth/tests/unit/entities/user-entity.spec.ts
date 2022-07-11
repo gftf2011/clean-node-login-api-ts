@@ -307,7 +307,7 @@ describe('User Entity', () => {
   };
 
   it('should not create user if "name" property is undefined', () => {
-    const name: string = undefined;
+    const name: any = undefined;
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
@@ -323,7 +323,7 @@ describe('User Entity', () => {
   });
 
   it('should not create user if "name" property is null', () => {
-    const name: string = null;
+    const name: any = null;
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
@@ -404,7 +404,7 @@ describe('User Entity', () => {
 
   it('should not create user if "lastname" property is undefined', () => {
     const name = generateValidName();
-    const lastname: string = undefined;
+    const lastname: any = undefined;
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
     const password = generateValidPassword();
@@ -420,7 +420,7 @@ describe('User Entity', () => {
 
   it('should not create user if "lastname" property is null', () => {
     const name = generateValidName();
-    const lastname: string = null;
+    const lastname: any = null;
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
     const password = generateValidPassword();
@@ -501,7 +501,7 @@ describe('User Entity', () => {
   it('should not create user if "taxvat" property is undefined', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
-    const taxvat: string = undefined;
+    const taxvat: any = undefined;
     const email = generateValidEmail();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
@@ -517,7 +517,7 @@ describe('User Entity', () => {
   it('should not create user if "taxvat" property is null', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
-    const taxvat: string = null;
+    const taxvat: any = null;
     const email = generateValidEmail();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
@@ -662,7 +662,7 @@ describe('User Entity', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
-    const email: string = undefined;
+    const email: any = undefined;
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
@@ -678,7 +678,7 @@ describe('User Entity', () => {
     const name = generateValidName();
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
-    const email: string = null;
+    const email: any = null;
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,
@@ -887,7 +887,7 @@ describe('User Entity', () => {
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
-    const password: string = undefined;
+    const password: any = undefined;
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -903,7 +903,7 @@ describe('User Entity', () => {
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
-    const password: string = null;
+    const password: any = null;
     const userOrError = UserEntity.create(
       name,
       lastname,
@@ -1040,5 +1040,21 @@ describe('User Entity', () => {
       password,
     );
     expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
+  });
+
+  it('should create user with correct parameters', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError.isRight()).toBeTruthy();
   });
 });
