@@ -162,6 +162,10 @@ describe('User Entity', () => {
     return `${'a'.repeat(64)}@${'d'.repeat(127)}..${'d'.repeat(126)}`;
   };
 
+  const generateInvalidDomainEmailWithLocalPartTooLong = (): string => {
+    return `${'a'.repeat(64)}@${'d'.repeat(128)}.${'d'.repeat(126)}`;
+  };
+
   const generateValidPassword = (): string => {
     const specialSymbols = '!@#$%&?';
     /**
@@ -740,35 +744,19 @@ describe('User Entity', () => {
     expect(userOrError).toEqual(left(new InvalidEmailError(email)));
   });
 
-  // it('should not create user if "taxvat" belongs to blacklist and first validation digit is zero', () => {
-  //   const name = generateValidName();
-  //   const lastname = generateValidLastname();
-  //   const taxvat = '01000001009';
-  //   const email = generateValidEmail();
-  //   const password = generateValidPassword();
-  //   const userOrError = UserEntity.create(
-  //     name,
-  //     lastname,
-  //     taxvat,
-  //     email,
-  //     password,
-  //   );
-  //   expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
-  // });
-
-  // it('should not create user if "taxvat" belongs to blacklist and second validation digit is zero', () => {
-  //   const name = generateValidName();
-  //   const lastname = generateValidLastname();
-  //   const taxvat = '00000000000';
-  //   const email = generateValidEmail();
-  //   const password = generateValidPassword();
-  //   const userOrError = UserEntity.create(
-  //     name,
-  //     lastname,
-  //     taxvat,
-  //     email,
-  //     password,
-  //   );
-  //   expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
-  // });
+  it('should not create user if "email" domain part has more than 127 characters - (too many characters)', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidDomainEmailWithLocalPartTooLong();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
 });
