@@ -776,4 +776,20 @@ describe('User Entity', () => {
     );
     expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
   });
+
+  it('should not create user if "password" property is null', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password: string = null;
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
+  });
 });
