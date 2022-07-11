@@ -12,6 +12,7 @@ import {
   InvalidEmailError,
   InvalidLastnameError,
   InvalidNameError,
+  InvalidPasswordError,
   InvalidTaxvatError,
 } from '../../../src/shared/errors';
 
@@ -758,5 +759,21 @@ describe('User Entity', () => {
       password,
     );
     expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "password" property is undefined', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password: string = undefined;
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
   });
 });

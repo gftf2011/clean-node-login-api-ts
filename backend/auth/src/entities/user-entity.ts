@@ -312,7 +312,7 @@ export class UserEntity {
 
   private static validatePassword(password: string): boolean {
     const pass: string = password;
-    if (!pass || pass.length < 11) {
+    if (!pass || pass.length < 11 || pass.length > 24) {
       return false;
     }
     if (hasPasswordAnyEmptySpace(pass)) {
