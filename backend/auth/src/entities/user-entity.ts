@@ -178,15 +178,14 @@ export class UserEntity {
     const num8: number = 3 * +String(value3).charAt(1);
     const num9: number = 2 * +String(value3).charAt(2);
 
-    let result =
+    const result =
       ((num1 + num2 + num3 + num4 + num5 + num6 + num7 + num8 + num9) * 10) %
       11;
 
-    if (result === 10) {
-      result = 0;
-    }
+    let resultString = String(result);
+    resultString = resultString.charAt(resultString.length - 1);
 
-    return +String(validationDigits).charAt(0) === result;
+    return +String(validationDigits).charAt(0) === +resultString;
   }
 
   /**
@@ -220,16 +219,15 @@ export class UserEntity {
 
     const num10: number = 2 * +String(validationDigits).charAt(0);
 
-    let result =
+    const result =
       ((num1 + num2 + num3 + num4 + num5 + num6 + num7 + num8 + num9 + num10) *
         10) %
       11;
 
-    if (result === 10) {
-      result = 0;
-    }
+    let resultString = String(result);
+    resultString = resultString.charAt(resultString.length - 1);
 
-    return +String(validationDigits).charAt(1) === result;
+    return +String(validationDigits).charAt(1) === +resultString;
   }
 
   private static validateName(name: string): boolean {
