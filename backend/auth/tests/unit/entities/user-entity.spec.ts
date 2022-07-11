@@ -278,6 +278,23 @@ describe('User Entity', () => {
       .toLowerCase()}${chosenSpecialSymbol}`;
   };
 
+  const generateInvalidPasswordWithNoLowercaseLetters = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 2, max: 2 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
   it('should not create user if "name" property is undefined', () => {
     const name: string = undefined;
     const lastname = generateValidLastname();
@@ -956,6 +973,22 @@ describe('User Entity', () => {
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
     const password = generateInvalidPasswordWithFewNumbers();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
+  });
+
+  it('should not create user if "password" has no capital letters', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateInvalidPasswordWithNoCapitalLetters();
     const userOrError = UserEntity.create(
       name,
       lastname,
