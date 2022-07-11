@@ -998,4 +998,20 @@ describe('User Entity', () => {
     );
     expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
   });
+
+  it('should not create user if "password" has no lower case letters', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateInvalidPasswordWithNoLowercaseLetters();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
+  });
 });

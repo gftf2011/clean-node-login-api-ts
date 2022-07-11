@@ -47,10 +47,6 @@ export const getOnlyLowerCaseLettersFromValue = (value: string): string => {
   return value.replace(NOT_LOWER_CASE_LETTER_REGEX, EMPTY_CHARACTER_SEPARATOR);
 };
 
-export const getOnlySpecialCharactersFromValue = (value: string): string => {
-  return value.replace(NOT_SPECIAL_CHARACTER_REGEX, EMPTY_CHARACTER_SEPARATOR);
-};
-
 export const normalizeValueToPascalCase = (value: string): string => {
   const valuePieces: string[] = value.split(MULTI_WHITE_SPACES_REGEX);
 

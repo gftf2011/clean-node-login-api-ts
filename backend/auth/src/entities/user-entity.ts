@@ -16,7 +16,6 @@ import {
   getOnlyCapitalLettersFromValue,
   getOnlyLowerCaseLettersFromValue,
   getOnlyNumbersFromValue,
-  getOnlySpecialCharactersFromValue,
   normalizeValueToPascalCase,
   removeExtremitiesWhiteSpaces,
   removeMultipleWhiteSpacesToSingleWhiteSpace,
@@ -241,6 +240,25 @@ export class UserEntity {
     return PASSWORD_HAS_ANY_SPACE_REGEX.test(password);
   }
 
+  /**
+   * @desc Utility method to get password special characters
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} password - user password
+   * @returns {string} return the password special characters
+   */
+  private static getOnlySpecialCharactersFromPassword(
+    password: string,
+  ): string {
+    const NOT_SPECIAL_CHARACTER_REGEX = /([^!@#$%&?]*)/g;
+
+    const EMPTY_CHARACTER_SEPARATOR = '';
+
+    return password.replace(
+      NOT_SPECIAL_CHARACTER_REGEX,
+      EMPTY_CHARACTER_SEPARATOR,
+    );
+  }
+
   private static validateName(name: string): boolean {
     if (!name) {
       return false;
@@ -342,7 +360,7 @@ export class UserEntity {
       return false;
     }
     const onlySpecialCharacters: string =
-      getOnlySpecialCharactersFromValue(pass);
+      UserEntity.getOnlySpecialCharactersFromPassword(pass);
     if (onlySpecialCharacters.length < 1) {
       return false;
     }
