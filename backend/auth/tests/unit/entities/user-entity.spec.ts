@@ -221,6 +221,27 @@ describe('User Entity', () => {
       .toUpperCase()}${chosenSpecialSymbol}`;
   };
 
+  const generateInvalidPasswordWithWhiteSpace = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    const WHITE_SPACE = ' ';
+
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${WHITE_SPACE}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
   it('should not create user if "name" property is undefined', () => {
     const name: string = undefined;
     const lastname = generateValidLastname();
@@ -867,6 +888,22 @@ describe('User Entity', () => {
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
     const password = generateInvalidLongPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
+  });
+
+  it('should not create user if "password" with white space', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateInvalidPasswordWithWhiteSpace();
     const userOrError = UserEntity.create(
       name,
       lastname,
