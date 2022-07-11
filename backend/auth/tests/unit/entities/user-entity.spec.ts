@@ -295,6 +295,17 @@ describe('User Entity', () => {
       .toUpperCase()}${chosenSpecialSymbol}`;
   };
 
+  const generateInvalidPasswordWithNoSpecialChar = (): string => {
+    return `${faker.datatype.number({
+      min: 100000000,
+      max: 999999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toUpperCase()}`;
+  };
+
   it('should not create user if "name" property is undefined', () => {
     const name: string = undefined;
     const lastname = generateValidLastname();
@@ -1005,6 +1016,22 @@ describe('User Entity', () => {
     const taxvat = generateValidTaxvat();
     const email = generateValidEmail();
     const password = generateInvalidPasswordWithNoLowercaseLetters();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidPasswordError(password)));
+  });
+
+  it('should not create user if "password" has no special characters', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateValidEmail();
+    const password = generateInvalidPasswordWithNoSpecialChar();
     const userOrError = UserEntity.create(
       name,
       lastname,
