@@ -9,7 +9,6 @@ const EMPTY_CHARACTER_SEPARATOR = '';
 const NOT_CAPITAL_LETTER_REGEX = /([^A-Z]*)/g;
 const NOT_LOWER_CASE_LETTER_REGEX = /([^a-z]*)/g;
 const NOT_NUMBER_REGEX = /([^0-9]*)/g;
-const NOT_SPECIAL_CHARACTER_REGEX = /([^!@#$%&?]*)/g;
 
 const MULTI_WHITE_SPACES_REGEX = /([ ]+)/g;
 
