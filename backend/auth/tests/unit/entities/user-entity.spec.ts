@@ -154,6 +154,10 @@ describe('User Entity', () => {
     return `${'a'.repeat(64)}@`;
   };
 
+  const generateInvalidDomainEmailWithWithNoDotSeparator = (): string => {
+    return `${'a'.repeat(64)}@${'d'.repeat(127)}`;
+  };
+
   const generateValidPassword = (): string => {
     const specialSymbols = '!@#$%&?';
     /**
@@ -689,6 +693,22 @@ describe('User Entity', () => {
     const lastname = generateValidLastname();
     const taxvat = generateValidTaxvat();
     const email = generateInvalidEmailWithNoDomain();
+    const password = generateValidPassword();
+    const userOrError = UserEntity.create(
+      name,
+      lastname,
+      taxvat,
+      email,
+      password,
+    );
+    expect(userOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create user if "email" if domain does not have a dot separator ', () => {
+    const name = generateValidName();
+    const lastname = generateValidLastname();
+    const taxvat = generateValidTaxvat();
+    const email = generateInvalidDomainEmailWithWithNoDotSeparator();
     const password = generateValidPassword();
     const userOrError = UserEntity.create(
       name,

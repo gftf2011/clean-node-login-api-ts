@@ -306,9 +306,6 @@ export class UserEntity {
       return false;
     }
     const addresses = getEmailDomainsFromAddress(address);
-    if (addresses.length < 2) {
-      return false;
-    }
     if (addresses.some(part => part.length > 127)) {
       return false;
     }
