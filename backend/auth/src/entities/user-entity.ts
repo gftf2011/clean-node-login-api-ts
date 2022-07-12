@@ -10,9 +10,6 @@ import {
   InvalidTaxvatError,
 } from '../shared/errors';
 import {
-  getEmailAccount,
-  getEmailAddress,
-  getEmailDomainsFromAddress,
   getOnlyCapitalLettersFromValue,
   getOnlyLowerCaseLettersFromValue,
   getOnlyNumbersFromValue,
@@ -90,6 +87,42 @@ export class UserEntity {
       /^([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})$/g;
 
     return TAXVAT_ONLY_NUMBERS_REGEX.test(taxvat);
+  }
+
+  /**
+   * @desc Utility method to grab email account
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} email - user email
+   * @returns {string} return user email account
+   */
+  private static getEmailAccount(email: string): string {
+    const EMAIL_ADDRESS_SEPARATOR = '@';
+
+    return email.split(EMAIL_ADDRESS_SEPARATOR)[0];
+  }
+
+  /**
+   * @desc Utility method to grab email address
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} email - user email
+   * @returns {string} return user email address
+   */
+  private static getEmailAddress = (email: string): string => {
+    const EMAIL_ADDRESS_SEPARATOR = '@';
+
+    return email.split(EMAIL_ADDRESS_SEPARATOR)[1];
+  };
+
+  /**
+   * @desc Utility method to grab email address separeted by parts
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} email - user email
+   * @returns {string[]} return user email address parts
+   */
+  private static getEmailDomainsFromAddress(address: string): string[] {
+    const EMAIL_DOMAIN_SEPARATOR = '.';
+
+    return address.split(EMAIL_DOMAIN_SEPARATOR);
   }
 
   /**
@@ -324,15 +357,15 @@ export class UserEntity {
     if (!UserEntity.isEmailValid(email)) {
       return false;
     }
-    const account = getEmailAccount(email);
-    const address = getEmailAddress(email);
+    const account = UserEntity.getEmailAccount(email);
+    const address = UserEntity.getEmailAddress(email);
     if (account.length > 64) {
       return false;
     }
     if (address.length > 255) {
       return false;
     }
-    const addresses = getEmailDomainsFromAddress(address);
+    const addresses = UserEntity.getEmailDomainsFromAddress(address);
     if (addresses.some(part => part.length > 127)) {
       return false;
     }
