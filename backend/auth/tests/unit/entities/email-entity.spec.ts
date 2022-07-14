@@ -26,6 +26,10 @@ describe('Email Entity', () => {
     return `${'a'.repeat(63)}.@${'d'.repeat(127)}.${'d'.repeat(126)}`;
   };
 
+  const generateInvalidEmailWithNoAccount = (): string => {
+    return `@${'d'.repeat(127)}.${'d'.repeat(127)}`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -64,6 +68,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" account has an ending dot', () => {
     const email = generateInvalidEmailWithEndingDot();
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create email if "value" account has 0 characters - (too few characters)', () => {
+    const email = generateInvalidEmailWithNoAccount();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
