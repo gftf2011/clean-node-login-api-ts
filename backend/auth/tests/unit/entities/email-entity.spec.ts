@@ -22,6 +22,10 @@ describe('Email Entity', () => {
     return `${'a'.repeat(63)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
   };
 
+  const generateInvalidEmailWithEndingDot = (): string => {
+    return `${'a'.repeat(63)}.@${'d'.repeat(127)}.${'d'.repeat(126)}`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -54,6 +58,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" domain property has more than 255 characters - (too many characters)', () => {
     const email = generateInvalidLongEmailDomain();
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create email if "value" account has an ending dot', () => {
+    const email = generateInvalidEmailWithEndingDot();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
