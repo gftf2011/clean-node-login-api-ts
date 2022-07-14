@@ -1,4 +1,9 @@
 /**
+ * Driver
+ */
+import faker from 'faker';
+
+/**
  * Entities
  */
 import { EmailEntity } from '../../../src/entities';
@@ -10,6 +15,10 @@ import { InvalidEmailError } from '../../../src/shared/errors';
 import { left } from '../../../src/shared';
 
 describe('Email Entity', () => {
+  const generateValidEmail = (): string => {
+    return faker.internet.email();
+  };
+
   const generateLongInvalidEmail = (): string => {
     return `${'a'.repeat(64)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
   };
@@ -140,5 +149,14 @@ describe('Email Entity', () => {
     const email = generateInvalidDomainEmailWithLocalPartTooLong();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should create email with correct parameters', () => {
+    const email = generateValidEmail();
+    const emailOrError = EmailEntity.create(email);
+
+    const emailEntity = emailOrError.value as EmailEntity;
+
+    expect(emailEntity.getEmail()).toBe(email);
   });
 });
