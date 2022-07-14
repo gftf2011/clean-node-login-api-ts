@@ -306,25 +306,6 @@ describe('User Entity', () => {
       .toUpperCase()}`;
   };
 
-  const normalizeValueToPascalCase = (value: string): string => {
-    const MULTI_WHITE_SPACES_REGEX = /([ ]+)/g;
-
-    const valuePieces: string[] = value.split(MULTI_WHITE_SPACES_REGEX);
-
-    const formattedPieces: string[] = valuePieces.map((piece: string) => {
-      const newPiece: string = piece.toLocaleLowerCase();
-      if (newPiece.length > 1) {
-        return `${newPiece.charAt(0).toLocaleUpperCase()}${newPiece.substring(
-          1,
-          newPiece.length,
-        )}`;
-      }
-      return newPiece.toLocaleUpperCase();
-    });
-
-    return formattedPieces.join('');
-  };
-
   const clearTaxvat = (taxvat: string): string => {
     return taxvat.replace(/[\\.-]*/g, '').trim();
   };
@@ -1083,8 +1064,8 @@ describe('User Entity', () => {
 
     expect(userOrError.isRight()).toBeTruthy();
 
-    expect(user.getName()).toBe(normalizeValueToPascalCase(name));
-    expect(user.getLastname()).toBe(normalizeValueToPascalCase(lastname));
+    expect(user.getName()).toBe(name);
+    expect(user.getLastname()).toBe(lastname);
     expect(user.getTaxvat()).toBe(clearTaxvat(taxvat));
     expect(user.getEmail()).toBe(email);
     expect(user.getPassword()).toBe(password);
