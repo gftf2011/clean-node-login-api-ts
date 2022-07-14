@@ -6,6 +6,7 @@ import faker from 'faker';
 /**
  * Entities
  */
+// eslint-disable-next-line sort-imports
 import { EmailEntity } from '../../../src/entities';
 
 /**

@@ -3,6 +3,7 @@
  */
 import { Either, left, right } from '../shared';
 import {
+  normalizeValueToLowerCase,
   normalizeValueToPascalCase,
   removeExtremitiesWhiteSpaces,
   removeMultipleWhiteSpacesToSingleWhiteSpace,
@@ -18,7 +19,7 @@ export class NameEntity {
   }
 
   public getName(): string {
-    return this.value;
+    return normalizeValueToLowerCase(this.value);
   }
 
   public getNameInPascalCase(): string {
@@ -42,6 +43,12 @@ export class NameEntity {
     if (!this.validate(name)) {
       return left(new InvalidNameError(name));
     }
-    return right(new NameEntity(name));
+    return right(
+      new NameEntity(
+        removeMultipleWhiteSpacesToSingleWhiteSpace(
+          removeExtremitiesWhiteSpaces(normalizeValueToLowerCase(name)),
+        ),
+      ),
+    );
   }
 }
