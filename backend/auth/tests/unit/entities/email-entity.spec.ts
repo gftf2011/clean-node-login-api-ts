@@ -42,6 +42,10 @@ describe('Email Entity', () => {
     )}`;
   };
 
+  const generateInvalidEmailWithNoDomain = (): string => {
+    return `${'a'.repeat(64)}@`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -98,6 +102,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" account has invalid character', () => {
     const email = generateInvalidEmailAccountWithInvalidChar();
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create email if "value" domain has 0 characters - (too few characters)', () => {
+    const email = generateInvalidEmailWithNoDomain();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
