@@ -30,6 +30,12 @@ describe('Email Entity', () => {
     return `@${'d'.repeat(127)}.${'d'.repeat(127)}`;
   };
 
+  const generateInvalidEmailAccountWithTwoDots = (): string => {
+    return `${'a'.repeat(31)}..${'a'.repeat(31)}@${'d'.repeat(
+      127,
+    )}.${'d'.repeat(127)}`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -74,6 +80,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" account has 0 characters - (too few characters)', () => {
     const email = generateInvalidEmailWithNoAccount();
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create enail if "value" account has 2 dots', () => {
+    const email = generateInvalidEmailAccountWithTwoDots();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
