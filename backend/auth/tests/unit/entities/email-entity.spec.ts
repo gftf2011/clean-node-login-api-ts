@@ -21,4 +21,10 @@ describe('Email Entity', () => {
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
+
+  it('should not create email if "value" property is empty', () => {
+    const email: any = '';
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
 });
