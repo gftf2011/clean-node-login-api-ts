@@ -6,7 +6,7 @@ const NOT_CAPITAL_LETTER_REGEX = /([^A-Z]*)/g;
 const NOT_LOWER_CASE_LETTER_REGEX = /([^a-z]*)/g;
 const NOT_NUMBER_REGEX = /([^0-9]*)/g;
 
-const MULTI_WHITE_SPACES_REGEX = /([ ]+)/g;
+const MULTI_WHITE_SPACES_REGEX = /(\s+)/g;
 
 export const removeExtremitiesWhiteSpaces = (value: string): string => {
   return value.trim();
@@ -31,7 +31,7 @@ export const getOnlyLowerCaseLettersFromValue = (value: string): string => {
 };
 
 export const normalizeValueToLowerCase = (value: string): string => {
-  return value.toLocaleLowerCase();
+  return value.toLocaleLowerCase().trim();
 };
 
 export const normalizeValueToPascalCase = (value: string): string => {
