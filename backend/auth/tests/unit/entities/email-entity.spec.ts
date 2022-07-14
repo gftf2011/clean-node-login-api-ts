@@ -10,6 +10,10 @@ import { InvalidEmailError } from '../../../src/shared/errors';
 import { left } from '../../../src/shared';
 
 describe('Email Entity', () => {
+  const generateLongInvalidEmail = (): string => {
+    return `${'a'.repeat(64)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -24,6 +28,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" property is empty', () => {
     const email: any = '';
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create email if "value" property has more than 320 characters - (too many characters)', () => {
+    const email = generateLongInvalidEmail();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
