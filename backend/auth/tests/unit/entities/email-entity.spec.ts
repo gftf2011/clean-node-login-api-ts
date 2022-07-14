@@ -50,6 +50,10 @@ describe('Email Entity', () => {
     return `${'a'.repeat(64)}@${'d'.repeat(127)}`;
   };
 
+  const generateInvalidDomainEmailWithTwoDotsSeparator = (): string => {
+    return `${'a'.repeat(64)}@${'d'.repeat(127)}..${'d'.repeat(126)}`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -118,6 +122,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" domain does not have a dot separator', () => {
     const email = generateInvalidDomainEmailWithNoDotSeparator();
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create email if "value" domain has 2 dot separators', () => {
+    const email = generateInvalidDomainEmailWithTwoDotsSeparator();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
