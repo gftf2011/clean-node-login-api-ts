@@ -3,6 +3,7 @@
  */
 import { Either, left, right } from '../shared';
 import {
+  normalizeValueToLowerCase,
   normalizeValueToPascalCase,
   removeExtremitiesWhiteSpaces,
   removeMultipleWhiteSpacesToSingleWhiteSpace,
@@ -42,6 +43,12 @@ export class LastnameEntity {
     if (!this.validate(lastname)) {
       return left(new InvalidLastnameError(lastname));
     }
-    return right(new LastnameEntity(lastname));
+    return right(
+      new LastnameEntity(
+        removeMultipleWhiteSpacesToSingleWhiteSpace(
+          removeExtremitiesWhiteSpaces(normalizeValueToLowerCase(lastname)),
+        ),
+      ),
+    );
   }
 }
