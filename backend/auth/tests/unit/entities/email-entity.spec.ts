@@ -54,6 +54,10 @@ describe('Email Entity', () => {
     return `${'a'.repeat(64)}@${'d'.repeat(127)}..${'d'.repeat(126)}`;
   };
 
+  const generateInvalidDomainEmailWithLocalPartTooLong = (): string => {
+    return `${'a'.repeat(64)}@${'d'.repeat(128)}.${'d'.repeat(126)}`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -128,6 +132,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" domain has 2 dot separators', () => {
     const email = generateInvalidDomainEmailWithTwoDotsSeparator();
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create email if "value" domain part has more than 127 characters - (too many characters)', () => {
+    const email = generateInvalidDomainEmailWithLocalPartTooLong();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
