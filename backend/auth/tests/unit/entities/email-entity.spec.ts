@@ -14,6 +14,10 @@ describe('Email Entity', () => {
     return `${'a'.repeat(64)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
   };
 
+  const generateInvalidLongEmailAccount = (): string => {
+    return `${'a'.repeat(65)}@${'d'.repeat(126)}.${'d'.repeat(126)}`;
+  };
+
   it('should not create email if "value" property is undefined', () => {
     const email: any = undefined;
     const emailOrError = EmailEntity.create(email);
@@ -34,6 +38,12 @@ describe('Email Entity', () => {
 
   it('should not create email if "value" property has more than 320 characters - (too many characters)', () => {
     const email = generateLongInvalidEmail();
+    const emailOrError = EmailEntity.create(email);
+    expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
+  });
+
+  it('should not create email if "value" account property has more than 64 characters - (too many characters)', () => {
+    const email = generateInvalidLongEmailAccount();
     const emailOrError = EmailEntity.create(email);
     expect(emailOrError).toEqual(left(new InvalidEmailError(email)));
   });
