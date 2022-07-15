@@ -39,7 +39,7 @@ export class SignInController extends WebController {
 
   /**
    * @desc performs an sign-up action
-   * @param {HttpRequest} request - request that contains information about the 'clinet'
+   * @param {HttpRequest} request - request that contains information about the 'client'
    * @returns {Promise<HttpResponse>} data output after sign-in operation
    */
   public async perform(request: HttpRequest): Promise<HttpResponse> {
