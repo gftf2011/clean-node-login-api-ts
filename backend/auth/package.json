@@ -10,7 +10,7 @@
     "start": "node dist/main/index.js",
     "start:dev": "npm run build:dev && npm run build && npm run start",
     "pretest": "npm run build:test",
-    "test": "jest --clearCache ; jest --colors --coverage --verbose --config jest-unit.config.js"
+    "test": "jest --clearCache ; jest --colors --coverage --verbose --runInBand --config jest-unit.config.js"
   },
   "keywords": [],
   "author": "",

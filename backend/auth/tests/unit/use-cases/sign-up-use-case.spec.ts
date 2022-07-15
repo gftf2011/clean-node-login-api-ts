@@ -13,7 +13,11 @@ import { BasicUserDto, ISignUpUseCase } from '../../../src/use-cases/ports';
 /**
  * Shared
  */
-import { InvalidEmailError, ServerError } from '../../../src/shared/errors';
+import {
+  InvalidEmailError,
+  InvalidNameError,
+  ServerError,
+} from '../../../src/shared/errors';
 
 /**
  * Use Cases
@@ -563,6 +567,93 @@ describe('Sign-Up Use Case', () => {
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new InvalidEmailError(email));
+  });
+
+  it('should throw invalid name error if name is undefined', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const name: any = undefined;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name,
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidNameError(name));
+  });
+
+  it('should throw invalid name error if name is null', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const name: any = null;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name,
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidNameError(name));
+  });
+
+  it('should throw invalid name error if name is empty', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const name = '';
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name,
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidNameError(name));
   });
 
   afterAll(() => {
