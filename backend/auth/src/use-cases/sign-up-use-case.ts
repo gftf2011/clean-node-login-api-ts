@@ -49,11 +49,11 @@ export class SignUpUseCase implements ISignUpUseCase {
     host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
-      !process.env.CODE_SALT &&
-      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_ACCESS_TOKEN_ID &&
-      !process.env.JWT_REFRESH_TOKEN_ID &&
+      !process.env.CODE_SALT ||
+      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_ACCESS_TOKEN_ID ||
+      !process.env.JWT_REFRESH_TOKEN_ID ||
       !process.env.APP_SECRET
     ) {
       return left(new ServerError());
