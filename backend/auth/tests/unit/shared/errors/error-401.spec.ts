@@ -2,13 +2,13 @@
  * Shared
  */
 // eslint-disable-next-line sort-imports
-import { Error400 } from '../../../../src/shared/errors';
+import { Error401 } from '../../../../src/shared/errors';
 
-describe('Error 400', () => {
-  let sut: Error400;
+describe('Error 401', () => {
+  let sut: Error401;
 
   beforeEach(() => {
-    sut = new Error400();
+    sut = new Error401();
   });
 
   it('should extend Error', () => {
