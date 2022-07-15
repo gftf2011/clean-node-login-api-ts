@@ -656,6 +656,64 @@ describe('Sign-Up Use Case', () => {
     expect(response.value).toEqual(new InvalidNameError(name));
   });
 
+  it('should throw invalid name error if name property has only white spaces', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const name = ' ';
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name,
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidNameError(name));
+  });
+
+  it('should throw invalid name error if name property has only one character - (too few characters)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const name = faker.lorem.word(1);
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name,
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidNameError(name));
+  });
+
   afterAll(() => {
     /**
      * Restore old environment

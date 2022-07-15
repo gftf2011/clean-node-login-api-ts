@@ -83,8 +83,8 @@ describe('Name Entity', () => {
 
     const nameEntity = nameOrError.value as NameEntity;
 
-    expect(nameEntity.getName()).toBe(name);
-    expect(nameEntity.getNameInPascalCase()).toBe(
+    expect(nameEntity.getValue()).toBe(name);
+    expect(nameEntity.getValueInPascalCase()).toBe(
       normalizeValueToPascalCase(name),
     );
   });

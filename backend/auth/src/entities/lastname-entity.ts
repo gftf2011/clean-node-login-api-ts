@@ -8,9 +8,18 @@ import {
   removeExtremitiesWhiteSpaces,
   removeMultipleWhiteSpacesToSingleWhiteSpace,
 } from '../shared/utils';
+
+/**
+ * Entities
+ */
+import { IEntity } from './contracts';
+
+/**
+ * Shared
+ */
 import { InvalidLastnameError } from '../shared/errors';
 
-export class LastnameEntity {
+export class LastnameEntity implements IEntity {
   private readonly value: string;
 
   private constructor(lastname: string) {
@@ -18,11 +27,11 @@ export class LastnameEntity {
     Object.freeze(this);
   }
 
-  public getLastname(): string {
+  public getValue(): string {
     return this.value;
   }
 
-  public getLastnameInPascalCase(): string {
+  public getValueInPascalCase(): string {
     return normalizeValueToPascalCase(this.value);
   }
 

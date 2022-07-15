@@ -225,6 +225,6 @@ describe('Password Entity', () => {
 
     const passwordEntity = passwordOrError.value as PasswordEntity;
 
-    expect(passwordEntity.getPassword()).toBe(password);
+    expect(passwordEntity.getValue()).toBe(password);
   });
 });

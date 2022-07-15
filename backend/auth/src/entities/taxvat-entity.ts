@@ -2,9 +2,18 @@
  * Shared
  */
 import { Either, left, right } from '../shared';
+
+/**
+ * Entities
+ */
+import { IEntity } from './contracts';
+
+/**
+ * Shared
+ */
 import { InvalidTaxvatError } from '../shared/errors';
 
-export class TaxvatEntity {
+export class TaxvatEntity implements IEntity {
   private readonly value: string;
 
   private constructor(taxvat: string) {
@@ -12,11 +21,11 @@ export class TaxvatEntity {
     Object.freeze(this);
   }
 
-  public getTaxvat(): string {
+  public getValue(): string {
     return this.value;
   }
 
-  public getFormattedTaxvat(): string {
+  public getFormattedValue(): string {
     return TaxvatEntity.formatTaxvat(this.value);
   }
 

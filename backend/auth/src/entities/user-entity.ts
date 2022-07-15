@@ -2,7 +2,12 @@
  * Shared
  */
 import { Either, left, right } from '../shared';
+
+/**
+ * Entities
+ */
 import { EmailEntity } from './email-entity';
+import { EntityFactory } from './helpers/factory-methods';
 import { LastnameEntity } from './lastname-entity';
 import { NameEntity } from './name-entity';
 import { PasswordEntity } from './password-entity';
@@ -35,23 +40,23 @@ export class UserEntity {
   }
 
   getName(): string {
-    return this.name.getName();
+    return this.name.getValue();
   }
 
   getLastname(): string {
-    return this.lastname.getLastname();
+    return this.lastname.getValue();
   }
 
   getTaxvat(): string {
-    return this.taxvat.getTaxvat();
+    return this.taxvat.getValue();
   }
 
   getEmail(): string {
-    return this.email.getEmail();
+    return this.email.getValue();
   }
 
   getPassword(): string {
-    return this.password.getPassword();
+    return this.password.getValue();
   }
 
   static create(
@@ -61,11 +66,11 @@ export class UserEntity {
     email: string,
     password: string,
   ): Either<Error, UserEntity> {
-    const nameOrError = NameEntity.create(name);
-    const lastnameOrError = LastnameEntity.create(lastname);
-    const taxvatOrError = TaxvatEntity.create(taxvat);
-    const emailOrError = EmailEntity.create(email);
-    const passwordOrError = PasswordEntity.create(password);
+    const nameOrError = EntityFactory.create(NameEntity.name, name);
+    const lastnameOrError = EntityFactory.create(LastnameEntity.name, lastname);
+    const taxvatOrError = EntityFactory.create(TaxvatEntity.name, taxvat);
+    const emailOrError = EntityFactory.create(EmailEntity.name, email);
+    const passwordOrError = EntityFactory.create(PasswordEntity.name, password);
 
     if (nameOrError.isLeft()) {
       return left(nameOrError.value);
@@ -89,11 +94,11 @@ export class UserEntity {
 
     return right(
       new UserEntity(
-        nameOrError.value,
-        lastnameOrError.value,
-        taxvatOrError.value,
-        emailOrError.value,
-        passwordOrError.value,
+        nameOrError.value as NameEntity,
+        lastnameOrError.value as LastnameEntity,
+        taxvatOrError.value as TaxvatEntity,
+        emailOrError.value as EmailEntity,
+        passwordOrError.value as PasswordEntity,
       ),
     );
   }

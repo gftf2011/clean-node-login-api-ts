@@ -8,9 +8,18 @@ import {
   removeExtremitiesWhiteSpaces,
   removeMultipleWhiteSpacesToSingleWhiteSpace,
 } from '../shared/utils';
+
+/**
+ * Entities
+ */
+import { IEntity } from './contracts';
+
+/**
+ * Shared
+ */
 import { InvalidNameError } from '../shared/errors';
 
-export class NameEntity {
+export class NameEntity implements IEntity {
   private readonly value: string;
 
   private constructor(name: string) {
@@ -18,11 +27,11 @@ export class NameEntity {
     Object.freeze(this);
   }
 
-  public getName(): string {
-    return normalizeValueToLowerCase(this.value);
+  public getValue(): string {
+    return this.value;
   }
 
-  public getNameInPascalCase(): string {
+  public getValueInPascalCase(): string {
     return normalizeValueToPascalCase(this.value);
   }
 

@@ -1,7 +1,7 @@
 /**
  * Infra
  */
-import { Pool } from 'pg';
+import { Pool, PoolClient } from 'pg';
 // eslint-disable-next-line sort-imports
 import { DbClient, DbClientPool } from '../../contracts';
 import { DbDirector } from '../helpers/builders/db-director';
@@ -23,14 +23,30 @@ export class PostgresDbClientPool implements DbClientPool {
 
   private constructor() {}
 
-  static connect(): void {
+  static async connect(): Promise<void> {
     if (!PostgresDbClientPool.pool) {
       const builder = new PgClientBuilder();
 
       const director = new DbDirector();
       director.setBuilder(builder);
 
-      PostgresDbClientPool.pool = director.getDbClient();
+      let poolConnection: PoolClient;
+
+      const pool: Pool = director.getDbClient();
+
+      /**
+       * Retry connection logic, postgres pool must
+       * be tested before clients are created
+       */
+      while (!poolConnection) {
+        try {
+          poolConnection = await pool.connect();
+        } catch (err) {
+          poolConnection = null;
+        }
+      }
+
+      PostgresDbClientPool.pool = pool;
     }
   }
 

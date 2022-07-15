@@ -176,8 +176,8 @@ describe('Taxvat Entity', () => {
 
     const taxvatEntity = taxvatOrError.value as TaxvatEntity;
 
-    expect(taxvatEntity.getTaxvat()).toBe(taxvat);
-    expect(taxvatEntity.getFormattedTaxvat()).toBe(formatTaxvat(taxvat));
+    expect(taxvatEntity.getValue()).toBe(taxvat);
+    expect(taxvatEntity.getFormattedValue()).toBe(formatTaxvat(taxvat));
   });
 
   it('should create taxvat with correct parameters - (even with value formatted)', () => {
@@ -186,7 +186,7 @@ describe('Taxvat Entity', () => {
 
     const taxvatEntity = taxvatOrError.value as TaxvatEntity;
 
-    expect(taxvatEntity.getTaxvat()).toBe(clearTaxvat(taxvat));
-    expect(taxvatEntity.getFormattedTaxvat()).toBe(taxvat);
+    expect(taxvatEntity.getValue()).toBe(clearTaxvat(taxvat));
+    expect(taxvatEntity.getFormattedValue()).toBe(taxvat);
   });
 });

@@ -16,7 +16,9 @@ export class PgClientBuilder implements IDbClientBuilder {
   }
 
   private reset(): void {
-    this.product = {};
+    this.product = {
+      connectionTimeoutMillis: 10000,
+    };
   }
 
   public setHost(): void {

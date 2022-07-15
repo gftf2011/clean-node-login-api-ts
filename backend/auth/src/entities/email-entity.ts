@@ -2,9 +2,18 @@
  * Shared
  */
 import { Either, left, right } from '../shared';
+
+/**
+ * Entities
+ */
+import { IEntity } from './contracts';
+
+/**
+ * Shared
+ */
 import { InvalidEmailError } from '../shared/errors';
 
-export class EmailEntity {
+export class EmailEntity implements IEntity {
   private readonly value: string;
 
   private constructor(email: string) {
@@ -12,7 +21,7 @@ export class EmailEntity {
     Object.freeze(this);
   }
 
-  public getEmail(): string {
+  public getValue(): string {
     return this.value;
   }
 

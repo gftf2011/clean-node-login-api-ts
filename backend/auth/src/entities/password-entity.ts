@@ -7,9 +7,18 @@ import {
   getOnlyLowerCaseLettersFromValue,
   getOnlyNumbersFromValue,
 } from '../shared/utils';
+
+/**
+ * Entities
+ */
+import { IEntity } from './contracts';
+
+/**
+ * Shared
+ */
 import { InvalidPasswordError } from '../shared/errors';
 
-export class PasswordEntity {
+export class PasswordEntity implements IEntity {
   private readonly value: string;
 
   private constructor(password: string) {
@@ -17,7 +26,7 @@ export class PasswordEntity {
     Object.freeze(this);
   }
 
-  public getPassword(): string {
+  public getValue(): string {
     return this.value;
   }
 

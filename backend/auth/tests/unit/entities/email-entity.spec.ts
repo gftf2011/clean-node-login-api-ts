@@ -158,6 +158,6 @@ describe('Email Entity', () => {
 
     const emailEntity = emailOrError.value as EmailEntity;
 
-    expect(emailEntity.getEmail()).toBe(email);
+    expect(emailEntity.getValue()).toBe(email);
   });
 });
