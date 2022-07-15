@@ -5,9 +5,11 @@
   "main": "dist/main/index.js",
   "scripts": {
     "build:dev": "rm -rf .env && cat ./env/dev/.env >> .env",
+    "build:test": "rm -rf .env && cat ./env/test/.env >> .env",
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "start": "node dist/main/index.js",
     "start:dev": "npm run build:dev && npm run build && npm run start",
+    "pretest": "npm run build:test",
     "test": "jest --clearCache ; jest --colors --coverage --verbose  --runInBand"
   },
   "keywords": [],
