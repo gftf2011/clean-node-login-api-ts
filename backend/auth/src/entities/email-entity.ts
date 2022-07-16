@@ -121,6 +121,12 @@ export class EmailEntity implements IEntity {
     return true;
   }
 
+  /**
+   * @desc responsible function to create an Email
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} email - email
+   * @returns {Either<Error, EmailEntity>} returns the created Email entity or an Error
+   */
   public static create(email: string): Either<Error, EmailEntity> {
     if (!this.validate(email)) {
       return left(new InvalidEmailError(email));

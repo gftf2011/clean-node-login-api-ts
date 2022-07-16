@@ -236,6 +236,12 @@ export class TaxvatEntity implements IEntity {
     return true;
   }
 
+  /**
+   * @desc responsible function to create a Taxvat
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} taxvat - taxvat
+   * @returns {Either<Error, TaxvatEntity>} returns the created Taxvat entity or an Error
+   */
   public static create(taxvat: string): Either<Error, TaxvatEntity> {
     if (!this.validate(taxvat)) {
       return left(new InvalidTaxvatError(taxvat));

@@ -104,6 +104,12 @@ export class PasswordEntity implements IEntity {
     return true;
   }
 
+  /**
+   * @desc responsible function to create a Password
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} password - password
+   * @returns {Either<Error, PasswordEntity>} returns the created Password entity or an Error
+   */
   public static create(password: string): Either<Error, PasswordEntity> {
     if (!this.validate(password)) {
       return left(new InvalidPasswordError(password));

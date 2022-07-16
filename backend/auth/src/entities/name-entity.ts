@@ -72,6 +72,12 @@ export class NameEntity implements IEntity {
     return true;
   }
 
+  /**
+   * @desc responsible function to create a Name
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} name - name
+   * @returns {Either<Error, NameEntity>} returns the created Name entity or an Error
+   */
   public static create(name: string): Either<Error, NameEntity> {
     if (!this.validate(name)) {
       return left(new InvalidNameError(name));

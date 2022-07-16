@@ -72,6 +72,12 @@ export class LastnameEntity implements IEntity {
     return true;
   }
 
+  /**
+   * @desc responsible function to create a Lastname
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} lastname - lastname
+   * @returns {Either<Error, LastnameEntity>} returns the created Lastname entity or an Error
+   */
   public static create(lastname: string): Either<Error, LastnameEntity> {
     if (!this.validate(lastname)) {
       return left(new InvalidLastnameError(lastname));
