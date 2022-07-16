@@ -15,7 +15,9 @@ import { BasicUserDto, ISignUpUseCase } from '../../../src/use-cases/ports';
  */
 import {
   InvalidEmailError,
+  InvalidLastnameError,
   InvalidNameError,
+  InvalidPasswordError,
   ServerError,
 } from '../../../src/shared/errors';
 
@@ -45,6 +47,127 @@ describe('Sign-Up Use Case', () => {
 
     OLD_ENV = process.env;
   });
+
+  const generateInvalidShortPassword = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+    return `${faker.datatype.number({
+      min: 1000000,
+      max: 9999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
+  const generateInvalidLongPassword = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+    return `${faker.datatype.number({
+      min: 1000000000,
+      max: 9999999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 7, max: 7 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 7, max: 7 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
+  const generateInvalidPasswordWithWhiteSpace = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    const WHITE_SPACE = ' ';
+
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${WHITE_SPACE}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
+  const generateInvalidPasswordWithFewNumbers = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    return `${faker.datatype.number({
+      min: 1000000,
+      max: 9999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 2, max: 2 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
+  const generateInvalidPasswordWithNoCapitalLetters = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 2, max: 2 }))
+      .toLowerCase()}${chosenSpecialSymbol}`;
+  };
+
+  const generateInvalidPasswordWithNoLowercaseLetters = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 2, max: 2 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
+
+  const generateInvalidPasswordWithNoSpecialChar = (): string => {
+    return `${faker.datatype.number({
+      min: 100000000,
+      max: 999999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 1 }))
+      .toUpperCase()}`;
+  };
 
   beforeEach(() => {
     /**
@@ -712,6 +835,459 @@ describe('Sign-Up Use Case', () => {
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new InvalidNameError(name));
+  });
+
+  it('should throw invalid name error if name property has more than 255 characters - (too many characters)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const name = faker.lorem.word(256);
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name,
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidNameError(name));
+  });
+
+  it('should throw invalid lastname error if lastname "value" property is undefined', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const lastname: any = undefined;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname,
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidLastnameError(lastname));
+  });
+
+  it('should throw invalid lastname error if lastname "value" property is null', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const lastname: any = null;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname,
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidLastnameError(lastname));
+  });
+
+  it('should throw invalid lastname error if lastname "value" property is empty', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const lastname = '';
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname,
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidLastnameError(lastname));
+  });
+
+  it('should throw invalid lastname error if lastname "value" property has only white spaces', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const lastname = '  ';
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname,
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidLastnameError(lastname));
+  });
+
+  it('should throw invalid lastname error if lastname "value" property has only one character - (too few characters)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const lastname = faker.lorem.word(1);
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname,
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidLastnameError(lastname));
+  });
+
+  it('should throw invalid lastname error if lastname "value" property has more than 255 characters - (too many characters)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const lastname = faker.lorem.word(256);
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname,
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidLastnameError(lastname));
+  });
+
+  it('should throw invalid password error if password "value" property is undefined', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password: any = undefined;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property is null', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password: any = null;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property is empty', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = '';
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property has less than 11 characters - (too few characters)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = generateInvalidShortPassword();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property has more than 24 characters - (too many characters)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = generateInvalidLongPassword();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property has white space', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = generateInvalidPasswordWithWhiteSpace();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property has less than 8 numeric digits', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = generateInvalidPasswordWithFewNumbers();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property has no capital letters', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = generateInvalidPasswordWithNoCapitalLetters();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property has no lower case letters', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = generateInvalidPasswordWithNoLowercaseLetters();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid password error if password "value" property has no special characters', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const password = generateInvalidPasswordWithNoSpecialChar();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password,
+      taxvat: cpf.generate(),
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidPasswordError(password));
   });
 
   afterAll(() => {
