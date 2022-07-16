@@ -24,7 +24,7 @@ export class UserRepository implements IUserRepository {
     return userResponse;
   }
 
-  async findUserByEmail(email: string): Promise<User> {
+  async findUserByEmail(email: string): Promise<User | undefined> {
     return this.userDAO.findUserByEmail(email);
   }
 }

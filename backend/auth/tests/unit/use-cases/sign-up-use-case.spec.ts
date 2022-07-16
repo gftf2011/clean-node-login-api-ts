@@ -20,12 +20,19 @@ import {
   InvalidPasswordError,
   InvalidTaxvatError,
   ServerError,
+  UserAlreadyExistsError,
 } from '../../../src/shared/errors';
 
 /**
  * Use Cases
  */
 import { SignUpUseCase } from '../../../src/use-cases';
+
+/**
+ * Mocks
+ */
+// eslint-disable-next-line sort-imports
+import { FakeUserAlreadyExistsRepository } from '../doubles/mocks';
 
 describe('Sign-Up Use Case', () => {
   let OLD_ENV: NodeJS.ProcessEnv;
@@ -48,6 +55,24 @@ describe('Sign-Up Use Case', () => {
 
     OLD_ENV = process.env;
   });
+
+  const generateValidPassword = (): string => {
+    const specialSymbols = '!@#$%&?';
+    /**
+     * Code below will pick one of the special characters to be put in the password
+     */
+    const chosenSpecialSymbol = specialSymbols.charAt(
+      Math.round((specialSymbols.length - 1) * Math.random()),
+    );
+    return `${faker.datatype.number({
+      min: 10000000,
+      max: 99999999,
+    })}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 2 }))
+      .toLowerCase()}${faker.lorem
+      .word(faker.datatype.number({ min: 1, max: 2 }))
+      .toUpperCase()}${chosenSpecialSymbol}`;
+  };
 
   const generateInvalidShortPassword = (): string => {
     const specialSymbols = '!@#$%&?';
@@ -387,11 +412,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -416,11 +437,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -445,11 +462,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -474,11 +487,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -503,11 +512,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -532,11 +537,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -561,11 +562,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -590,11 +587,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -621,11 +614,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -652,11 +641,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -681,11 +666,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -710,11 +691,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -739,11 +716,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -768,11 +741,7 @@ describe('Sign-Up Use Case', () => {
       email,
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -797,11 +766,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name,
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -826,11 +791,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name,
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -855,11 +816,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name,
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -884,11 +841,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name,
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -913,11 +866,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name,
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -942,11 +891,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name,
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -971,11 +916,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname,
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -1000,11 +941,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname,
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -1029,11 +966,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname,
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -1058,11 +991,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname,
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -1087,11 +1016,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname,
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -1116,11 +1041,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname,
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat: cpf.generate(),
     };
 
@@ -1395,11 +1316,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1424,11 +1341,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1453,11 +1366,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1482,11 +1391,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1511,11 +1416,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1540,11 +1441,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1569,11 +1466,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1598,11 +1491,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1627,11 +1516,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1656,11 +1541,7 @@ describe('Sign-Up Use Case', () => {
       email: faker.internet.email(),
       name: faker.name.firstName(),
       lastname: faker.name.lastName(),
-      password: faker.internet.password(
-        11,
-        true,
-        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
-      ),
+      password: generateValidPassword(),
       taxvat,
     };
 
@@ -1668,6 +1549,33 @@ describe('Sign-Up Use Case', () => {
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw user already exists error if user created is already in the database', async () => {
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: generateValidPassword(),
+      taxvat: cpf.generate(),
+    };
+
+    const fakeUserAlreadyExistsRepository = new FakeUserAlreadyExistsRepository(
+      request,
+    );
+
+    sut = new SignUpUseCase(
+      fakeUserAlreadyExistsRepository,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new UserAlreadyExistsError());
   });
 
   afterAll(() => {
