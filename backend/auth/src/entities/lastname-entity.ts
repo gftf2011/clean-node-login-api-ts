@@ -19,6 +19,10 @@ import { IEntity } from './contracts';
  */
 import { InvalidLastnameError } from '../shared/errors';
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Lastname business domain
+ */
 export class LastnameEntity implements IEntity {
   private readonly value: string;
 
@@ -27,14 +31,34 @@ export class LastnameEntity implements IEntity {
     Object.freeze(this);
   }
 
+  /**
+   * @desc Getter to return lastname value
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @returns {string} get lastname
+   * @example
+   * returns 'ferrari'
+   */
   public getValue(): string {
     return this.value;
   }
 
+  /**
+   * @desc Getter to return lastname value in Pascal case
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @returns {string} get lastname in Pascal case
+   * @example
+   * returns 'Ferrari'
+   */
   public getValueInPascalCase(): string {
     return normalizeValueToPascalCase(this.value);
   }
 
+  /**
+   * @desc Validate if lastname is valid according with business rule definition
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} - lastname
+   * @returns {boolean} indicates if lastname is valid
+   */
   private static validate(lastname: string): boolean {
     if (!lastname) {
       return false;

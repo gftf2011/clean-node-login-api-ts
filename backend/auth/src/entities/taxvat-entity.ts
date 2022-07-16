@@ -13,6 +13,10 @@ import { IEntity } from './contracts';
  */
 import { InvalidTaxvatError } from '../shared/errors';
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Taxvat business domain
+ */
 export class TaxvatEntity implements IEntity {
   private readonly value: string;
 
@@ -21,10 +25,24 @@ export class TaxvatEntity implements IEntity {
     Object.freeze(this);
   }
 
+  /**
+   * @desc Getter to return taxvat value
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @returns {string} get unformatted taxvat
+   * @example
+   * returns 11111111111
+   */
   public getValue(): string {
     return this.value;
   }
 
+  /**
+   * @desc Method returns taxvat in formatted way
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @returns {string} get formatted taxvat
+   * @example
+   * returns 111.111.111-11
+   */
   public getFormattedValue(): string {
     return TaxvatEntity.formatTaxvat(this.value);
   }
@@ -183,6 +201,12 @@ export class TaxvatEntity implements IEntity {
     return TAXVAT_BLACKLIST.some((value: string) => value === taxvat);
   }
 
+  /**
+   * @desc Validate if taxvat is valid according with business rule definition
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} - taxvat
+   * @returns {boolean} indicates if taxvat is valid OR not
+   */
   private static validate(taxvat: string): boolean {
     if (!taxvat) {
       return false;

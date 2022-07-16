@@ -13,6 +13,10 @@ import { IEntity } from './contracts';
  */
 import { InvalidEmailError } from '../shared/errors';
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Email business domain
+ */
 export class EmailEntity implements IEntity {
   private readonly value: string;
 
@@ -21,6 +25,13 @@ export class EmailEntity implements IEntity {
     Object.freeze(this);
   }
 
+  /**
+   * @desc Getter to return email value
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @returns {string} get email
+   * @example
+   * returns 'test@gmail.com'
+   */
   public getValue(): string {
     return this.value;
   }
@@ -79,6 +90,12 @@ export class EmailEntity implements IEntity {
     return address.split(EMAIL_DOMAIN_SEPARATOR);
   }
 
+  /**
+   * @desc Validate if email is valid according with business rule definition
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} - email
+   * @returns {boolean} indicates if email is valid
+   */
   private static validate(email: string): boolean {
     if (!email) {
       return false;

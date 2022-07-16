@@ -18,6 +18,10 @@ import { IEntity } from './contracts';
  */
 import { InvalidPasswordError } from '../shared/errors';
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Password business domain
+ */
 export class PasswordEntity implements IEntity {
   private readonly value: string;
 
@@ -26,6 +30,11 @@ export class PasswordEntity implements IEntity {
     Object.freeze(this);
   }
 
+  /**
+   * @desc Getter to return password value
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @returns {string} get password
+   */
   public getValue(): string {
     return this.value;
   }
@@ -61,6 +70,12 @@ export class PasswordEntity implements IEntity {
     );
   }
 
+  /**
+   * @desc Validate if password is valid according with business rule definition
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} - password
+   * @returns {boolean} indicates if password is valid
+   */
   private static validate(password: string): boolean {
     const pass: string = password;
     if (!pass || pass.length < 11 || pass.length > 24) {
