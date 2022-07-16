@@ -18,6 +18,7 @@ import {
   InvalidLastnameError,
   InvalidNameError,
   InvalidPasswordError,
+  InvalidTaxvatError,
   ServerError,
 } from '../../../src/shared/errors';
 
@@ -167,6 +168,95 @@ describe('Sign-Up Use Case', () => {
       .toLowerCase()}${faker.lorem
       .word(faker.datatype.number({ min: 1, max: 1 }))
       .toUpperCase()}`;
+  };
+
+  const generateValidTaxvat = (formatted?: boolean): string => {
+    return cpf.generate(formatted);
+  };
+
+  const clearTaxvat = (taxvat: string): string => {
+    return taxvat.replace(/[\\.-]*/g, '').trim();
+  };
+
+  const formatTaxvat = (taxvat: string): string => {
+    const cleanTaxvat = taxvat.replace(/[\\.-]*/g, '').trim();
+    return cleanTaxvat.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+  };
+
+  const generateBlacklistedTaxvat = (): string => {
+    const taxvatBlacklist = [
+      '00000000000',
+      '11111111111',
+      '22222222222',
+      '33333333333',
+      '44444444444',
+      '55555555555',
+      '66666666666',
+      '77777777777',
+      '88888888888',
+      '99999999999',
+    ];
+    return taxvatBlacklist[
+      Math.round((taxvatBlacklist.length - 1) * Math.random())
+    ];
+  };
+
+  const generateInvalidFirstDigitTaxvat = (formatted?: boolean): string => {
+    const cpfGenerated = cpf.generate();
+    const secondValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 1,
+      cpfGenerated.length,
+    );
+    const firstValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 2,
+      cpfGenerated.length - 1,
+    );
+
+    const invalidFirstValidationDigit =
+      +firstValidationDigit >= 9
+        ? +firstValidationDigit - 1
+        : +firstValidationDigit + 1;
+
+    const invalidTaxvat =
+      cpfGenerated.substring(0, cpfGenerated.length - 2) +
+      invalidFirstValidationDigit +
+      secondValidationDigit;
+
+    return formatted
+      ? `${invalidTaxvat.substring(0, 3)}.${invalidTaxvat.substring(
+          3,
+          6,
+        )}.${invalidTaxvat.substring(6, 9)}-${invalidTaxvat.substring(9, 11)}`
+      : invalidTaxvat;
+  };
+
+  const generateInvalidSecondDigitTaxvat = (formatted?: boolean): string => {
+    const cpfGenerated = cpf.generate();
+    const firstValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 2,
+      cpfGenerated.length - 1,
+    );
+    const secondValidationDigit = cpfGenerated.substring(
+      cpfGenerated.length - 1,
+      cpfGenerated.length,
+    );
+
+    const invalidSecondValidationDigit =
+      +secondValidationDigit >= 9
+        ? +secondValidationDigit - 1
+        : +secondValidationDigit + 1;
+
+    const invalidTaxvat =
+      cpfGenerated.substring(0, cpfGenerated.length - 2) +
+      firstValidationDigit +
+      invalidSecondValidationDigit;
+
+    return formatted
+      ? `${invalidTaxvat.substring(0, 3)}.${invalidTaxvat.substring(
+          3,
+          6,
+        )}.${invalidTaxvat.substring(6, 9)}-${invalidTaxvat.substring(9, 11)}`
+      : invalidTaxvat;
   };
 
   beforeEach(() => {
@@ -1288,6 +1378,296 @@ describe('Sign-Up Use Case', () => {
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new InvalidPasswordError(password));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property is undefined', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat: any = undefined;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property is null', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat: any = null;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property is empty', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = '';
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property does not have correct length', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = `${faker.datatype.number({ min: 1, max: 10 })}`;
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property belongs to blacklist', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = generateBlacklistedTaxvat();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property first validation digit is invalid', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = generateInvalidFirstDigitTaxvat();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property first validation digit is invalid - (even formatted)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = generateInvalidFirstDigitTaxvat(true);
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property second validation digit is invalid', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = generateInvalidSecondDigitTaxvat();
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" property second validation digit is invalid - (even formatted)', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = generateInvalidSecondDigitTaxvat(true);
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
+  });
+
+  it('should throw invalid taxvat error if taxvat "value" if property has letters', async () => {
+    sut = new SignUpUseCase(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
+
+    const taxvat = faker.lorem.word(11);
+
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: faker.internet.password(
+        11,
+        true,
+        /^([0-9]{8})([a-z]{1})([A-Z]{1})([!@#$%&?]{1})$/,
+      ),
+      taxvat,
+    };
+
+    const response = await sut.perform(request, '');
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new InvalidTaxvatError(taxvat));
   });
 
   afterAll(() => {
