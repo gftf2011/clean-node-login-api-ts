@@ -29,10 +29,16 @@ import {
 import { SignUpUseCase } from '../../../src/use-cases';
 
 /**
- * Mocks
+ * Fakes
  */
 // eslint-disable-next-line sort-imports
-import { FakeUserAlreadyExistsRepository } from '../doubles/mocks';
+import { FakeInMemoryUserRepository } from '../doubles/fakes';
+
+/**
+ * Stubs
+ */
+// eslint-disable-next-line sort-imports
+import { UserAlreadyExistsRepositoryStub } from '../doubles/stubs';
 
 /**
  * Dummies
@@ -266,17 +272,98 @@ enum SUT_TYPE {
   ALL_DUMMY = 'ALL_DUMMY',
 }
 
-const makeSut = (type: SUT_TYPE): ISignUpUseCase => {
-  let sut: ISignUpUseCase;
+// eslint-disable-next-line no-shadow
+enum USER_REPOSITORY_TYPE {
+  DUMMY = 'DUMMY',
+  STUB_USER_ALREADY_EXISTS = 'STUB_USER_ALREADY_EXISTS',
+  FAKE = 'FAKE',
+  SPY = 'SPY',
+}
 
-  const userRepositoryDummy = new UserRepositoryDummy();
-  const cryptoHashServiceDummy = new CryptoHashServiceDummy();
-  const cryptoEncryptServiceDummy = new CryptoEncryptServiceDummy();
-  const jwtTokenServiceDummy = new JWTTokenServiceDummy();
+// eslint-disable-next-line no-shadow
+enum HASH_SERVICE_TYPE {
+  DUMMY = 'DUMMY',
+}
+
+// eslint-disable-next-line no-shadow
+enum ENCRYPT_SERVICE_TYPE {
+  DUMMY = 'DUMMY',
+}
+
+// eslint-disable-next-line no-shadow
+enum TOKEN_SERVICE_TYPE {
+  DUMMY = 'DUMMY',
+}
+
+// eslint-disable-next-line no-shadow
+enum QUEUE_PUBLISH_MANAGER_TYPE {
+  DUMMY = 'DUMMY',
+}
+
+const makeUserRepository = (type: USER_REPOSITORY_TYPE): any => {
+  switch (type) {
+    case USER_REPOSITORY_TYPE.DUMMY:
+      return new UserRepositoryDummy();
+    case USER_REPOSITORY_TYPE.FAKE:
+      return new FakeInMemoryUserRepository();
+    case USER_REPOSITORY_TYPE.STUB_USER_ALREADY_EXISTS:
+      return new UserAlreadyExistsRepositoryStub();
+    default:
+      return new UserRepositoryDummy();
+  }
+};
+
+const makeHashService = (type: HASH_SERVICE_TYPE): any => {
+  switch (type) {
+    case HASH_SERVICE_TYPE.DUMMY:
+      return new CryptoHashServiceDummy();
+    default:
+      return new CryptoHashServiceDummy();
+  }
+};
+
+const makeEncryptService = (type: ENCRYPT_SERVICE_TYPE): any => {
+  switch (type) {
+    case ENCRYPT_SERVICE_TYPE.DUMMY:
+      return new CryptoEncryptServiceDummy();
+    default:
+      return new CryptoEncryptServiceDummy();
+  }
+};
+
+const makeTokenService = (type: TOKEN_SERVICE_TYPE): any => {
+  switch (type) {
+    case TOKEN_SERVICE_TYPE.DUMMY:
+      return new JWTTokenServiceDummy();
+    default:
+      return new JWTTokenServiceDummy();
+  }
+};
+
+const makeQueuePublishManager = (type: QUEUE_PUBLISH_MANAGER_TYPE): any => {
+  switch (type) {
+    case QUEUE_PUBLISH_MANAGER_TYPE.DUMMY:
+      return new RabbitmqQueuePublishManagerDummy();
+    default:
+      return new RabbitmqQueuePublishManagerDummy();
+  }
+};
+
+const makeSut = (
+  userRepository: USER_REPOSITORY_TYPE,
+  hashService: HASH_SERVICE_TYPE,
+  encryptService: ENCRYPT_SERVICE_TYPE,
+  tokenService: TOKEN_SERVICE_TYPE,
+  queuePublishManager: QUEUE_PUBLISH_MANAGER_TYPE,
+): ISignUpUseCase => {
+  const userRepositoryDummy = makeUserRepository(userRepository);
+  const cryptoHashServiceDummy = makeHashService(hashService);
+  const cryptoEncryptServiceDummy = makeEncryptService(encryptService);
+  const jwtTokenServiceDummy = makeTokenService(tokenService);
   const rabbitmqQueuePublishManagerDummy =
-    new RabbitmqQueuePublishManagerDummy();
+    makeQueuePublishManager(queuePublishManager);
 
-  sut = new SignUpUseCase(
+  const sut = new SignUpUseCase(
     userRepositoryDummy,
     cryptoHashServiceDummy,
     cryptoEncryptServiceDummy,
@@ -284,13 +371,7 @@ const makeSut = (type: SUT_TYPE): ISignUpUseCase => {
     rabbitmqQueuePublishManagerDummy,
   );
 
-  switch (type) {
-    case SUT_TYPE.ALL_DUMMY:
-      return sut;
-    default:
-      sut = {} as any;
-      return sut;
-  }
+  return sut;
 };
 
 describe('Sign-Up Use Case', () => {
@@ -327,7 +408,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw server error if CODE_SALT env is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     process.env.CODE_SALT = '';
 
@@ -338,7 +425,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw server error if JWT_ACCESS_TOKEN_EXPIRES_IN env is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     process.env.JWT_ACCESS_TOKEN_EXPIRES_IN = '';
 
@@ -349,7 +442,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw server error if JWT_REFRESH_TOKEN_EXPIRES_IN env is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     process.env.JWT_REFRESH_TOKEN_EXPIRES_IN = '';
 
@@ -360,7 +459,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw server error if JWT_ACCESS_TOKEN_ID env is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     process.env.JWT_ACCESS_TOKEN_ID = '';
 
@@ -371,7 +476,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw server error if JWT_REFRESH_TOKEN_ID env is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     process.env.JWT_REFRESH_TOKEN_ID = '';
 
@@ -382,7 +493,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw server error if APP_SECRET env is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     process.env.APP_SECRET = '';
 
@@ -393,7 +510,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email is undefiend', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email: any = undefined;
 
@@ -412,7 +535,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email is null', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email: any = null;
 
@@ -431,7 +560,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = '';
 
@@ -450,7 +585,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email property has more than 320 characters - (too many characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(64)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
 
@@ -469,7 +610,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email account property has more than 64 characters - (too many characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(65)}@${'d'.repeat(126)}.${'d'.repeat(126)}`;
 
@@ -488,7 +635,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email domain property has more than 255 characters - (too many characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(63)}@${'d'.repeat(127)}.${'d'.repeat(128)}`;
 
@@ -507,7 +660,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email account has an ending dot', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(63)}.@${'d'.repeat(127)}.${'d'.repeat(126)}`;
 
@@ -526,7 +685,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email account has 0 characters - (too few characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `@${'d'.repeat(127)}.${'d'.repeat(127)}`;
 
@@ -545,7 +710,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email account has 2 dots', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(31)}..${'a'.repeat(31)}@${'d'.repeat(
       127,
@@ -566,7 +737,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email account has invalid character', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(32)} ${'a'.repeat(31)}@${'d'.repeat(
       127,
@@ -587,7 +764,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email domain has 0 characters - (too few characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(64)}@`;
 
@@ -606,7 +789,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email domain does not have a dot separator', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(64)}@${'d'.repeat(127)}`;
 
@@ -625,7 +814,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email domain has 2 dot separators', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(64)}@${'d'.repeat(127)}..${'d'.repeat(126)}`;
 
@@ -644,7 +839,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid email error if email domain part has more than 127 characters - (too many characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const email = `${'a'.repeat(64)}@${'d'.repeat(128)}.${'d'.repeat(126)}`;
 
@@ -663,7 +864,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid name error if name is undefined', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const name: any = undefined;
 
@@ -682,7 +889,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid name error if name is null', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const name: any = null;
 
@@ -701,7 +914,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid name error if name is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const name = '';
 
@@ -720,7 +939,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid name error if name property has only white spaces', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const name = ' ';
 
@@ -739,7 +964,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid name error if name property has only one character - (too few characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const name = faker.lorem.word(1);
 
@@ -758,7 +989,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid name error if name property has more than 255 characters - (too many characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const name = faker.lorem.word(256);
 
@@ -777,7 +1014,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid lastname error if lastname "value" property is undefined', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const lastname: any = undefined;
 
@@ -796,7 +1039,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid lastname error if lastname "value" property is null', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const lastname: any = null;
 
@@ -815,7 +1064,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid lastname error if lastname "value" property is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const lastname = '';
 
@@ -834,7 +1089,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid lastname error if lastname "value" property has only white spaces', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const lastname = '  ';
 
@@ -853,7 +1114,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid lastname error if lastname "value" property has only one character - (too few characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const lastname = faker.lorem.word(1);
 
@@ -872,7 +1139,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid lastname error if lastname "value" property has more than 255 characters - (too many characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const lastname = faker.lorem.word(256);
 
@@ -891,7 +1164,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property is undefined', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password: any = undefined;
 
@@ -910,7 +1189,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property is null', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password: any = null;
 
@@ -929,7 +1214,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = '';
 
@@ -948,7 +1239,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property has less than 11 characters - (too few characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = generateInvalidShortPassword();
 
@@ -967,7 +1264,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property has more than 24 characters - (too many characters)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = generateInvalidLongPassword();
 
@@ -986,7 +1289,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property has white space', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = generateInvalidPasswordWithWhiteSpace();
 
@@ -1005,7 +1314,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property has less than 8 numeric digits', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = generateInvalidPasswordWithFewNumbers();
 
@@ -1024,7 +1339,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property has no capital letters', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = generateInvalidPasswordWithNoCapitalLetters();
 
@@ -1043,7 +1364,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property has no lower case letters', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = generateInvalidPasswordWithNoLowercaseLetters();
 
@@ -1062,7 +1389,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid password error if password "value" property has no special characters', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const password = generateInvalidPasswordWithNoSpecialChar();
 
@@ -1081,7 +1414,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property is undefined', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat: any = undefined;
 
@@ -1100,7 +1439,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property is null', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat: any = null;
 
@@ -1119,7 +1464,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property is empty', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = '';
 
@@ -1138,7 +1489,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property does not have correct length', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = `${faker.datatype.number({ min: 1, max: 10 })}`;
 
@@ -1157,7 +1514,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property belongs to blacklist', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = generateBlacklistedTaxvat();
 
@@ -1176,7 +1539,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property first validation digit is invalid', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = generateInvalidFirstDigitTaxvat();
 
@@ -1195,7 +1564,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property first validation digit is invalid - (even formatted)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = generateInvalidFirstDigitTaxvat(true);
 
@@ -1214,7 +1589,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property second validation digit is invalid', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = generateInvalidSecondDigitTaxvat();
 
@@ -1233,7 +1614,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" property second validation digit is invalid - (even formatted)', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = generateInvalidSecondDigitTaxvat(true);
 
@@ -1252,7 +1639,13 @@ describe('Sign-Up Use Case', () => {
   });
 
   it('should throw invalid taxvat error if taxvat "value" if property has letters', async () => {
-    sut = makeSut(SUT_TYPE.ALL_DUMMY);
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.DUMMY,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
 
     const taxvat = faker.lorem.word(11);
 
@@ -1279,16 +1672,12 @@ describe('Sign-Up Use Case', () => {
       taxvat: cpf.generate(),
     };
 
-    const fakeUserAlreadyExistsRepository = new FakeUserAlreadyExistsRepository(
-      request,
-    );
-
-    sut = new SignUpUseCase(
-      fakeUserAlreadyExistsRepository,
-      {} as any,
-      {} as any,
-      {} as any,
-      {} as any,
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.STUB_USER_ALREADY_EXISTS,
+      HASH_SERVICE_TYPE.DUMMY,
+      ENCRYPT_SERVICE_TYPE.DUMMY,
+      TOKEN_SERVICE_TYPE.DUMMY,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
     );
 
     const response = await sut.perform(request, '');

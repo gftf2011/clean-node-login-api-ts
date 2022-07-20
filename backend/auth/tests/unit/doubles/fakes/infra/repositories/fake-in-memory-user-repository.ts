@@ -7,19 +7,15 @@ import {
   UserDto,
 } from '../../../../../../src/use-cases/ports';
 
-export class FakeUserAlreadyExistsRepository implements IUserRepository {
+export class FakeInMemoryUserRepository implements IUserRepository {
   private database: UserDto[] = [];
 
-  constructor(private readonly user: BasicUserDto) {
-    const newUser = {
-      ...user,
-      confirmed: false,
-      id: `${this.database.length}`,
-    };
-    this.database.push(newUser);
-  }
+  constructor() {}
 
-  create: (user: UserDto) => Promise<UserDto>;
+  async create(user: UserDto): Promise<UserDto> {
+    this.database.push(user);
+    return user;
+  }
 
   async findUserByEmail(email: string): Promise<UserDto | undefined> {
     const result = await this.database.find(user => user.email === email);
