@@ -32,13 +32,20 @@ import { SignUpUseCase } from '../../../src/use-cases';
  * Fakes
  */
 // eslint-disable-next-line sort-imports
-import { FakeInMemoryUserRepository } from '../doubles/fakes';
+import {
+  FakeInMemoryUserRepository,
+  FakeNoneEncryptService,
+  FakeNoneHashService,
+} from '../doubles/fakes';
 
 /**
  * Stubs
  */
 // eslint-disable-next-line sort-imports
-import { UserAlreadyExistsRepositoryStub } from '../doubles/stubs';
+import {
+  NoJsonWebAlgorithmInSignUpTokenServiceStub,
+  UserAlreadyExistsRepositoryStub,
+} from '../doubles/stubs';
 
 /**
  * Dummies
@@ -51,6 +58,11 @@ import {
   RabbitmqQueuePublishManagerDummy,
   UserRepositoryDummy,
 } from '../doubles/dummies';
+
+/**
+ * Spies
+ */
+import { UserAlreadyExistsRepositorySpy } from '../doubles/spies';
 
 const generateValidPassword = (): string => {
   const specialSymbols = '!@#$%&?';
@@ -268,31 +280,29 @@ const generateInvalidSecondDigitTaxvat = (formatted?: boolean): string => {
 };
 
 // eslint-disable-next-line no-shadow
-enum SUT_TYPE {
-  ALL_DUMMY = 'ALL_DUMMY',
-}
-
-// eslint-disable-next-line no-shadow
 enum USER_REPOSITORY_TYPE {
   DUMMY = 'DUMMY',
   STUB_USER_ALREADY_EXISTS = 'STUB_USER_ALREADY_EXISTS',
-  FAKE = 'FAKE',
-  SPY = 'SPY',
+  FAKE_IN_MEMORY = 'FAKE_IN_MEMORY',
+  SPY_USER_ALREADY_EXISTS = 'SPY_USER_ALREADY_EXISTS',
 }
 
 // eslint-disable-next-line no-shadow
 enum HASH_SERVICE_TYPE {
   DUMMY = 'DUMMY',
+  FAKE_NONE = 'FAKE_NONE',
 }
 
 // eslint-disable-next-line no-shadow
 enum ENCRYPT_SERVICE_TYPE {
   DUMMY = 'DUMMY',
+  FAKE_NONE = 'FAKE_NONE',
 }
 
 // eslint-disable-next-line no-shadow
 enum TOKEN_SERVICE_TYPE {
   DUMMY = 'DUMMY',
+  STUB_NO_JWA_IN_SIGN = 'STUB_NO_JWA_IN_SIGN',
 }
 
 // eslint-disable-next-line no-shadow
@@ -304,10 +314,12 @@ const makeUserRepository = (type: USER_REPOSITORY_TYPE): any => {
   switch (type) {
     case USER_REPOSITORY_TYPE.DUMMY:
       return new UserRepositoryDummy();
-    case USER_REPOSITORY_TYPE.FAKE:
+    case USER_REPOSITORY_TYPE.FAKE_IN_MEMORY:
       return new FakeInMemoryUserRepository();
     case USER_REPOSITORY_TYPE.STUB_USER_ALREADY_EXISTS:
       return new UserAlreadyExistsRepositoryStub();
+    case USER_REPOSITORY_TYPE.SPY_USER_ALREADY_EXISTS:
+      return new UserAlreadyExistsRepositorySpy();
     default:
       return new UserRepositoryDummy();
   }
@@ -317,6 +329,8 @@ const makeHashService = (type: HASH_SERVICE_TYPE): any => {
   switch (type) {
     case HASH_SERVICE_TYPE.DUMMY:
       return new CryptoHashServiceDummy();
+    case HASH_SERVICE_TYPE.FAKE_NONE:
+      return new FakeNoneHashService();
     default:
       return new CryptoHashServiceDummy();
   }
@@ -326,6 +340,8 @@ const makeEncryptService = (type: ENCRYPT_SERVICE_TYPE): any => {
   switch (type) {
     case ENCRYPT_SERVICE_TYPE.DUMMY:
       return new CryptoEncryptServiceDummy();
+    case ENCRYPT_SERVICE_TYPE.FAKE_NONE:
+      return new FakeNoneEncryptService();
     default:
       return new CryptoEncryptServiceDummy();
   }
@@ -335,6 +351,8 @@ const makeTokenService = (type: TOKEN_SERVICE_TYPE): any => {
   switch (type) {
     case TOKEN_SERVICE_TYPE.DUMMY:
       return new JWTTokenServiceDummy();
+    case TOKEN_SERVICE_TYPE.STUB_NO_JWA_IN_SIGN:
+      return new NoJsonWebAlgorithmInSignUpTokenServiceStub();
     default:
       return new JWTTokenServiceDummy();
   }
@@ -1672,18 +1690,56 @@ describe('Sign-Up Use Case', () => {
       taxvat: cpf.generate(),
     };
 
-    sut = makeSut(
-      USER_REPOSITORY_TYPE.STUB_USER_ALREADY_EXISTS,
-      HASH_SERVICE_TYPE.DUMMY,
+    const userRepositorySpy = new UserAlreadyExistsRepositorySpy();
+    const cryptoHashServiceDummy = makeHashService(HASH_SERVICE_TYPE.DUMMY);
+    const cryptoEncryptServiceDummy = makeEncryptService(
       ENCRYPT_SERVICE_TYPE.DUMMY,
-      TOKEN_SERVICE_TYPE.DUMMY,
+    );
+    const jwtTokenServiceDummy = makeTokenService(TOKEN_SERVICE_TYPE.DUMMY);
+    const rabbitmqQueuePublishManagerDummy = makeQueuePublishManager(
       QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
+
+    sut = new SignUpUseCase(
+      userRepositorySpy,
+      cryptoHashServiceDummy,
+      cryptoEncryptServiceDummy,
+      jwtTokenServiceDummy,
+      rabbitmqQueuePublishManagerDummy,
     );
 
     const response = await sut.perform(request, '');
 
+    expect(userRepositorySpy.countCreateCalls()).toBe(0);
+    expect(userRepositorySpy.countFindUserByEmailCalls()).toBe(1);
+    expect(userRepositorySpy.getEmail()).toBe(request.email);
+
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new UserAlreadyExistsError());
+  });
+
+  it('should throw server error if jwt service that creates refresh token throws server error', async () => {
+    const request: BasicUserDto = {
+      email: faker.internet.email(),
+      name: faker.name.firstName(),
+      lastname: faker.name.lastName(),
+      password: generateValidPassword(),
+      taxvat: cpf.generate(),
+    };
+    const host = faker.internet.ip();
+
+    sut = makeSut(
+      USER_REPOSITORY_TYPE.FAKE_IN_MEMORY,
+      HASH_SERVICE_TYPE.FAKE_NONE,
+      ENCRYPT_SERVICE_TYPE.FAKE_NONE,
+      TOKEN_SERVICE_TYPE.STUB_NO_JWA_IN_SIGN,
+      QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
+    );
+
+    const response = await sut.perform(request, host);
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new ServerError());
   });
 
   afterEach(() => {

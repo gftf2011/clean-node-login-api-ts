@@ -2,7 +2,6 @@
  * Infra
  */
 import {
-  BasicUserDto,
   IUserRepository,
   UserDto,
 } from '../../../../../../src/use-cases/ports';
@@ -13,7 +12,10 @@ export class FakeInMemoryUserRepository implements IUserRepository {
   constructor() {}
 
   async create(user: UserDto): Promise<UserDto> {
-    this.database.push(user);
+    this.database.push({
+      id: `${this.database.length}`,
+      ...user,
+    });
     return user;
   }
 
