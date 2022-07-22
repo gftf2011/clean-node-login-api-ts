@@ -47,19 +47,28 @@ export class UserAlreadyExistsRepositorySpy implements IUserRepository {
   }
 
   create(user: UserDto): Promise<UserDto> {
+    const size = this.parameters.create.response.length;
     this.createCalls++;
     this.parameters.create.user.push(user);
-    this.parameters.create.response.push(user);
-    return user as any;
+    this.parameters.create.response.push({
+      ...user,
+      id: `${size}`,
+    } as any);
+    return {
+      ...user,
+      id: `${size}`,
+    } as any;
   }
 
   findUserByEmail(email: string): Promise<UserDto | undefined> {
     this.findUserByEmailCalls++;
     this.parameters.findUserByEmail.email.push(email);
     this.parameters.findUserByEmail.response.push({
+      id: '0',
       email,
     } as any);
     return {
+      id: '0',
       email,
     } as any;
   }

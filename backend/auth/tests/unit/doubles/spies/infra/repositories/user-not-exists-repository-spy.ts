@@ -47,12 +47,16 @@ export class UserNotExistsRepositorySpy implements IUserRepository {
   }
 
   create(user: UserDto): Promise<UserDto> {
+    const size = this.parameters.create.response.length;
     this.createCalls++;
     this.parameters.create.user.push(user);
-    this.parameters.create.response.push(user);
-    return {
-      id: '0',
+    this.parameters.create.response.push({
       ...user,
+      id: `${size}`,
+    } as any);
+    return {
+      ...user,
+      id: `${size}`,
     } as any;
   }
 
