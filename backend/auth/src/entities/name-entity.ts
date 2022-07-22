@@ -4,7 +4,6 @@
 import { Either, left, right } from '../shared';
 import {
   normalizeValueToLowerCase,
-  normalizeValueToPascalCase,
   removeExtremitiesWhiteSpaces,
   removeMultipleWhiteSpacesToSingleWhiteSpace,
 } from '../shared/utils';
@@ -40,17 +39,6 @@ export class NameEntity implements IEntity {
    */
   public getValue(): string {
     return this.value;
-  }
-
-  /**
-   * @desc Getter to return name value in Pascal case
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get name in Pascal case
-   * @example
-   * returns 'Gabriel'
-   */
-  public getValueInPascalCase(): string {
-    return normalizeValueToPascalCase(this.value);
   }
 
   /**

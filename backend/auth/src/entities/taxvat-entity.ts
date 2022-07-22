@@ -37,17 +37,6 @@ export class TaxvatEntity implements IEntity {
   }
 
   /**
-   * @desc Method returns taxvat in formatted way
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get formatted taxvat
-   * @example
-   * returns 111.111.111-11
-   */
-  public getFormattedValue(): string {
-    return TaxvatEntity.formatTaxvat(this.value);
-  }
-
-  /**
    * @desc Utility method to clean formatted taxvat
    * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
    * @param {string} taxvat - user taxvat
@@ -55,17 +44,6 @@ export class TaxvatEntity implements IEntity {
    */
   private static clearTaxvat(taxvat: string): string {
     return taxvat.replace(/[\\.-]*/g, '').trim();
-  }
-
-  /**
-   * @desc Utility method to format taxvat
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {string} return formatted taxvat
-   */
-  private static formatTaxvat(taxvat: string): string {
-    const cleanTaxvat = this.clearTaxvat(taxvat);
-    return cleanTaxvat.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
   }
 
   /**
