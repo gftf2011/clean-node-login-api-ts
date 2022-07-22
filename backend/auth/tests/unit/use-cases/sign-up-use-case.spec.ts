@@ -62,7 +62,13 @@ import {
 /**
  * Spies
  */
-import { UserAlreadyExistsRepositorySpy } from '../doubles/spies';
+import {
+  GenericEncryptServiceSpy,
+  GenericHashServiceSpy,
+  OnlyFirstSignCallErrorTokenServiceSpy,
+  UserAlreadyExistsRepositorySpy,
+  UserNotExistsRepositorySpy,
+} from '../doubles/spies';
 
 const generateValidPassword = (): string => {
   const specialSymbols = '!@#$%&?';
@@ -285,24 +291,28 @@ enum USER_REPOSITORY_TYPE {
   STUB_USER_ALREADY_EXISTS = 'STUB_USER_ALREADY_EXISTS',
   FAKE_IN_MEMORY = 'FAKE_IN_MEMORY',
   SPY_USER_ALREADY_EXISTS = 'SPY_USER_ALREADY_EXISTS',
+  SPY_USER_NOT_EXISTS = 'SPY_USER_NOT_EXISTS',
 }
 
 // eslint-disable-next-line no-shadow
 enum HASH_SERVICE_TYPE {
   DUMMY = 'DUMMY',
   FAKE_NONE = 'FAKE_NONE',
+  SPY_GENERIC = 'SPY_GENERIC',
 }
 
 // eslint-disable-next-line no-shadow
 enum ENCRYPT_SERVICE_TYPE {
   DUMMY = 'DUMMY',
   FAKE_NONE = 'FAKE_NONE',
+  SPY_GENERIC = 'SPY_GENERIC',
 }
 
 // eslint-disable-next-line no-shadow
 enum TOKEN_SERVICE_TYPE {
   DUMMY = 'DUMMY',
   STUB_NO_JWA_IN_SIGN = 'STUB_NO_JWA_IN_SIGN',
+  SPY_ONLY_FIRST_SIGN_CALL = 'SPY_ONLY_FIRST_SIGN_CALL',
 }
 
 // eslint-disable-next-line no-shadow
@@ -320,6 +330,8 @@ const makeUserRepository = (type: USER_REPOSITORY_TYPE): any => {
       return new UserAlreadyExistsRepositoryStub();
     case USER_REPOSITORY_TYPE.SPY_USER_ALREADY_EXISTS:
       return new UserAlreadyExistsRepositorySpy();
+    case USER_REPOSITORY_TYPE.SPY_USER_NOT_EXISTS:
+      return new UserNotExistsRepositorySpy();
     default:
       return new UserRepositoryDummy();
   }
@@ -331,6 +343,8 @@ const makeHashService = (type: HASH_SERVICE_TYPE): any => {
       return new CryptoHashServiceDummy();
     case HASH_SERVICE_TYPE.FAKE_NONE:
       return new FakeNoneHashService();
+    case HASH_SERVICE_TYPE.SPY_GENERIC:
+      return new GenericHashServiceSpy();
     default:
       return new CryptoHashServiceDummy();
   }
@@ -342,6 +356,8 @@ const makeEncryptService = (type: ENCRYPT_SERVICE_TYPE): any => {
       return new CryptoEncryptServiceDummy();
     case ENCRYPT_SERVICE_TYPE.FAKE_NONE:
       return new FakeNoneEncryptService();
+    case ENCRYPT_SERVICE_TYPE.SPY_GENERIC:
+      return new GenericEncryptServiceSpy();
     default:
       return new CryptoEncryptServiceDummy();
   }
@@ -353,6 +369,8 @@ const makeTokenService = (type: TOKEN_SERVICE_TYPE): any => {
       return new JWTTokenServiceDummy();
     case TOKEN_SERVICE_TYPE.STUB_NO_JWA_IN_SIGN:
       return new NoJsonWebAlgorithmInSignUpTokenServiceStub();
+    case TOKEN_SERVICE_TYPE.SPY_ONLY_FIRST_SIGN_CALL:
+      return new OnlyFirstSignCallErrorTokenServiceSpy();
     default:
       return new JWTTokenServiceDummy();
   }
@@ -1690,7 +1708,9 @@ describe('Sign-Up Use Case', () => {
       taxvat: cpf.generate(),
     };
 
-    const userRepositorySpy = new UserAlreadyExistsRepositorySpy();
+    const userRepositorySpy = makeUserRepository(
+      USER_REPOSITORY_TYPE.SPY_USER_ALREADY_EXISTS,
+    );
     const cryptoHashServiceDummy = makeHashService(HASH_SERVICE_TYPE.DUMMY);
     const cryptoEncryptServiceDummy = makeEncryptService(
       ENCRYPT_SERVICE_TYPE.DUMMY,
@@ -1712,7 +1732,9 @@ describe('Sign-Up Use Case', () => {
 
     expect(userRepositorySpy.countCreateCalls()).toBe(0);
     expect(userRepositorySpy.countFindUserByEmailCalls()).toBe(1);
-    expect(userRepositorySpy.getEmail()).toBe(request.email);
+    expect(userRepositorySpy.getParameters().findUserByEmail.email[0]).toBe(
+      request.email,
+    );
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new UserAlreadyExistsError());
@@ -1728,15 +1750,58 @@ describe('Sign-Up Use Case', () => {
     };
     const host = faker.internet.ip();
 
-    sut = makeSut(
-      USER_REPOSITORY_TYPE.FAKE_IN_MEMORY,
-      HASH_SERVICE_TYPE.FAKE_NONE,
-      ENCRYPT_SERVICE_TYPE.FAKE_NONE,
-      TOKEN_SERVICE_TYPE.STUB_NO_JWA_IN_SIGN,
+    const userRepositorySpy = makeUserRepository(
+      USER_REPOSITORY_TYPE.SPY_USER_NOT_EXISTS,
+    );
+    const cryptoHashServiceSpy = makeHashService(HASH_SERVICE_TYPE.SPY_GENERIC);
+    const cryptoEncryptServiceSpy = makeEncryptService(
+      ENCRYPT_SERVICE_TYPE.SPY_GENERIC,
+    );
+    const jwtTokenServiceSpy = makeTokenService(
+      TOKEN_SERVICE_TYPE.SPY_ONLY_FIRST_SIGN_CALL,
+    );
+    const rabbitmqQueuePublishManagerDummy = makeQueuePublishManager(
       QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
     );
 
+    sut = new SignUpUseCase(
+      userRepositorySpy,
+      cryptoHashServiceSpy,
+      cryptoEncryptServiceSpy,
+      jwtTokenServiceSpy,
+      rabbitmqQueuePublishManagerDummy,
+    );
+
     const response = await sut.perform(request, host);
+
+    expect(userRepositorySpy.getParameters().findUserByEmail.email[0]).toBe(
+      request.email,
+    );
+
+    expect(cryptoHashServiceSpy.getParameters().encode.password[0]).toBe(
+      request.password,
+    );
+    expect(cryptoHashServiceSpy.getParameters().encode.salt[0]).toBe(
+      `${request.email}${request.taxvat}`,
+    );
+    expect(cryptoHashServiceSpy.getParameters().encode.password[1]).toBe(
+      `${cryptoHashServiceSpy.getParameters().encode.response[0]}`,
+    );
+    expect(cryptoHashServiceSpy.getParameters().encode.salt[1]).toBe(
+      process.env.CODE_SALT,
+    );
+
+    expect(cryptoEncryptServiceSpy.getParameters().encode.secret[0]).toBe(
+      request.taxvat,
+    );
+
+    expect(
+      userRepositorySpy.getParameters().create.user[0],
+    ).not.toBeUndefined();
+
+    expect(jwtTokenServiceSpy.getParameters().sign.response[0].value).toEqual(
+      new ServerError(),
+    );
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new ServerError());

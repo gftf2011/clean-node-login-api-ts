@@ -18,7 +18,7 @@ interface Parameters {
   findUserByEmail: FindUserByEmailFunction;
 }
 
-export class UserAlreadyExistsRepositorySpy implements IUserRepository {
+export class UserNotExistsRepositorySpy implements IUserRepository {
   private parameters: Parameters = {
     create: {
       response: [],
@@ -50,7 +50,10 @@ export class UserAlreadyExistsRepositorySpy implements IUserRepository {
     this.createCalls++;
     this.parameters.create.user.push(user);
     this.parameters.create.response.push(user);
-    return user as any;
+    return {
+      id: '0',
+      ...user,
+    } as any;
   }
 
   findUserByEmail(email: string): Promise<UserDto | undefined> {
@@ -59,8 +62,6 @@ export class UserAlreadyExistsRepositorySpy implements IUserRepository {
     this.parameters.findUserByEmail.response.push({
       email,
     } as any);
-    return {
-      email,
-    } as any;
+    return undefined as any;
   }
 }
