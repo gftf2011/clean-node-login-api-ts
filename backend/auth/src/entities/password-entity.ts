@@ -22,7 +22,7 @@ import { InvalidPasswordError } from '../shared/errors';
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Password business domain
  */
-export class PasswordEntity implements IEntity {
+export class PasswordEntity implements IEntity<string> {
   private readonly value: string;
 
   private constructor(password: string) {

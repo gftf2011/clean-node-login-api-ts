@@ -69,19 +69,26 @@ export class SignInUseCase implements ISignInUseCase {
       return left(accountOrError.value);
     }
 
-    const userExists = await this.userRepository.findUserByEmail(email);
+    const accountValidated = accountOrError.value.getValue();
+
+    const userExists = await this.userRepository.findUserByEmail(
+      accountValidated.email,
+    );
 
     if (!userExists) {
       return left(new UnauthorizedError());
     }
 
     const decryptedTaxvat = this.encryptService.decode(userExists.taxvat);
-    const customSalt = `${email}${decryptedTaxvat}`;
+    const customSalt = `${userExists.password}${decryptedTaxvat}`;
     const defaultSalt = process.env.CODE_SALT;
     /**
      * encrypt password with user custom salt hash value
      */
-    const hashedPassword = this.hashService.encode(password, customSalt);
+    const hashedPassword = this.hashService.encode(
+      userExists.password,
+      customSalt,
+    );
     /**
      * encrypt encrypted password with code default salt hash value
      */

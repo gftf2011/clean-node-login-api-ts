@@ -384,11 +384,11 @@ describe('Account Entity', () => {
     const password = generateValidPassword();
     const accountOrError = AccountEntity.create(email, password);
 
-    const account = accountOrError.value as AccountEntity;
+    const account = (accountOrError.value as AccountEntity).getValue();
 
     expect(accountOrError.isRight()).toBeTruthy();
 
-    expect(account.getEmail()).toBe(email);
-    expect(account.getPassword()).toBe(password);
+    expect(account.email).toBe(email);
+    expect(account.password).toBe(password);
   });
 });

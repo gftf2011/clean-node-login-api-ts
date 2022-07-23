@@ -17,7 +17,7 @@ import { InvalidEmailError } from '../shared/errors';
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Email business domain
  */
-export class EmailEntity implements IEntity {
+export class EmailEntity implements IEntity<string> {
   private readonly value: string;
 
   private constructor(email: string) {

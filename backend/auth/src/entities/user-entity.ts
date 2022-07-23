@@ -8,25 +8,26 @@ import { Either, left, right } from '../shared';
  */
 import { EmailEntity } from './email-entity';
 import { EntityFactory } from './helpers/factory-methods';
+import { IEntity } from './contracts';
 import { LastnameEntity } from './lastname-entity';
 import { NameEntity } from './name-entity';
 import { PasswordEntity } from './password-entity';
 import { TaxvatEntity } from './taxvat-entity';
 
+interface User {
+  name: string;
+  lastname: string;
+  taxvat: string;
+  email: string;
+  password: string;
+}
+
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc User business domain
  */
-export class UserEntity {
-  private readonly name: NameEntity;
-
-  private readonly lastname: LastnameEntity;
-
-  private readonly taxvat: TaxvatEntity;
-
-  private readonly email: EmailEntity;
-
-  private readonly password: PasswordEntity;
+export class UserEntity implements IEntity<User> {
+  private readonly value: User;
 
   private constructor(
     name: NameEntity,
@@ -35,65 +36,23 @@ export class UserEntity {
     email: EmailEntity,
     password: PasswordEntity,
   ) {
-    this.name = name;
-    this.lastname = lastname;
-    this.taxvat = taxvat;
-    this.email = email;
-    this.password = password;
+    this.value = {
+      email: email.getValue(),
+      lastname: lastname.getValue(),
+      name: name.getValue(),
+      password: password.getValue(),
+      taxvat: taxvat.getValue(),
+    };
     Object.freeze(this);
   }
 
   /**
-   * @desc Getter to return name value
+   * @desc Getter to return User value
    * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get name
-   * @example
-   * returns 'gabriel'
+   * @returns {User} get User
    */
-  getName(): string {
-    return this.name.getValue();
-  }
-
-  /**
-   * @desc Getter to return lastname value
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get lastname
-   * @example
-   * returns 'ferrari'
-   */
-  getLastname(): string {
-    return this.lastname.getValue();
-  }
-
-  /**
-   * @desc Getter to return taxvat value
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get unformatted taxvat
-   * @example
-   * returns 11111111111
-   */
-  getTaxvat(): string {
-    return this.taxvat.getValue();
-  }
-
-  /**
-   * @desc Getter to return email value
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get email
-   * @example
-   * returns 'test@gmail.com'
-   */
-  getEmail(): string {
-    return this.email.getValue();
-  }
-
-  /**
-   * @desc Getter to return password value
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get password
-   */
-  getPassword(): string {
-    return this.password.getValue();
+  getValue(): User {
+    return this.value;
   }
 
   /**

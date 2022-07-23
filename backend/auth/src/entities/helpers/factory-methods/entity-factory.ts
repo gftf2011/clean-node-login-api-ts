@@ -25,7 +25,7 @@ export class EntityFactory {
    * @param {string} value - initial value to verify inside Entity
    * @returns {Either<Error, IEntity>} returns if Entity was created successfully OR an Error was returned
    */
-  static create(entity: string, value: string): Either<Error, IEntity> {
+  static create(entity: string, value: string): Either<Error, IEntity<string>> {
     switch (entity) {
       case EmailEntity.name:
         return EmailEntity.create(value);

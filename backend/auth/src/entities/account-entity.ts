@@ -8,41 +8,42 @@ import { Either, left, right } from '../shared';
  */
 import { EmailEntity } from './email-entity';
 import { EntityFactory } from './helpers/factory-methods';
+import { IEntity } from './contracts';
 import { PasswordEntity } from './password-entity';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Account business domain
  */
-export class AccountEntity {
-  private readonly email: EmailEntity;
 
-  private readonly password: PasswordEntity;
+// interface Account {
+//   email: EmailEntity;
+//   password: PasswordEntity;
+// }
+
+interface Account {
+  email: string;
+  password: string;
+}
+
+export class AccountEntity implements IEntity<Account> {
+  private readonly value: Account;
 
   private constructor(email: EmailEntity, password: PasswordEntity) {
-    this.email = email;
-    this.password = password;
+    this.value = {
+      email: email.getValue(),
+      password: password.getValue(),
+    };
     Object.freeze(this);
   }
 
   /**
-   * @desc Getter to return email value
+   * @desc Getter to return Account value
    * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get email
-   * @example
-   * returns 'test@gmail.com'
+   * @returns {Account} get account
    */
-  getEmail(): string {
-    return this.email.getValue();
-  }
-
-  /**
-   * @desc Getter to return password value
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @returns {string} get password
-   */
-  getPassword(): string {
-    return this.password.getValue();
+  getValue(): Account {
+    return this.value;
   }
 
   /**

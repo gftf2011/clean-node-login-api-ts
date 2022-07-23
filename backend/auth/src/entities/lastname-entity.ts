@@ -22,7 +22,7 @@ import { InvalidLastnameError } from '../shared/errors';
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Lastname business domain
  */
-export class LastnameEntity implements IEntity {
+export class LastnameEntity implements IEntity<string> {
   private readonly value: string;
 
   private constructor(lastname: string) {

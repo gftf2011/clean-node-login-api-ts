@@ -22,7 +22,7 @@ import { InvalidNameError } from '../shared/errors';
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Name business domain
  */
-export class NameEntity implements IEntity {
+export class NameEntity implements IEntity<string> {
   private readonly value: string;
 
   private constructor(name: string) {

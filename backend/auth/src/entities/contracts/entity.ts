@@ -1,3 +1,3 @@
-export interface IEntity {
-  getValue: () => string;
+export interface IEntity<T> {
+  getValue: () => T;
 }

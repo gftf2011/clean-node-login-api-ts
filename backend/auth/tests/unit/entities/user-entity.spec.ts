@@ -1060,14 +1060,14 @@ describe('User Entity', () => {
       password,
     );
 
-    const user = userOrError.value as UserEntity;
+    const user = (userOrError.value as UserEntity).getValue();
 
     expect(userOrError.isRight()).toBeTruthy();
 
-    expect(user.getName()).toBe(name);
-    expect(user.getLastname()).toBe(lastname);
-    expect(user.getTaxvat()).toBe(clearTaxvat(taxvat));
-    expect(user.getEmail()).toBe(email);
-    expect(user.getPassword()).toBe(password);
+    expect(user.name).toBe(name);
+    expect(user.lastname).toBe(lastname);
+    expect(user.taxvat).toBe(clearTaxvat(taxvat));
+    expect(user.email).toBe(email);
+    expect(user.password).toBe(password);
   });
 });

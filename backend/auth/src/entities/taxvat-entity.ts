@@ -17,7 +17,7 @@ import { InvalidTaxvatError } from '../shared/errors';
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Taxvat business domain
  */
-export class TaxvatEntity implements IEntity {
+export class TaxvatEntity implements IEntity<string> {
   private readonly value: string;
 
   private constructor(taxvat: string) {
