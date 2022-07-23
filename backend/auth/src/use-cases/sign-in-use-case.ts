@@ -19,6 +19,11 @@ import { Either, left, right } from '../shared';
 import { ServerError, UnauthorizedError } from '../shared/errors';
 
 /**
+ * Entities
+ */
+import { AccountEntity } from '../entities';
+
+/**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Contains the logic to perform a sign-in operation
  */
@@ -54,6 +59,15 @@ export class SignInUseCase implements ISignInUseCase {
     }
 
     const { email, password } = request;
+
+    const accountOrError: Either<Error, AccountEntity> = AccountEntity.create(
+      email,
+      password,
+    );
+
+    if (accountOrError.isLeft()) {
+      return left(accountOrError.value);
+    }
 
     const userExists = await this.userRepository.findUserByEmail(email);
 
