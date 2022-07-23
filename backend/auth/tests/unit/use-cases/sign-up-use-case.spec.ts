@@ -65,11 +65,17 @@ import {
 import {
   GenericEncryptServiceSpy,
   GenericHashServiceSpy,
-  OnlyFirstSignCallErrorTokenServiceSpy,
-  OnlySecondSignCallErrorTokenServiceSpy,
   UserAlreadyExistsRepositorySpy,
   UserNotExistsRepositorySpy,
 } from '../doubles/spies';
+
+/**
+ * Mocks
+ */
+import {
+  OnlyFirstSignCallErrorTokenServiceMock,
+  OnlySecondSignCallErrorTokenServiceMock,
+} from '../doubles/mocks';
 
 const generateValidPassword = (): string => {
   const specialSymbols = '!@#$%&?';
@@ -313,8 +319,8 @@ enum ENCRYPT_SERVICE_TYPE {
 enum TOKEN_SERVICE_TYPE {
   DUMMY = 'DUMMY',
   STUB_NO_JWA_IN_SIGN = 'STUB_NO_JWA_IN_SIGN',
-  SPY_ONLY_FIRST_SIGN_CALL = 'SPY_ONLY_FIRST_SIGN_CALL',
-  SPY_ONLY_SECOND_SIGN_CALL = 'SPY_ONLY_SECOND_SIGN_CALL',
+  MOCK_ONLY_FIRST_SIGN_CALL = 'MOCK_ONLY_FIRST_SIGN_CALL',
+  MOCK_ONLY_SECOND_SIGN_CALL = 'MOCK_ONLY_SECOND_SIGN_CALL',
 }
 
 // eslint-disable-next-line no-shadow
@@ -371,10 +377,10 @@ const makeTokenService = (type: TOKEN_SERVICE_TYPE): any => {
       return new JWTTokenServiceDummy();
     case TOKEN_SERVICE_TYPE.STUB_NO_JWA_IN_SIGN:
       return new NoJsonWebAlgorithmInSignUpTokenServiceStub();
-    case TOKEN_SERVICE_TYPE.SPY_ONLY_FIRST_SIGN_CALL:
-      return new OnlyFirstSignCallErrorTokenServiceSpy();
-    case TOKEN_SERVICE_TYPE.SPY_ONLY_SECOND_SIGN_CALL:
-      return new OnlySecondSignCallErrorTokenServiceSpy();
+    case TOKEN_SERVICE_TYPE.MOCK_ONLY_FIRST_SIGN_CALL:
+      return new OnlyFirstSignCallErrorTokenServiceMock();
+    case TOKEN_SERVICE_TYPE.MOCK_ONLY_SECOND_SIGN_CALL:
+      return new OnlySecondSignCallErrorTokenServiceMock();
     default:
       return new JWTTokenServiceDummy();
   }
@@ -1761,8 +1767,8 @@ describe('Sign-Up Use Case', () => {
     const cryptoEncryptServiceSpy = makeEncryptService(
       ENCRYPT_SERVICE_TYPE.SPY_GENERIC,
     );
-    const jwtTokenServiceSpy = makeTokenService(
-      TOKEN_SERVICE_TYPE.SPY_ONLY_FIRST_SIGN_CALL,
+    const jwtTokenServiceMock = makeTokenService(
+      TOKEN_SERVICE_TYPE.MOCK_ONLY_FIRST_SIGN_CALL,
     );
     const rabbitmqQueuePublishManagerDummy = makeQueuePublishManager(
       QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
@@ -1772,7 +1778,7 @@ describe('Sign-Up Use Case', () => {
       userRepositorySpy,
       cryptoHashServiceSpy,
       cryptoEncryptServiceSpy,
-      jwtTokenServiceSpy,
+      jwtTokenServiceMock,
       rabbitmqQueuePublishManagerDummy,
     );
 
@@ -1803,7 +1809,7 @@ describe('Sign-Up Use Case', () => {
       userRepositorySpy.getParameters().create.user[0],
     ).not.toBeUndefined();
 
-    expect(jwtTokenServiceSpy.getParameters().sign.response[0].value).toEqual(
+    expect(jwtTokenServiceMock.getParameters().sign.response[0].value).toEqual(
       new ServerError(),
     );
 
@@ -1828,8 +1834,8 @@ describe('Sign-Up Use Case', () => {
     const cryptoEncryptServiceSpy = makeEncryptService(
       ENCRYPT_SERVICE_TYPE.SPY_GENERIC,
     );
-    const jwtTokenServiceSpy = makeTokenService(
-      TOKEN_SERVICE_TYPE.SPY_ONLY_SECOND_SIGN_CALL,
+    const jwtTokenServiceMock = makeTokenService(
+      TOKEN_SERVICE_TYPE.MOCK_ONLY_SECOND_SIGN_CALL,
     );
     const rabbitmqQueuePublishManagerDummy = makeQueuePublishManager(
       QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
@@ -1839,7 +1845,7 @@ describe('Sign-Up Use Case', () => {
       userRepositorySpy,
       cryptoHashServiceSpy,
       cryptoEncryptServiceSpy,
-      jwtTokenServiceSpy,
+      jwtTokenServiceMock,
       rabbitmqQueuePublishManagerDummy,
     );
 
@@ -1870,22 +1876,22 @@ describe('Sign-Up Use Case', () => {
       userRepositorySpy.getParameters().create.user[0],
     ).not.toBeUndefined();
 
-    expect(jwtTokenServiceSpy.getParameters().sign.expirationTime[0]).toBe(
+    expect(jwtTokenServiceMock.getParameters().sign.expirationTime[0]).toBe(
       Number(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN),
     );
-    expect(jwtTokenServiceSpy.getParameters().sign.options[0]).toEqual({
+    expect(jwtTokenServiceMock.getParameters().sign.options[0]).toEqual({
       subject: process.env.APP_SECRET,
       issuer: host,
       jwtId: process.env.JWT_REFRESH_TOKEN_ID,
     });
 
-    expect(jwtTokenServiceSpy.getParameters().sign.payload[0]).toEqual({
+    expect(jwtTokenServiceMock.getParameters().sign.payload[0]).toEqual({
       id: userRepositorySpy.getParameters().create.response[0].id,
     });
-    expect(jwtTokenServiceSpy.getParameters().sign.response[0].isRight()).toBe(
+    expect(jwtTokenServiceMock.getParameters().sign.response[0].isRight()).toBe(
       true,
     );
-    expect(jwtTokenServiceSpy.getParameters().sign.response[1].isLeft()).toBe(
+    expect(jwtTokenServiceMock.getParameters().sign.response[1].isLeft()).toBe(
       true,
     );
 

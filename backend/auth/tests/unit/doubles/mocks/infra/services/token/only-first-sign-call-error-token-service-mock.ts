@@ -24,7 +24,7 @@ interface Parameters {
   verify: VerifyFunction;
 }
 
-export class OnlyFirstSignCallErrorTokenServiceSpy implements ITokenService {
+export class OnlyFirstSignCallErrorTokenServiceMock implements ITokenService {
   private parameters: Parameters = {
     sign: {
       expirationTime: [],
