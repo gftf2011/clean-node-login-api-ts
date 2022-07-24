@@ -41,6 +41,7 @@ import {
 // eslint-disable-next-line sort-imports
 import {
   NoJsonWebAlgorithmInSignUpTokenServiceStub,
+  OnlyCallSamePasswordByParameterHashServiceStub,
   UserAlreadyExistsRepositoryStub,
 } from '../doubles/stubs';
 
@@ -228,6 +229,7 @@ enum HASH_SERVICE_TYPE {
   DUMMY = 'DUMMY',
   FAKE_NONE = 'FAKE_NONE',
   SPY_GENERIC = 'SPY_GENERIC',
+  STUB_ONLY_CALL_SAME_PASSWORD = 'STUB_ONLY_CALL_SAME_PASSWORD',
 }
 
 // eslint-disable-next-line no-shadow
@@ -271,6 +273,8 @@ const makeHashService = (type: HASH_SERVICE_TYPE): any => {
       return new FakeNoneHashService();
     case HASH_SERVICE_TYPE.SPY_GENERIC:
       return new GenericHashServiceSpy();
+    case HASH_SERVICE_TYPE.STUB_ONLY_CALL_SAME_PASSWORD:
+      return new OnlyCallSamePasswordByParameterHashServiceStub();
     default:
       return new CryptoHashServiceDummy();
   }
@@ -1053,6 +1057,51 @@ describe('Sign-In Use Case', () => {
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new UnauthorizedError());
+  });
+
+  it('should throw server error if jwt service that creates refresh token throws server error', async () => {
+    const request: AccountDto = {
+      email: faker.internet.email(),
+      password: generateValidPassword(),
+    };
+    const host = faker.internet.ip();
+
+    const userRepositorySpy = makeUserRepository(
+      USER_REPOSITORY_TYPE.SPY_USER_ALREADY_EXISTS,
+    );
+    const cryptoHashServiceStub = makeHashService(
+      HASH_SERVICE_TYPE.STUB_ONLY_CALL_SAME_PASSWORD,
+    );
+    const cryptoEncryptServiceSpy = makeEncryptService(
+      ENCRYPT_SERVICE_TYPE.SPY_GENERIC,
+    );
+    const jwtTokenServiceMock = makeTokenService(
+      TOKEN_SERVICE_TYPE.MOCK_ONLY_FIRST_SIGN_CALL,
+    );
+
+    sut = new SignInUseCase(
+      userRepositorySpy,
+      cryptoEncryptServiceSpy,
+      cryptoHashServiceStub,
+      jwtTokenServiceMock,
+    );
+
+    const response = await sut.perform(request, host);
+
+    expect(userRepositorySpy.getParameters().findUserByEmail.email[0]).toBe(
+      request.email,
+    );
+
+    expect(cryptoEncryptServiceSpy.getParameters().decode.encrypt[0]).toBe(
+      userRepositorySpy.getParameters().findUserByEmail.response[0].taxvat,
+    );
+
+    expect(jwtTokenServiceMock.getParameters().sign.response[0].value).toEqual(
+      new ServerError(),
+    );
+
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new ServerError());
   });
 
   // it('should throw server error if jwt service that creates access token throws server error', async () => {
