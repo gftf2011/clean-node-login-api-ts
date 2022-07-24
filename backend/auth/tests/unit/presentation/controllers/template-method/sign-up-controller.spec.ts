@@ -27,7 +27,10 @@ import { SignUpUseCaseDummy } from '../../../doubles/dummies';
 /**
  * Shared
  */
-import { MissingParamsError } from '../../../../../src/shared/errors';
+import {
+  MissingHeaderParamsError,
+  MissingParamsError,
+} from '../../../../../src/shared/errors';
 
 // eslint-disable-next-line no-shadow
 enum SIGN_UP_USE_CASE_TYPE {
@@ -164,6 +167,26 @@ describe('Sign-Up Controller', () => {
     expect(response).toEqual({
       statusCode: 400,
       body: new MissingParamsError(['lastname']),
+    });
+  });
+
+  it('should return missing header param error if host request parameter is missing', async () => {
+    const request: HttpRequest = {
+      body: {
+        taxvat: cpf.generate(),
+        password: faker.internet.password(),
+        email: faker.internet.email(),
+        name: faker.name.firstName(),
+        lastname: faker.name.lastName(),
+      },
+      headers: {},
+    };
+
+    const response = await sut.handle(request);
+
+    expect(response).toEqual({
+      statusCode: 400,
+      body: new MissingHeaderParamsError(['host']),
     });
   });
 
