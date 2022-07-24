@@ -1019,9 +1019,7 @@ describe('Sign-In Use Case', () => {
     const cryptoEncryptServiceSpy = makeEncryptService(
       ENCRYPT_SERVICE_TYPE.SPY_GENERIC,
     );
-    const jwtTokenServiceMock = makeTokenService(
-      TOKEN_SERVICE_TYPE.MOCK_ONLY_FIRST_SIGN_CALL,
-    );
+    const jwtTokenServiceMock = makeTokenService(TOKEN_SERVICE_TYPE.DUMMY);
 
     sut = new SignInUseCase(
       userRepositorySpy,
@@ -1104,87 +1102,65 @@ describe('Sign-In Use Case', () => {
     expect(response.value).toEqual(new ServerError());
   });
 
-  // it('should throw server error if jwt service that creates access token throws server error', async () => {
-  //   const request: BasicUserDto = {
-  //     email: faker.internet.email(),
-  //     name: faker.name.firstName(),
-  //     lastname: faker.name.lastName(),
-  //     password: generateValidPassword(),
-  //     taxvat: cpf.generate(),
-  //   };
-  //   const host = faker.internet.ip();
+  it('should throw server error if jwt service that creates access token throws server error', async () => {
+    const request: AccountDto = {
+      email: faker.internet.email(),
+      password: generateValidPassword(),
+    };
+    const host = faker.internet.ip();
 
-  //   const userRepositorySpy = makeUserRepository(
-  //     USER_REPOSITORY_TYPE.SPY_USER_NOT_EXISTS,
-  //   );
-  //   const cryptoHashServiceSpy = makeHashService(HASH_SERVICE_TYPE.SPY_GENERIC);
-  //   const cryptoEncryptServiceSpy = makeEncryptService(
-  //     ENCRYPT_SERVICE_TYPE.SPY_GENERIC,
-  //   );
-  //   const jwtTokenServiceMock = makeTokenService(
-  //     TOKEN_SERVICE_TYPE.MOCK_ONLY_SECOND_SIGN_CALL,
-  //   );
-  //   const rabbitmqQueuePublishManagerDummy = makeQueuePublishManager(
-  //     QUEUE_PUBLISH_MANAGER_TYPE.DUMMY,
-  //   );
+    const userRepositorySpy = makeUserRepository(
+      USER_REPOSITORY_TYPE.SPY_USER_ALREADY_EXISTS,
+    );
+    const cryptoHashServiceStub = makeHashService(
+      HASH_SERVICE_TYPE.STUB_ONLY_CALL_SAME_PASSWORD,
+    );
+    const cryptoEncryptServiceSpy = makeEncryptService(
+      ENCRYPT_SERVICE_TYPE.SPY_GENERIC,
+    );
+    const jwtTokenServiceMock = makeTokenService(
+      TOKEN_SERVICE_TYPE.MOCK_ONLY_SECOND_SIGN_CALL,
+    );
 
-  //   sut = new SignUpUseCase(
-  //     userRepositorySpy,
-  //     cryptoHashServiceSpy,
-  //     cryptoEncryptServiceSpy,
-  //     jwtTokenServiceMock,
-  //     rabbitmqQueuePublishManagerDummy,
-  //   );
+    sut = new SignInUseCase(
+      userRepositorySpy,
+      cryptoEncryptServiceSpy,
+      cryptoHashServiceStub,
+      jwtTokenServiceMock,
+    );
 
-  //   const response = await sut.perform(request, host);
+    const response = await sut.perform(request, host);
 
-  //   expect(userRepositorySpy.getParameters().findUserByEmail.email[0]).toBe(
-  //     request.email,
-  //   );
+    expect(userRepositorySpy.getParameters().findUserByEmail.email[0]).toBe(
+      request.email,
+    );
 
-  //   expect(cryptoHashServiceSpy.getParameters().encode.password[0]).toBe(
-  //     request.password,
-  //   );
-  //   expect(cryptoHashServiceSpy.getParameters().encode.salt[0]).toBe(
-  //     `${request.email}${request.taxvat}`,
-  //   );
-  //   expect(cryptoHashServiceSpy.getParameters().encode.password[1]).toBe(
-  //     `${cryptoHashServiceSpy.getParameters().encode.response[0]}`,
-  //   );
-  //   expect(cryptoHashServiceSpy.getParameters().encode.salt[1]).toBe(
-  //     process.env.CODE_SALT,
-  //   );
+    expect(cryptoEncryptServiceSpy.getParameters().decode.encrypt[0]).toBe(
+      userRepositorySpy.getParameters().findUserByEmail.response[0].taxvat,
+    );
 
-  //   expect(cryptoEncryptServiceSpy.getParameters().encode.secret[0]).toBe(
-  //     request.taxvat,
-  //   );
+    expect(jwtTokenServiceMock.getParameters().sign.expirationTime[0]).toBe(
+      Number(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN),
+    );
+    expect(jwtTokenServiceMock.getParameters().sign.options[0]).toEqual({
+      subject: process.env.APP_SECRET,
+      issuer: host,
+      jwtId: process.env.JWT_REFRESH_TOKEN_ID,
+    });
 
-  //   expect(
-  //     userRepositorySpy.getParameters().create.user[0],
-  //   ).not.toBeUndefined();
+    expect(jwtTokenServiceMock.getParameters().sign.payload[0]).toEqual({
+      id: userRepositorySpy.getParameters().findUserByEmail.response[0].id,
+    });
+    expect(jwtTokenServiceMock.getParameters().sign.response[0].isRight()).toBe(
+      true,
+    );
+    expect(jwtTokenServiceMock.getParameters().sign.response[1].isLeft()).toBe(
+      true,
+    );
 
-  //   expect(jwtTokenServiceMock.getParameters().sign.expirationTime[0]).toBe(
-  //     Number(process.env.JWT_REFRESH_TOKEN_EXPIRES_IN),
-  //   );
-  //   expect(jwtTokenServiceMock.getParameters().sign.options[0]).toEqual({
-  //     subject: process.env.APP_SECRET,
-  //     issuer: host,
-  //     jwtId: process.env.JWT_REFRESH_TOKEN_ID,
-  //   });
-
-  //   expect(jwtTokenServiceMock.getParameters().sign.payload[0]).toEqual({
-  //     id: userRepositorySpy.getParameters().create.response[0].id,
-  //   });
-  //   expect(jwtTokenServiceMock.getParameters().sign.response[0].isRight()).toBe(
-  //     true,
-  //   );
-  //   expect(jwtTokenServiceMock.getParameters().sign.response[1].isLeft()).toBe(
-  //     true,
-  //   );
-
-  //   expect(response.isLeft()).toBeTruthy();
-  //   expect(response.value).toEqual(new ServerError());
-  // });
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new ServerError());
+  });
 
   // it('should create sign up account', async () => {
   //   const request: BasicUserDto = {
