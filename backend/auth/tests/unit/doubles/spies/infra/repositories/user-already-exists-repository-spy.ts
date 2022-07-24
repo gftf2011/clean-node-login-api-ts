@@ -66,10 +66,14 @@ export class UserAlreadyExistsRepositorySpy implements IUserRepository {
     this.parameters.findUserByEmail.response.push({
       id: '0',
       email,
+      password: 'fake_password',
+      taxvat: '11111111111',
     } as any);
     return {
       id: '0',
       email,
+      password: 'fake_password',
+      taxvat: '11111111111',
     } as any;
   }
 }

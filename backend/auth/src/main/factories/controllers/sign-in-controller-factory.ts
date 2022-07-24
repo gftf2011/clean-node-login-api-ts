@@ -10,10 +10,6 @@ import {
   PostgresDbClientManager,
   PostgresDbClientPool,
 } from '../../../infra/db';
-import {
-  RabbitmqQueueConnection,
-  RabbitmqQueuePublishManager,
-} from '../../../infra/queue';
 
 /**
  * Presentation
@@ -42,10 +38,6 @@ import { UserDao } from '../../../infra/dao';
 import { UserRepository } from '../../../infra/repositories';
 
 export const makeSignInController = (): Controller => {
-  const queue = RabbitmqQueueConnection.getInstance();
-
-  const queueManager = new RabbitmqQueuePublishManager(queue);
-
   const postgresPool = PostgresDbClientPool.getInstance();
 
   const postgresClientManager = new PostgresDbClientManager(postgresPool);
@@ -63,7 +55,6 @@ export const makeSignInController = (): Controller => {
     cryptoEncryptService,
     cryptoHashService,
     jwtTokenService,
-    queueManager,
   );
 
   const signInController = new SignInController(signInUseCase);

@@ -53,7 +53,7 @@ export class GenericEncryptServiceSpy implements IEncryptService {
   decode(encrypt: string): string {
     this.decodeCalls++;
     this.parameters.decode.encrypt.push(encrypt);
-    this.parameters.decode.response.push(`none_${encrypt}`);
-    return `none_${encrypt}`;
+    this.parameters.decode.response.push(`${encrypt}`);
+    return `${encrypt}`;
   }
 }

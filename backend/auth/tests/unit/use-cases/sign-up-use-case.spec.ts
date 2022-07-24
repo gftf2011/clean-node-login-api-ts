@@ -411,19 +411,19 @@ const makeSut = (
   tokenService: TOKEN_SERVICE_TYPE,
   queuePublishManager: QUEUE_PUBLISH_MANAGER_TYPE,
 ): ISignUpUseCase => {
-  const userRepositoryDummy = makeUserRepository(userRepository);
-  const cryptoHashServiceDummy = makeHashService(hashService);
-  const cryptoEncryptServiceDummy = makeEncryptService(encryptService);
-  const jwtTokenServiceDummy = makeTokenService(tokenService);
-  const rabbitmqQueuePublishManagerDummy =
+  const userRepositoryDouble = makeUserRepository(userRepository);
+  const cryptoHashServiceDouble = makeHashService(hashService);
+  const cryptoEncryptServiceDouble = makeEncryptService(encryptService);
+  const jwtTokenServiceDouble = makeTokenService(tokenService);
+  const rabbitmqQueuePublishManagerDouble =
     makeQueuePublishManager(queuePublishManager);
 
   const sut = new SignUpUseCase(
-    userRepositoryDummy,
-    cryptoHashServiceDummy,
-    cryptoEncryptServiceDummy,
-    jwtTokenServiceDummy,
-    rabbitmqQueuePublishManagerDummy,
+    userRepositoryDouble,
+    cryptoHashServiceDouble,
+    cryptoEncryptServiceDouble,
+    jwtTokenServiceDouble,
+    rabbitmqQueuePublishManagerDouble,
   );
 
   return sut;

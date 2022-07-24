@@ -5,7 +5,7 @@ import {
 
 interface FindUserByEmailFunction {
   email: string[];
-  response: UserDto[];
+  response: any[];
 }
 
 interface CreateFunction {
@@ -63,9 +63,7 @@ export class UserNotExistsRepositorySpy implements IUserRepository {
   findUserByEmail(email: string): Promise<UserDto | undefined> {
     this.findUserByEmailCalls++;
     this.parameters.findUserByEmail.email.push(email);
-    this.parameters.findUserByEmail.response.push({
-      email,
-    } as any);
+    this.parameters.findUserByEmail.response.push(undefined);
     return undefined as any;
   }
 }

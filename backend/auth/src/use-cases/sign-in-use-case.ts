@@ -9,14 +9,17 @@ import {
   ISignInUseCase,
   ITokenService,
   IUserRepository,
-  QueuePublishManager,
 } from './ports';
 
 /**
  * Shared
  */
 import { Either, left, right } from '../shared';
-import { ServerError, UnauthorizedError } from '../shared/errors';
+import {
+  ForbiddenError,
+  ServerError,
+  UnauthorizedError,
+} from '../shared/errors';
 
 /**
  * Entities
@@ -33,7 +36,6 @@ export class SignInUseCase implements ISignInUseCase {
     private readonly encryptService: IEncryptService,
     private readonly hashService: IHashService,
     private readonly tokenService: ITokenService,
-    private readonly queueManager: QueuePublishManager,
   ) {}
 
   /**
@@ -48,11 +50,11 @@ export class SignInUseCase implements ISignInUseCase {
     host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
-      !process.env.CODE_SALT &&
-      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_ACCESS_TOKEN_ID &&
-      !process.env.JWT_REFRESH_TOKEN_ID &&
+      !process.env.CODE_SALT ||
+      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_ACCESS_TOKEN_ID ||
+      !process.env.JWT_REFRESH_TOKEN_ID ||
       !process.env.APP_SECRET
     ) {
       return left(new ServerError());
@@ -76,11 +78,11 @@ export class SignInUseCase implements ISignInUseCase {
     );
 
     if (!userExists) {
-      return left(new UnauthorizedError());
+      return left(new ForbiddenError());
     }
 
     const decryptedTaxvat = this.encryptService.decode(userExists.taxvat);
-    const customSalt = `${userExists.password}${decryptedTaxvat}`;
+    const customSalt = `${userExists.email}${decryptedTaxvat}`;
     const defaultSalt = process.env.CODE_SALT;
     /**
      * encrypt password with user custom salt hash value
@@ -136,8 +138,6 @@ export class SignInUseCase implements ISignInUseCase {
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value);
     }
-
-    // await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userExists))
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
