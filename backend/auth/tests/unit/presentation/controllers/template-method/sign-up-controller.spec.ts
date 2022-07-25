@@ -33,6 +33,11 @@ import {
 } from '../../../doubles/stubs';
 
 /**
+ * Spies
+ */
+import { PerformSuccessSignUpUseCaseSpy } from '../../../doubles/spies';
+
+/**
  * Shared
  */
 import {
@@ -47,9 +52,10 @@ enum SIGN_UP_USE_CASE_TYPE {
   DUMMY = 'DUMMY',
   STUB_PERFORM_SERVER_ERROR = 'STUB_PERFORM_SERVER_ERROR',
   STUB_PERFORM_UNAUTHORIZED_ERROR = 'STUB_PERFORM_UNAUTHORIZED_ERROR',
+  SPY_PERFORM_SUCCESS = 'SPY_PERFORM_SUCCESS',
 }
 
-const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): ISignUpUseCase => {
+const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): any => {
   switch (type) {
     case SIGN_UP_USE_CASE_TYPE.DUMMY:
       return new SignUpUseCaseDummy();
@@ -57,6 +63,8 @@ const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): ISignUpUseCase => {
       return new PerformServerErrorSignUpUseCaseStub();
     case SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_UNAUTHORIZED_ERROR:
       return new PerformUnauthorizedErrorSignUpUseCaseStub();
+    case SIGN_UP_USE_CASE_TYPE.SPY_PERFORM_SUCCESS:
+      return new PerformSuccessSignUpUseCaseSpy();
     default:
       return new SignUpUseCaseDummy();
   }
@@ -251,6 +259,34 @@ describe('Sign-Up Controller', () => {
     expect(response).toEqual({
       statusCode: 401,
       body: new UnauthorizedError(),
+    });
+  });
+
+  it('should return created account', async () => {
+    const request: HttpRequest = {
+      body: {
+        taxvat: cpf.generate(),
+        password: faker.internet.password(),
+        email: faker.internet.email(),
+        name: faker.name.firstName(),
+        lastname: faker.name.lastName(),
+      },
+      headers: {
+        host: faker.internet.ip(),
+      },
+    };
+
+    const spySignUpUseCase = makeSignUpUseCase(
+      SIGN_UP_USE_CASE_TYPE.SPY_PERFORM_SUCCESS,
+    );
+
+    sut = new SignUpController(spySignUpUseCase);
+
+    const response = await sut.handle(request);
+
+    expect(response).toEqual({
+      statusCode: 201,
+      body: spySignUpUseCase.getParameters().perform.response[0].value,
     });
   });
 
