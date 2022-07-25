@@ -15,11 +15,6 @@ import {
 } from '../../../../../src/presentation/controllers';
 
 /**
- * Use-Cases
- */
-import { ISignUpUseCase } from '../../../../../src/use-cases/ports';
-
-/**
  * Dummies
  */
 import { SignUpUseCaseDummy } from '../../../doubles/dummies';
