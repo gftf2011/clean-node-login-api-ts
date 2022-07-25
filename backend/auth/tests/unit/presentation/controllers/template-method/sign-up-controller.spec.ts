@@ -25,22 +25,31 @@ import { ISignUpUseCase } from '../../../../../src/use-cases/ports';
 import { SignUpUseCaseDummy } from '../../../doubles/dummies';
 
 /**
+ * Stubs
+ */
+import { PerformServerErrorSignUpUseCaseStub } from '../../../doubles/stubs';
+
+/**
  * Shared
  */
 import {
   MissingHeaderParamsError,
   MissingParamsError,
+  ServerError,
 } from '../../../../../src/shared/errors';
 
 // eslint-disable-next-line no-shadow
 enum SIGN_UP_USE_CASE_TYPE {
   DUMMY = 'DUMMY',
+  STUB_PERFORM_SERVER_ERROR = 'STUB_PERFORM_SERVER_ERROR',
 }
 
 const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): ISignUpUseCase => {
   switch (type) {
     case SIGN_UP_USE_CASE_TYPE.DUMMY:
       return new SignUpUseCaseDummy();
+    case SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_SERVER_ERROR:
+      return new PerformServerErrorSignUpUseCaseStub();
     default:
       return new SignUpUseCaseDummy();
   }
@@ -187,6 +196,30 @@ describe('Sign-Up Controller', () => {
     expect(response).toEqual({
       statusCode: 400,
       body: new MissingHeaderParamsError(['host']),
+    });
+  });
+
+  it('should return server error if use case returns server error', async () => {
+    const request: HttpRequest = {
+      body: {
+        taxvat: cpf.generate(),
+        password: faker.internet.password(),
+        email: faker.internet.email(),
+        name: faker.name.firstName(),
+        lastname: faker.name.lastName(),
+      },
+      headers: {
+        host: faker.internet.ip(),
+      },
+    };
+
+    const response = await makeSut(
+      SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_SERVER_ERROR,
+    ).handle(request);
+
+    expect(response).toEqual({
+      statusCode: 500,
+      body: new ServerError(),
     });
   });
 
