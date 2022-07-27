@@ -7,6 +7,11 @@
 import { JwtTokenService } from '../../../../../src/infra/services/token';
 
 /**
+ * Shared
+ */
+import { ServerError } from '../../../../../src/shared/errors';
+
+/**
  * Driver
  */
 import faker from 'faker';
@@ -35,19 +40,69 @@ describe('JWT Token Service', () => {
     process.env = { ...OLD_ENV };
   });
 
-  it('', () => {
-    // const tokenServiceSignSpy = jest
-    //   .spyOn(jwt, 'sign')
-    //   .mockImplementationOnce(() => {
-    //     return 'any_token';
-    //   });
-    // const tokenService = new JwtTokenService();
-    // tokenService.sign(
-    //   { id: 1 },
-    //   { subject: 'subject', jwtId: '1', issuer: 'issuer' },
-    //   100,
-    // );
-    // expect(tokenServiceSignSpy).toBeCalledTimes(1);
+  it('should return server error if JWT_SECRET is empty', () => {
+    process.env.JWT_SECRET = '';
+
+    const tokenServiceSignSpy = jest.spyOn(jwt, 'sign');
+    const tokenService = new JwtTokenService();
+    const response = tokenService.sign(
+      { id: 1 },
+      { subject: 'subject', jwtId: '1', issuer: 'issuer' },
+      100,
+    );
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new ServerError());
+    expect(tokenServiceSignSpy).toBeCalledTimes(0);
+  });
+
+  it('should return server error if JWT_ALGORITHM is empty', () => {
+    process.env.JWT_ALGORITHM = '';
+
+    const tokenServiceSignSpy = jest.spyOn(jwt, 'sign');
+    const tokenService = new JwtTokenService();
+    const response = tokenService.sign(
+      { id: 1 },
+      { subject: 'subject', jwtId: '1', issuer: 'issuer' },
+      100,
+    );
+    expect(response.isLeft()).toBeTruthy();
+    expect(response.value).toEqual(new ServerError());
+    expect(tokenServiceSignSpy).toBeCalledTimes(0);
+  });
+
+  it('should return json web token with correct parameters', () => {
+    const fakeToken = faker.datatype.uuid();
+
+    const tokenServiceSignSpy = jest
+      .spyOn(jwt, 'sign')
+      .mockImplementationOnce(() => fakeToken);
+
+    const tokenService = new JwtTokenService();
+
+    const response = tokenService.sign(
+      { id: 1 },
+      { subject: 'subject', jwtId: '1', issuer: 'issuer' },
+      100,
+    );
+    expect(response.isRight()).toBeTruthy();
+    expect(response.value).toEqual(fakeToken);
+
+    expect(tokenServiceSignSpy).toBeCalledWith(
+      { data: { id: 1 } },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: 100,
+        header: {
+          typ: 'JWT',
+          alg: process.env.JWT_ALGORITHM,
+        },
+        subject: 'subject',
+        issuer: 'issuer',
+        jwtid: '1',
+      },
+    );
+
+    expect(tokenServiceSignSpy).toBeCalledTimes(1);
   });
 
   afterAll(() => {
