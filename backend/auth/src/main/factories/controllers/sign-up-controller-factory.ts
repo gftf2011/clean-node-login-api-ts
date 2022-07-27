@@ -1,6 +1,7 @@
 /**
  * Infra
  */
+import { CreateUserDao, FindUserByEmailDao } from '../../../infra/dao';
 import {
   CryptoEncryptService,
   CryptoHashService,
@@ -14,6 +15,7 @@ import {
   RabbitmqQueueConnection,
   RabbitmqQueuePublishManager,
 } from '../../../infra/queue';
+import { CircuitBreakerDaoProxy } from '../../../infra/dao/helpers/proxies/circuit-breaker-dao-proxy';
 
 /**
  * Presentation
@@ -38,7 +40,6 @@ import { SignUpUseCase } from '../../../use-cases';
 /**
  * Infra
  */
-import { UserDao } from '../../../infra/dao';
 import { UserRepository } from '../../../infra/repositories';
 
 export const makeSignUpController = (): Controller => {
@@ -50,9 +51,20 @@ export const makeSignUpController = (): Controller => {
 
   const postgresClientManager = new PostgresDbClientManager(postgresPool);
 
-  const userDao = new UserDao(postgresClientManager);
+  const createUserDao = new CreateUserDao(postgresClientManager);
+  const findUserByEmailDao = new FindUserByEmailDao(postgresClientManager);
 
-  const userRepository = new UserRepository(userDao);
+  const createUserDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
+    createUserDao,
+  );
+  const findUserByEmailDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
+    findUserByEmailDao,
+  );
+
+  const userRepository = new UserRepository(
+    createUserDaoCircuitBreakerProxy,
+    findUserByEmailDaoCircuitBreakerProxy,
+  );
 
   const cryptoEncryptService = new CryptoEncryptService();
   const cryptoHashService = new CryptoHashService();

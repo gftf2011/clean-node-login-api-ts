@@ -32,7 +32,7 @@ export class JwtTokenService implements ITokenService {
     options: TokenOptions,
     expirationTime: number,
   ): Either<Error, string> {
-    if (!JWT_SECRET || !JWT_ALGORITHM) {
+    if (!process.env.JWT_SECRET || !process.env.JWT_ALGORITHM) {
       return left(new ServerError());
     }
 
@@ -45,16 +45,20 @@ export class JwtTokenService implements ITokenService {
       jwtId: options.jwtId,
     };
 
-    const jsonWebToken: string = jwt.sign({ data: payload }, JWT_SECRET, {
-      expiresIn: expirationTime,
-      header: {
-        typ: 'JWT',
-        alg: JWT_ALGORITHM,
+    const jsonWebToken: string = jwt.sign(
+      { data: payload },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: expirationTime,
+        header: {
+          typ: 'JWT',
+          alg: process.env.JWT_ALGORITHM,
+        },
+        subject: registeredClaims.subject,
+        issuer: registeredClaims.issuer,
+        jwtid: registeredClaims.jwtId,
       },
-      subject: registeredClaims.subject,
-      issuer: registeredClaims.issuer,
-      jwtid: registeredClaims.jwtId,
-    });
+    );
 
     return right(`${jsonWebToken}`);
   }
