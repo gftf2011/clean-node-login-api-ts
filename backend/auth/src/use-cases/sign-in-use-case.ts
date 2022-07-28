@@ -109,28 +109,30 @@ export class SignInUseCase implements ISignInUseCase {
     const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN;
     const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN;
 
-    const refreshTokenOrError = this.tokenService.sign(
-      {
-        id: userExists.id,
-      },
-      {
-        subject: process.env.APP_SECRET,
-        issuer: host,
-        jwtId: refreshTokenId,
-      },
-      refreshTokenExpiresIn,
-    );
-    const accessTokenOrError = this.tokenService.sign(
-      {
-        email: this.encryptService.encode(userExists.email),
-      },
-      {
-        subject: userExists.id,
-        issuer: host,
-        jwtId: accessTokenId,
-      },
-      accessTokenExpiresIn,
-    );
+    const [refreshTokenOrError, accessTokenOrError] = await Promise.all([
+      this.tokenService.sign(
+        {
+          id: userExists.id,
+        },
+        {
+          subject: process.env.APP_SECRET,
+          issuer: host,
+          jwtId: refreshTokenId,
+        },
+        refreshTokenExpiresIn,
+      ),
+      this.tokenService.sign(
+        {
+          email: this.encryptService.encode(userExists.email),
+        },
+        {
+          subject: userExists.id,
+          issuer: host,
+          jwtId: accessTokenId,
+        },
+        accessTokenExpiresIn,
+      ),
+    ]);
 
     if (refreshTokenOrError.isLeft()) {
       return left(refreshTokenOrError.value);

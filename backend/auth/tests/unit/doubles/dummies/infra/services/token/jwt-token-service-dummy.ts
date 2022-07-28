@@ -10,7 +10,7 @@ export class JWTTokenServiceDummy implements ITokenService {
     payload: T,
     options: TokenOptions,
     expirationTime: number,
-  ) => Either<Error, string>;
+  ) => Promise<Either<Error, string>>;
 
-  verify: (token: string, options: TokenOptions) => Either<Error, any>;
+  verify: (token: string, options: TokenOptions) => Promise<Either<Error, any>>;
 }

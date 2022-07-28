@@ -1818,9 +1818,9 @@ describe('Sign-Up Use Case', () => {
       userRepositorySpy.getParameters().create.user[0],
     ).not.toBeUndefined();
 
-    expect(jwtTokenServiceMock.getParameters().sign.response[0].value).toEqual(
-      new ServerError(),
-    );
+    expect(
+      (await jwtTokenServiceMock.getParameters().sign.response[0]).value,
+    ).toEqual(new ServerError());
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new ServerError());
@@ -1897,12 +1897,12 @@ describe('Sign-Up Use Case', () => {
     expect(jwtTokenServiceMock.getParameters().sign.payload[0]).toEqual({
       id: userRepositorySpy.getParameters().create.response[0].id,
     });
-    expect(jwtTokenServiceMock.getParameters().sign.response[0].isRight()).toBe(
-      true,
-    );
-    expect(jwtTokenServiceMock.getParameters().sign.response[1].isLeft()).toBe(
-      true,
-    );
+    expect(
+      (await jwtTokenServiceMock.getParameters().sign.response[0]).isRight(),
+    ).toBe(true);
+    expect(
+      (await jwtTokenServiceMock.getParameters().sign.response[1]).isLeft(),
+    ).toBe(true);
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new ServerError());
@@ -1982,8 +1982,10 @@ describe('Sign-Up Use Case', () => {
 
     expect(response.isRight()).toBeTruthy();
     expect(response.value).toEqual({
-      accessToken: jwtTokenServiceSpy.getParameters().sign.response[0].value,
-      refreshToken: jwtTokenServiceSpy.getParameters().sign.response[1].value,
+      accessToken: (await jwtTokenServiceSpy.getParameters().sign.response[0])
+        .value,
+      refreshToken: (await jwtTokenServiceSpy.getParameters().sign.response[1])
+        .value,
     });
   });
 

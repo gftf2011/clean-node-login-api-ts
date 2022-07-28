@@ -59,7 +59,7 @@ export class OnlyFirstSignCallErrorTokenServiceMock implements ITokenService {
     payload: any,
     options: TokenOptions,
     expirationTime: number,
-  ): Either<Error, string> {
+  ): Promise<Either<Error, string>> {
     let answer: any;
 
     this.parameters.sign.expirationTime.push(expirationTime);
@@ -68,20 +68,22 @@ export class OnlyFirstSignCallErrorTokenServiceMock implements ITokenService {
 
     if (this.signCalls === 0) {
       this.signCalls++;
-      this.parameters.sign.response.push(left(new ServerError()));
+      this.parameters.sign.response.push(
+        Promise.resolve(left(new ServerError())),
+      );
       answer = left(new ServerError());
-      return answer;
+      return Promise.resolve(answer);
     }
     this.signCalls++;
-    this.parameters.sign.response.push(right('jsonWebToken'));
-    return right('jsonWebToken');
+    this.parameters.sign.response.push(Promise.resolve(right('jsonWebToken')));
+    return Promise.resolve(right('jsonWebToken'));
   }
 
-  verify(token: string, options: TokenOptions): Either<Error, any> {
+  verify(token: string, options: TokenOptions): Promise<Either<Error, any>> {
     this.verifyCalls++;
     this.parameters.verify.token.push(token);
     this.parameters.verify.options.push(options);
-    this.parameters.verify.response.push(right({ data: {} }));
-    return right({ data: {} });
+    this.parameters.verify.response.push(Promise.resolve(right({ data: {} })));
+    return Promise.resolve(right({ data: {} }));
   }
 }

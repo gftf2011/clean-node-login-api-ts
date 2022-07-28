@@ -1096,9 +1096,9 @@ describe('Sign-In Use Case', () => {
       userRepositorySpy.getParameters().findUserByEmail.response[0].taxvat,
     );
 
-    expect(jwtTokenServiceMock.getParameters().sign.response[0].value).toEqual(
-      new ServerError(),
-    );
+    expect(
+      (await jwtTokenServiceMock.getParameters().sign.response[0]).value,
+    ).toEqual(new ServerError());
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new ServerError());
@@ -1153,12 +1153,12 @@ describe('Sign-In Use Case', () => {
     expect(jwtTokenServiceMock.getParameters().sign.payload[0]).toEqual({
       id: userRepositorySpy.getParameters().findUserByEmail.response[0].id,
     });
-    expect(jwtTokenServiceMock.getParameters().sign.response[0].isRight()).toBe(
-      true,
-    );
-    expect(jwtTokenServiceMock.getParameters().sign.response[1].isLeft()).toBe(
-      true,
-    );
+    expect(
+      (await jwtTokenServiceMock.getParameters().sign.response[0]).isRight(),
+    ).toBe(true);
+    expect(
+      (await jwtTokenServiceMock.getParameters().sign.response[1]).isLeft(),
+    ).toBe(true);
 
     expect(response.isLeft()).toBeTruthy();
     expect(response.value).toEqual(new ServerError());
@@ -1193,6 +1193,13 @@ describe('Sign-In Use Case', () => {
 
     const response = await sut.perform(request, host);
 
+    const accessToken = (
+      await jwtTokenServiceSpy.getParameters().sign.response[0]
+    ).value;
+    const refreshToken = (
+      await jwtTokenServiceSpy.getParameters().sign.response[1]
+    ).value;
+
     expect(userRepositorySpy.getParameters().findUserByEmail.email[0]).toBe(
       request.email,
     );
@@ -1225,17 +1232,17 @@ describe('Sign-In Use Case', () => {
       email: cryptoEncryptServiceSpy.getParameters().encode.response[0],
     });
 
-    expect(jwtTokenServiceSpy.getParameters().sign.response[0].isRight()).toBe(
-      true,
-    );
-    expect(jwtTokenServiceSpy.getParameters().sign.response[1].isRight()).toBe(
-      true,
-    );
+    expect(
+      (await jwtTokenServiceSpy.getParameters().sign.response[0]).isRight(),
+    ).toBe(true);
+    expect(
+      (await jwtTokenServiceSpy.getParameters().sign.response[1]).isRight(),
+    ).toBe(true);
 
     expect(response.isRight()).toBeTruthy();
     expect(response.value).toEqual({
-      accessToken: jwtTokenServiceSpy.getParameters().sign.response[0].value,
-      refreshToken: jwtTokenServiceSpy.getParameters().sign.response[1].value,
+      accessToken,
+      refreshToken,
     });
   });
 

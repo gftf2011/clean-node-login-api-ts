@@ -26,13 +26,13 @@ export class NoJsonWebAlgorithmInSignUpTokenServiceStub
     _payload: T,
     _options: TokenOptions,
     _expirationTime: number,
-  ): Either<Error, string> {
+  ): Promise<Either<Error, string>> {
     if (!JWT_SECRET || !JWT_ALGORITHM) {
-      return left(new ServerError());
+      return left(new ServerError()) as any;
     }
 
-    return right('jsonWebToken');
+    return right('jsonWebToken') as any;
   }
 
-  verify: (token: string, options: TokenOptions) => Either<Error, any>;
+  verify: (token: string, options: TokenOptions) => Promise<Either<Error, any>>;
 }

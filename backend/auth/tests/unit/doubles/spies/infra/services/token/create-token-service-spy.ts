@@ -64,14 +64,14 @@ export class CreateTokenServiceSpy implements ITokenService {
     payload: T,
     options: TokenOptions,
     expirationTime: number,
-  ): Either<Error, string> {
+  ): Promise<Either<Error, string>> {
     this.parameters.sign.expirationTime.push(expirationTime);
     this.parameters.sign.options.push(options);
     this.parameters.sign.payload.push(payload);
     this.signCalls++;
-    this.parameters.sign.response.push(right('jsonWebToken'));
-    return right('jsonWebToken');
+    this.parameters.sign.response.push(Promise.resolve(right('jsonWebToken')));
+    return Promise.resolve(right('jsonWebToken'));
   }
 
-  verify: (token: string, options: TokenOptions) => Either<Error, any>;
+  verify: (token: string, options: TokenOptions) => Promise<Either<Error, any>>;
 }

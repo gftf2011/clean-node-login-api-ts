@@ -117,28 +117,30 @@ export class SignUpUseCase implements ISignUpUseCase {
 
     const userCreated = await this.userRepository.create(user);
 
-    const refreshTokenOrError = this.tokenService.sign(
-      {
-        id: userCreated.id,
-      },
-      {
-        subject: process.env.APP_SECRET,
-        issuer: host,
-        jwtId: refreshTokenId,
-      },
-      refreshTokenExpiresIn,
-    );
-    const accessTokenOrError = this.tokenService.sign(
-      {
-        email: this.encryptService.encode(userCreated.email),
-      },
-      {
-        subject: userCreated.id,
-        issuer: host,
-        jwtId: accessTokenId,
-      },
-      accessTokenExpiresIn,
-    );
+    const [refreshTokenOrError, accessTokenOrError] = await Promise.all([
+      this.tokenService.sign(
+        {
+          id: userCreated.id,
+        },
+        {
+          subject: process.env.APP_SECRET,
+          issuer: host,
+          jwtId: refreshTokenId,
+        },
+        refreshTokenExpiresIn,
+      ),
+      this.tokenService.sign(
+        {
+          email: this.encryptService.encode(userCreated.email),
+        },
+        {
+          subject: userCreated.id,
+          issuer: host,
+          jwtId: accessTokenId,
+        },
+        accessTokenExpiresIn,
+      ),
+    ]);
 
     if (refreshTokenOrError.isLeft()) {
       return left(refreshTokenOrError.value);
