@@ -4,10 +4,7 @@
 /**
  * Shared
  */
-import {
-  ServerError,
-  UnauthorizedError,
-} from '../../../../../src/shared/errors';
+import { ServerError } from '../../../../../src/shared/errors';
 
 /**
  * Infra
