@@ -12,11 +12,12 @@ export class FakeInMemoryUserRepository implements IUserRepository {
   constructor() {}
 
   async create(user: UserDto): Promise<UserDto> {
-    this.database.push({
+    const userCreated = {
       id: `${this.database.length}`,
       ...user,
-    });
-    return user;
+    };
+    this.database.push({ ...userCreated });
+    return userCreated;
   }
 
   async findUserByEmail(email: string): Promise<UserDto | undefined> {

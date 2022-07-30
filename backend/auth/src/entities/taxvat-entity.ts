@@ -160,7 +160,7 @@ export class TaxvatEntity implements IEntity<string> {
    */
   private static isTaxvatInBlacklist(taxvat: string): boolean {
     /**
-     * Taxvat list that pass through the validation algoritm
+     * Taxvat list that pass through the validation algorithm
      * but are not considered valid
      */
     const TAXVAT_BLACKLIST: string[] = [

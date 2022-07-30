@@ -25,12 +25,8 @@ import {
   PerformForbiddenErrorSignInUseCaseStub,
   PerformServerErrorSignInUseCaseStub,
   PerformUnauthorizedErrorSignInUseCaseStub,
+  PerformSuccessSignInUseCaseStub,
 } from '../../../doubles/stubs';
-
-/**
- * Spies
- */
-import { PerformSuccessSignInUseCaseSpy } from '../../../doubles/spies';
 
 /**
  * Shared
@@ -43,13 +39,12 @@ import {
   UnauthorizedError,
 } from '../../../../../src/shared/errors';
 
-// eslint-disable-next-line no-shadow
 enum SIGN_IN_USE_CASE_TYPE {
   DUMMY = 'DUMMY',
   STUB_PERFORM_SERVER_ERROR = 'STUB_PERFORM_SERVER_ERROR',
   STUB_PERFORM_UNAUTHORIZED_ERROR = 'STUB_PERFORM_UNAUTHORIZED_ERROR',
   STUB_PERFORM_FORBIDDEN_ERROR = 'STUB_PERFORM_FORBIDDEN_ERROR',
-  SPY_PERFORM_SUCCESS = 'SPY_PERFORM_SUCCESS',
+  STUB_PERFORM_SUCCESS = 'STUB_PERFORM_SUCCESS',
 }
 
 const makeSignInUseCase = (type: SIGN_IN_USE_CASE_TYPE): any => {
@@ -62,8 +57,8 @@ const makeSignInUseCase = (type: SIGN_IN_USE_CASE_TYPE): any => {
       return new PerformUnauthorizedErrorSignInUseCaseStub();
     case SIGN_IN_USE_CASE_TYPE.STUB_PERFORM_FORBIDDEN_ERROR:
       return new PerformForbiddenErrorSignInUseCaseStub();
-    case SIGN_IN_USE_CASE_TYPE.SPY_PERFORM_SUCCESS:
-      return new PerformSuccessSignInUseCaseSpy();
+    case SIGN_IN_USE_CASE_TYPE.STUB_PERFORM_SUCCESS:
+      return new PerformSuccessSignInUseCaseStub();
     default:
       return new SignInUseCaseDummy();
   }
@@ -215,17 +210,21 @@ describe('Sign-In Controller', () => {
       },
     };
 
-    const spySignInUseCase = makeSignInUseCase(
-      SIGN_IN_USE_CASE_TYPE.SPY_PERFORM_SUCCESS,
+    const stubSignInUseCase = makeSignInUseCase(
+      SIGN_IN_USE_CASE_TYPE.STUB_PERFORM_SUCCESS,
     );
 
-    sut = new SignInController(spySignInUseCase);
+    sut = new SignInController(stubSignInUseCase);
 
     const response = await sut.handle(request);
 
+    const body = (
+      await stubSignInUseCase.perform(request.body, request.headers?.host)
+    ).value;
+
     expect(response).toEqual({
       statusCode: 200,
-      body: spySignInUseCase.getParameters().perform.response[0].value,
+      body,
     });
   });
 

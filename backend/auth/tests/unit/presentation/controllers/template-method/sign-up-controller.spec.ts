@@ -25,12 +25,8 @@ import { SignUpUseCaseDummy } from '../../../doubles/dummies';
 import {
   PerformServerErrorSignUpUseCaseStub,
   PerformUnauthorizedErrorSignUpUseCaseStub,
+  PerformSuccessSignUpUseCaseStub,
 } from '../../../doubles/stubs';
-
-/**
- * Spies
- */
-import { PerformSuccessSignUpUseCaseSpy } from '../../../doubles/spies';
 
 /**
  * Shared
@@ -42,12 +38,11 @@ import {
   UnauthorizedError,
 } from '../../../../../src/shared/errors';
 
-// eslint-disable-next-line no-shadow
 enum SIGN_UP_USE_CASE_TYPE {
   DUMMY = 'DUMMY',
   STUB_PERFORM_SERVER_ERROR = 'STUB_PERFORM_SERVER_ERROR',
   STUB_PERFORM_UNAUTHORIZED_ERROR = 'STUB_PERFORM_UNAUTHORIZED_ERROR',
-  SPY_PERFORM_SUCCESS = 'SPY_PERFORM_SUCCESS',
+  STUB_PERFORM_SUCCESS = 'STUB_PERFORM_SUCCESS',
 }
 
 const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): any => {
@@ -58,8 +53,8 @@ const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): any => {
       return new PerformServerErrorSignUpUseCaseStub();
     case SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_UNAUTHORIZED_ERROR:
       return new PerformUnauthorizedErrorSignUpUseCaseStub();
-    case SIGN_UP_USE_CASE_TYPE.SPY_PERFORM_SUCCESS:
-      return new PerformSuccessSignUpUseCaseSpy();
+    case SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_SUCCESS:
+      return new PerformSuccessSignUpUseCaseStub();
     default:
       return new SignUpUseCaseDummy();
   }
@@ -271,17 +266,21 @@ describe('Sign-Up Controller', () => {
       },
     };
 
-    const spySignUpUseCase = makeSignUpUseCase(
-      SIGN_UP_USE_CASE_TYPE.SPY_PERFORM_SUCCESS,
+    const stubSignUpUseCase = makeSignUpUseCase(
+      SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_SUCCESS,
     );
 
-    sut = new SignUpController(spySignUpUseCase);
+    sut = new SignUpController(stubSignUpUseCase);
 
     const response = await sut.handle(request);
 
+    const body = (
+      await stubSignUpUseCase.perform(request.body, request.headers?.host)
+    ).value;
+
     expect(response).toEqual({
       statusCode: 201,
-      body: spySignUpUseCase.getParameters().perform.response[0].value,
+      body,
     });
   });
 

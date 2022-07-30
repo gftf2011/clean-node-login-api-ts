@@ -9,3 +9,4 @@ export * from './queue-publish';
 export * from './queue-connection';
 export * from './queue-channel';
 export * from './queue-buider';
+export * from './list-blacklist-taxvat-dao';

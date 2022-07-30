@@ -7,5 +7,10 @@ export class OnlyCallSamePasswordByParameterHashServiceStub
     return password;
   }
 
-  compare: (password: string, salt: string, hashedPassword: string) => boolean;
+  compare(password: string, salt: string, hashedPassword: string): boolean {
+    if (`${password}_${salt}` === hashedPassword) {
+      return true;
+    }
+    return false;
+  }
 }

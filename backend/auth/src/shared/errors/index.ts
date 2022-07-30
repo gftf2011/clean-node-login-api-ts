@@ -15,3 +15,4 @@ export * from './error-401';
 export * from './error-403';
 export * from './error-500';
 export * from './error-503';
+export * from './invalid-param-error';
