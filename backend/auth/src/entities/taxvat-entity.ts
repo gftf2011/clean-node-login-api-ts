@@ -152,32 +152,32 @@ export class TaxvatEntity implements IEntity<string> {
     return TAXVAT_ONLY_NUMBERS_REGEX.test(taxvat);
   }
 
-  /**
-   * @desc Utility method to tell if taxvat is in blacklist
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if taxvat is in blacklist
-   */
-  private static isTaxvatInBlacklist(taxvat: string): boolean {
-    /**
-     * Taxvat list that pass through the validation algorithm
-     * but are not considered valid
-     */
-    const TAXVAT_BLACKLIST: string[] = [
-      '00000000000',
-      '11111111111',
-      '22222222222',
-      '33333333333',
-      '44444444444',
-      '55555555555',
-      '66666666666',
-      '77777777777',
-      '88888888888',
-      '99999999999',
-    ];
+  // /**
+  //  * @desc Utility method to tell if taxvat is in blacklist
+  //  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+  //  * @param {string} taxvat - user taxvat
+  //  * @returns {boolean} return if taxvat is in blacklist
+  //  */
+  // private static isTaxvatInBlacklist(taxvat: string): boolean {
+  //   /**
+  //    * Taxvat list that pass through the validation algorithm
+  //    * but are not considered valid
+  //    */
+  //   const TAXVAT_BLACKLIST: string[] = [
+  //     '00000000000',
+  //     '11111111111',
+  //     '22222222222',
+  //     '33333333333',
+  //     '44444444444',
+  //     '55555555555',
+  //     '66666666666',
+  //     '77777777777',
+  //     '88888888888',
+  //     '99999999999',
+  //   ];
 
-    return TAXVAT_BLACKLIST.some((value: string) => value === taxvat);
-  }
+  //   return TAXVAT_BLACKLIST.some((value: string) => value === taxvat);
+  // }
 
   /**
    * @desc Validate if taxvat is valid according with business rule definition
@@ -207,9 +207,9 @@ export class TaxvatEntity implements IEntity<string> {
       return false;
     }
 
-    if (this.isTaxvatInBlacklist(clearedTaxvat)) {
-      return false;
-    }
+    // if (this.isTaxvatInBlacklist(clearedTaxvat)) {
+    //   return false;
+    // }
 
     return true;
   }

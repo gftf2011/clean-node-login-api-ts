@@ -26,12 +26,15 @@ import {
   PerformServerErrorSignUpUseCaseStub,
   PerformUnauthorizedErrorSignUpUseCaseStub,
   PerformSuccessSignUpUseCaseStub,
+  NoTaxvatInBlacklistValidatorAdapterStub,
+  InvalidTaxvatInBlacklistValidatorAdapterStub,
 } from '../../../doubles/stubs';
 
 /**
  * Shared
  */
 import {
+  InvalidParamError,
   MissingHeaderParamsError,
   MissingParamsError,
   ServerError,
@@ -44,6 +47,22 @@ enum SIGN_UP_USE_CASE_TYPE {
   STUB_PERFORM_UNAUTHORIZED_ERROR = 'STUB_PERFORM_UNAUTHORIZED_ERROR',
   STUB_PERFORM_SUCCESS = 'STUB_PERFORM_SUCCESS',
 }
+
+enum VALIDATOR_TYPE {
+  STUB_NO_TAXVAT_IN_BLACKLIST_PARAM = 'STUB_NO_TAXVAT_IN_BLACKLIST_PARAM',
+  STUB_INVALID_TAXVAT_IN_BLACKLIST_PARAM = 'STUB_INVALID_TAXVAT_IN_BLACKLIST_PARAM',
+}
+
+const makeValidator = (type: VALIDATOR_TYPE): any => {
+  switch (type) {
+    case VALIDATOR_TYPE.STUB_NO_TAXVAT_IN_BLACKLIST_PARAM:
+      return new NoTaxvatInBlacklistValidatorAdapterStub();
+    case VALIDATOR_TYPE.STUB_INVALID_TAXVAT_IN_BLACKLIST_PARAM:
+      return new InvalidTaxvatInBlacklistValidatorAdapterStub();
+    default:
+      return new NoTaxvatInBlacklistValidatorAdapterStub();
+  }
+};
 
 const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): any => {
   switch (type) {
@@ -60,19 +79,45 @@ const makeSignUpUseCase = (type: SIGN_UP_USE_CASE_TYPE): any => {
   }
 };
 
-const makeSut = (signUpType: SIGN_UP_USE_CASE_TYPE): Controller => {
+const makeSut = (
+  signUpType: SIGN_UP_USE_CASE_TYPE,
+  validatorsType: VALIDATOR_TYPE[],
+): Controller => {
+  const validatorDouble = validatorsType.map(validatorType =>
+    makeValidator(validatorType),
+  );
   const signUpDouble = makeSignUpUseCase(signUpType);
 
-  const sut = new SignUpController(signUpDouble);
+  const sut = new SignUpController(signUpDouble, validatorDouble);
 
   return sut;
+};
+
+const generateBlacklistedTaxvat = (): string => {
+  const taxvatBlacklist = [
+    '00000000000',
+    '11111111111',
+    '22222222222',
+    '33333333333',
+    '44444444444',
+    '55555555555',
+    '66666666666',
+    '77777777777',
+    '88888888888',
+    '99999999999',
+  ];
+  return taxvatBlacklist[
+    Math.round((taxvatBlacklist.length - 1) * Math.random())
+  ];
 };
 
 describe('Sign-Up Controller', () => {
   let sut: Controller;
 
   beforeEach(() => {
-    sut = makeSut(SIGN_UP_USE_CASE_TYPE.DUMMY);
+    sut = makeSut(SIGN_UP_USE_CASE_TYPE.DUMMY, [
+      VALIDATOR_TYPE.STUB_NO_TAXVAT_IN_BLACKLIST_PARAM,
+    ]);
   });
 
   it('should extend WebController', () => {
@@ -220,6 +265,7 @@ describe('Sign-Up Controller', () => {
 
     const response = await makeSut(
       SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_SERVER_ERROR,
+      [VALIDATOR_TYPE.STUB_NO_TAXVAT_IN_BLACKLIST_PARAM],
     ).handle(request);
 
     expect(response).toEqual({
@@ -244,11 +290,38 @@ describe('Sign-Up Controller', () => {
 
     const response = await makeSut(
       SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_UNAUTHORIZED_ERROR,
+      [VALIDATOR_TYPE.STUB_NO_TAXVAT_IN_BLACKLIST_PARAM],
     ).handle(request);
 
     expect(response).toEqual({
       statusCode: 401,
       body: new UnauthorizedError(),
+    });
+  });
+
+  it('should return invalid param error if taxvat is in blacklist', async () => {
+    const request: HttpRequest = {
+      body: {
+        taxvat: generateBlacklistedTaxvat(),
+        password: faker.internet.password(),
+        email: faker.internet.email(),
+        name: faker.name.firstName(),
+        lastname: faker.name.lastName(),
+      },
+      headers: {
+        host: faker.internet.ip(),
+      },
+    };
+
+    sut = makeSut(SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_SUCCESS, [
+      VALIDATOR_TYPE.STUB_INVALID_TAXVAT_IN_BLACKLIST_PARAM,
+    ]);
+
+    const response = await sut.handle(request);
+
+    expect(response).toEqual({
+      statusCode: 400,
+      body: new InvalidParamError(request.body.taxvat),
     });
   });
 
@@ -270,7 +343,11 @@ describe('Sign-Up Controller', () => {
       SIGN_UP_USE_CASE_TYPE.STUB_PERFORM_SUCCESS,
     );
 
-    sut = new SignUpController(stubSignUpUseCase);
+    const stubValidator = makeValidator(
+      VALIDATOR_TYPE.STUB_NO_TAXVAT_IN_BLACKLIST_PARAM,
+    );
+
+    sut = new SignUpController(stubSignUpUseCase, [stubValidator]);
 
     const response = await sut.handle(request);
 

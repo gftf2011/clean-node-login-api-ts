@@ -1,12 +1,17 @@
 /**
+ * Use Cases
+ */
+import { AccountDto, ISignInUseCase } from '../../../use-cases/ports';
+
+/**
  * Presentation
  */
 import { HttpRequest, HttpResponse } from '../../ports';
 
 /**
- * Use Cases
+ * Validation
  */
-import { ISignInUseCase } from '../../../use-cases/ports';
+import { IValidator, Validation } from '../../../validation';
 
 /**
  * Presentation
@@ -32,9 +37,18 @@ export class SignInController extends WebController {
    */
   public override requiredParams: string[] = ['email', 'password'];
 
-  constructor(signInUseCase: ISignInUseCase) {
+  constructor(signInUseCase: ISignInUseCase, validators: IValidator[] = []) {
     super();
     this.signInUseCase = signInUseCase;
+  }
+
+  /**
+   * @desc loads sign-in fields validation
+   * @param {AccountDto} data - account data transfer object
+   * @returns {Validation[]} array of validation objects
+   */
+  public buildValidators(data: AccountDto): Validation[] {
+    return [];
   }
 
   /**

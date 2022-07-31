@@ -1,7 +1,11 @@
 /**
  * Infra
  */
-import { CreateUserDao, FindUserByEmailDao } from '../../../infra/dao';
+import {
+  CreateUserDao,
+  FindUserByEmailDao,
+  ListBlacklistTaxvatDao,
+} from '../../../infra/dao';
 import {
   CryptoEncryptService,
   CryptoHashService,
@@ -40,6 +44,7 @@ import { SignUpUseCase } from '../../../use-cases';
 /**
  * Infra
  */
+import { TaxvatBlacklistValidatorAdapter } from '../../../infra/validators';
 import { UserRepository } from '../../../infra/repositories';
 
 export const makeSignUpController = (): Controller => {
@@ -53,12 +58,18 @@ export const makeSignUpController = (): Controller => {
 
   const createUserDao = new CreateUserDao(postgresClientManager);
   const findUserByEmailDao = new FindUserByEmailDao(postgresClientManager);
+  const listBlacklistTaxvatDao = new ListBlacklistTaxvatDao(
+    postgresClientManager,
+  );
 
   const createUserDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
     createUserDao,
   );
   const findUserByEmailDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
     findUserByEmailDao,
+  );
+  const listBlacklistTaxvatDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
+    listBlacklistTaxvatDao,
   );
 
   const userRepository = new UserRepository(
@@ -78,7 +89,13 @@ export const makeSignUpController = (): Controller => {
     queueManager,
   );
 
-  const signUpController = new SignUpController(signUpUseCase);
+  const taxvatBlacklistValidatorAdapter = new TaxvatBlacklistValidatorAdapter(
+    listBlacklistTaxvatDaoCircuitBreakerProxy,
+  );
+
+  const signUpController = new SignUpController(signUpUseCase, [
+    taxvatBlacklistValidatorAdapter,
+  ]);
 
   const decorator = new DbTransactionDecorator(
     signUpController,

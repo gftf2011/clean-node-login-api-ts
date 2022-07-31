@@ -6,11 +6,9 @@ import { IListBlacklistTaxvatDao } from '../../contracts';
 /**
  * Validation
  */
-import { ITaxvatBlacklistValidator } from '../../../validation/ports';
+import { IValidator } from '../../../validation/ports';
 
-export class TaxvatBlacklistValidatorAdapter
-  implements ITaxvatBlacklistValidator
-{
+export class TaxvatBlacklistValidatorAdapter implements IValidator {
   constructor(
     private readonly listBlacklistTaxvatDao: IListBlacklistTaxvatDao,
   ) {}

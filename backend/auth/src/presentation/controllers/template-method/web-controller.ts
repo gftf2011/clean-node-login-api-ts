@@ -25,6 +25,16 @@ import {
 } from '../../helpers/http-helper';
 
 /**
+ * Validation
+ */
+import { Validation } from '../../../validation';
+
+/**
+ * Presentation
+ */
+import { ValidationComposite } from '../../helpers/composite/validation-composite';
+
+/**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Contains the base algorithm that handles the data presentation.
  * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
@@ -33,6 +43,15 @@ export abstract class WebController implements Controller {
   public requiredParams: string[] = [];
 
   public requiredHeaderParams: string[] = [];
+
+  /**
+   * @desc handles controller input validations
+   * @param {Validation[]} validation - custom validators
+   * @returns {Promise<void>} throws error if validation fails
+   */
+  private validation(validators: Validation[]): Promise<void> {
+    return new ValidationComposite(validators).validate();
+  }
 
   /**
    * @desc handles throwable errors returned by the applicaion
@@ -74,12 +93,15 @@ export abstract class WebController implements Controller {
       if (missingHeaderParams.length !== 0) {
         throw new MissingHeaderParamsError(missingHeaderParams);
       }
+      await this.validation(this.buildValidators(request.body));
       const response = await this.perform(request);
       return response;
     } catch (error) {
       return WebController.handleError(error as Error);
     }
   }
+
+  public abstract buildValidators(data: any): Validation[];
 
   public abstract perform(request: HttpRequest): Promise<HttpResponse>;
 

@@ -1,30 +1,23 @@
 /**
  * Validation
  */
-import { ITaxvatBlacklistValidator } from '../ports';
+import { IValidator, Validation } from '../ports';
 
 /**
  * Shared
  */
 import { InvalidParamError } from '../../shared/errors';
 
-/**
- * Presentation
- */
-import { Validation } from '../../presentation/ports';
-
 export class TaxvatBlacklistValidation implements Validation {
   constructor(
-    private readonly fieldName: string,
-    private readonly taxvatBlacklistValidator: ITaxvatBlacklistValidator,
+    private readonly taxvat: string,
+    private readonly taxvatBlacklistValidator: IValidator,
   ) {}
 
-  async validate(input: any): Promise<void> {
-    const isValid = await this.taxvatBlacklistValidator.isValid(
-      input[this.fieldName],
-    );
+  async validate(): Promise<void> {
+    const isValid = await this.taxvatBlacklistValidator.isValid(this.taxvat);
     if (!isValid) {
-      throw new InvalidParamError(this.fieldName);
+      throw new InvalidParamError(this.taxvat);
     }
   }
 }

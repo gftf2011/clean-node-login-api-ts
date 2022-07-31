@@ -11,7 +11,7 @@ import { ITokenService, TokenOptions } from '../../../use-cases/ports';
 /**
  * Shared
  */
-import { ServerError, UnauthorizedError } from '../../../shared/errors';
+import { ServerError } from '../../../shared/errors';
 
 /**
  * Driver

@@ -12,10 +12,7 @@ export class ListBlacklistTaxvatDao implements IListBlacklistTaxvatDao {
   constructor(private readonly dbClientManager: DbClientManager) {}
 
   async execute(): Promise<string[]> {
-    /**
-     * TODO: Create Taxvat Schema
-     */
-    const statement = 'SELECT * FROM taxvat_schema.blacklist';
+    const statement = 'SELECT * FROM taxvats_schema.taxvat_blacklist';
 
     const values: any[] = [];
 

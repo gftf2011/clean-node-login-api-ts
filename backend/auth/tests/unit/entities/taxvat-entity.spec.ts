@@ -29,28 +29,28 @@ describe('Taxvat Entity', () => {
     return taxvat.replace(/[\\.-]*/g, '').trim();
   };
 
-  const formatTaxvat = (taxvat: string): string => {
-    const cleanTaxvat = taxvat.replace(/[\\.-]*/g, '').trim();
-    return cleanTaxvat.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
-  };
+  // const formatTaxvat = (taxvat: string): string => {
+  //   const cleanTaxvat = taxvat.replace(/[\\.-]*/g, '').trim();
+  //   return cleanTaxvat.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+  // };
 
-  const generateBlacklistedTaxvat = (): string => {
-    const taxvatBlacklist = [
-      '00000000000',
-      '11111111111',
-      '22222222222',
-      '33333333333',
-      '44444444444',
-      '55555555555',
-      '66666666666',
-      '77777777777',
-      '88888888888',
-      '99999999999',
-    ];
-    return taxvatBlacklist[
-      Math.round((taxvatBlacklist.length - 1) * Math.random())
-    ];
-  };
+  // const generateBlacklistedTaxvat = (): string => {
+  //   const taxvatBlacklist = [
+  //     '00000000000',
+  //     '11111111111',
+  //     '22222222222',
+  //     '33333333333',
+  //     '44444444444',
+  //     '55555555555',
+  //     '66666666666',
+  //     '77777777777',
+  //     '88888888888',
+  //     '99999999999',
+  //   ];
+  //   return taxvatBlacklist[
+  //     Math.round((taxvatBlacklist.length - 1) * Math.random())
+  //   ];
+  // };
 
   const generateInvalidFirstDigitTaxvat = (formatted?: boolean): string => {
     const cpfGenerated = cpf.generate();
@@ -134,11 +134,11 @@ describe('Taxvat Entity', () => {
     expect(taxvatOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
 
-  it('should not create taxvat if "value" belongs to blacklist', () => {
-    const taxvat = generateBlacklistedTaxvat();
-    const taxvatOrError = TaxvatEntity.create(taxvat);
-    expect(taxvatOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
-  });
+  // it('should not create taxvat if "value" belongs to blacklist', () => {
+  //   const taxvat = generateBlacklistedTaxvat();
+  //   const taxvatOrError = TaxvatEntity.create(taxvat);
+  //   expect(taxvatOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  // });
 
   it('should not create taxvat if "value" first validation digit is invalid', () => {
     const taxvat = generateInvalidFirstDigitTaxvat();
