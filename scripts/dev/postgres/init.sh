@@ -14,22 +14,35 @@ psql $POSTGRES_DEV_DB -c "CREATE EXTENSION \"uuid-ossp\""
 # Create Schemas
 psql $POSTGRES_DEV_DB -c "CREATE SCHEMA IF NOT EXISTS users_schema AUTHORIZATION $POSTGRES_DEV_USER"
 psql $POSTGRES_DEV_DB -c "CREATE SCHEMA IF NOT EXISTS emails_schema AUTHORIZATION $POSTGRES_DEV_USER"
+psql $POSTGRES_DEV_DB -c "CREATE SCHEMA IF NOT EXISTS taxvats_schema AUTHORIZATION $POSTGRES_DEV_USER"
+# taxvat_schema.taxvat_blacklist
 
 # Create Tables
+psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS taxvats_schema.taxvat_blacklist(
+  id uuid DEFAULT uuid_generate_v4 (),
+  value VARCHAR(11) UNIQUE NOT NULL,
+  PRIMARY KEY (id)
+)"
+
 psql $POSTGRES_DEV_DB -c "CREATE TABLE IF NOT EXISTS emails_schema.email_blacklist(
   id uuid DEFAULT uuid_generate_v4 (),
   domain VARCHAR(255) UNIQUE NOT NULL,
   PRIMARY KEY (id)
 )"
 
-# Insert Black List Emails Domain
+# Insert values to tables
 # ========================================
 
-file='./documents/disposable-emails.txt'
+disposable_emails_file='./documents/disposable-emails.txt'
+blacklist_taxvats_file='./documents/blacklist-taxvats.txt'
 
 while read line; do
   psql $POSTGRES_DEV_DB -c "INSERT INTO emails_schema.email_blacklist (domain) VALUES ('$line')"
-done < $file
+done < $disposable_emails_file
+
+while read line; do
+  psql $POSTGRES_DEV_DB -c "INSERT INTO taxvats_schema.taxvat_blacklist (value) VALUES ('$line')"
+done < $blacklist_taxvats_file
 # ========================================
 
 # Create Function to Check if email is in the Blacklist

@@ -67,7 +67,7 @@ const makeSignInUseCase = (type: SIGN_IN_USE_CASE_TYPE): any => {
 const makeSut = (signInType: SIGN_IN_USE_CASE_TYPE): Controller => {
   const signInDouble = makeSignInUseCase(signInType);
 
-  const sut = new SignInController(signInDouble);
+  const sut = new SignInController(signInDouble, []);
 
   return sut;
 };
@@ -214,7 +214,7 @@ describe('Sign-In Controller', () => {
       SIGN_IN_USE_CASE_TYPE.STUB_PERFORM_SUCCESS,
     );
 
-    sut = new SignInController(stubSignInUseCase);
+    sut = new SignInController(stubSignInUseCase, []);
 
     const response = await sut.handle(request);
 

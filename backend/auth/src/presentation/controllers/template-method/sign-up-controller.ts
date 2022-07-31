@@ -49,7 +49,7 @@ export class SignUpController extends WebController {
     'lastname',
   ];
 
-  constructor(signUpUseCase: ISignUpUseCase, validators: IValidator[] = []) {
+  constructor(signUpUseCase: ISignUpUseCase, validators: IValidator[]) {
     super();
     this.signUpUseCase = signUpUseCase;
     this.validators = validators;

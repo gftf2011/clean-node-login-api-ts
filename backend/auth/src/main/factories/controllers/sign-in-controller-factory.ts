@@ -69,7 +69,7 @@ export const makeSignInController = (): Controller => {
     jwtTokenService,
   );
 
-  const signInController = new SignInController(signInUseCase);
+  const signInController = new SignInController(signInUseCase, []);
 
   const decorator = new DbTransactionDecorator(
     signInController,

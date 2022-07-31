@@ -27,6 +27,8 @@ import { ok } from '../../helpers/http-helper';
 export class SignInController extends WebController {
   private readonly signInUseCase: ISignInUseCase;
 
+  private readonly validators: IValidator[];
+
   /**
    * @desc values overrides - ['host']
    */
@@ -37,9 +39,10 @@ export class SignInController extends WebController {
    */
   public override requiredParams: string[] = ['email', 'password'];
 
-  constructor(signInUseCase: ISignInUseCase, validators: IValidator[] = []) {
+  constructor(signInUseCase: ISignInUseCase, validators: IValidator[]) {
     super();
     this.signInUseCase = signInUseCase;
+    this.validators = validators;
   }
 
   /**
