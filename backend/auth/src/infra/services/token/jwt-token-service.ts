@@ -11,7 +11,7 @@ import { ITokenService, TokenOptions } from '../../../use-cases/ports';
 /**
  * Shared
  */
-import { ServerError, UnauthorizedError } from '../../../shared/errors';
+import { ServerError } from '../../../shared/errors';
 
 /**
  * Driver
@@ -19,20 +19,17 @@ import { ServerError, UnauthorizedError } from '../../../shared/errors';
 // eslint-disable-next-line import/order
 import jwt from 'jsonwebtoken';
 
-const { JWT_SECRET } = process.env; // Token signature
-const JWT_ALGORITHM: jwt.Algorithm = process.env.JWT_ALGORITHM as jwt.Algorithm; // JWA - (Json Web Algorithm)
-
 interface CustomJwtPayload extends jwt.JwtPayload {
   data: any;
 }
 
 export class JwtTokenService implements ITokenService {
-  sign<T>(
+  async sign<T>(
     payload: T,
     options: TokenOptions,
     expirationTime: number,
-  ): Either<Error, string> {
-    if (!JWT_SECRET || !JWT_ALGORITHM) {
+  ): Promise<Either<Error, string>> {
+    if (!process.env.JWT_SECRET || !process.env.JWT_ALGORITHM) {
       return left(new ServerError());
     }
 
@@ -45,25 +42,29 @@ export class JwtTokenService implements ITokenService {
       jwtId: options.jwtId,
     };
 
-    const jsonWebToken: string = jwt.sign({ data: payload }, JWT_SECRET, {
-      expiresIn: expirationTime,
-      header: {
-        typ: 'JWT',
-        alg: JWT_ALGORITHM,
+    const jsonWebToken: string = jwt.sign(
+      { data: payload },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: expirationTime,
+        header: {
+          typ: 'JWT',
+          alg: process.env.JWT_ALGORITHM,
+        },
+        subject: registeredClaims.subject,
+        issuer: registeredClaims.issuer,
+        jwtid: registeredClaims.jwtId,
       },
-      subject: registeredClaims.subject,
-      issuer: registeredClaims.issuer,
-      jwtid: registeredClaims.jwtId,
-    });
+    );
 
     return right(`${jsonWebToken}`);
   }
 
-  verify(
+  async verify(
     token: string,
     options: TokenOptions,
-  ): Either<Error, CustomJwtPayload> {
-    if (!JWT_SECRET || !JWT_ALGORITHM) {
+  ): Promise<Either<Error, CustomJwtPayload>> {
+    if (!process.env.JWT_SECRET || !process.env.JWT_ALGORITHM) {
       return left(new ServerError());
     }
 
@@ -73,17 +74,13 @@ export class JwtTokenService implements ITokenService {
       jwtId: options.jwtId,
     };
 
-    try {
-      const response = jwt.verify(token, JWT_SECRET, {
-        algorithms: [JWT_ALGORITHM],
-        subject: registeredClaims.subject,
-        issuer: registeredClaims.issuer,
-        jwtid: registeredClaims.jwtId,
-      }) as CustomJwtPayload;
+    const response = jwt.verify(token, process.env.JWT_SECRET, {
+      algorithms: [process.env.JWT_ALGORITHM as jwt.Algorithm],
+      subject: registeredClaims.subject,
+      issuer: registeredClaims.issuer,
+      jwtid: registeredClaims.jwtId,
+    });
 
-      return right(response);
-    } catch (error) {
-      return left(new UnauthorizedError());
-    }
+    return right(response) as any;
   }
 }

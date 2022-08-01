@@ -49,11 +49,11 @@ export class SignUpUseCase implements ISignUpUseCase {
     host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
-      !process.env.CODE_SALT &&
-      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_ACCESS_TOKEN_ID &&
-      !process.env.JWT_REFRESH_TOKEN_ID &&
+      !process.env.CODE_SALT ||
+      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_ACCESS_TOKEN_ID ||
+      !process.env.JWT_REFRESH_TOKEN_ID ||
       !process.env.APP_SECRET
     ) {
       return left(new ServerError());
@@ -73,20 +73,25 @@ export class SignUpUseCase implements ISignUpUseCase {
       return left(userOrError.value);
     }
 
+    const userValidated = userOrError.value.getValue();
+
     const userExists = await this.userRepository.findUserByEmail(
-      userOrError.value.getEmail(),
+      userValidated.email,
     );
 
     if (userExists) {
       return left(new UserAlreadyExistsError());
     }
 
-    const customSalt = `${userOrError.value.getEmail()}${userOrError.value.getTaxvat()}`;
+    const customSalt = `${userValidated.email}${userValidated.taxvat}`;
     const defaultSalt = process.env.CODE_SALT;
     /**
      * encrypt password with user custom salt hash value
      */
-    const hashedPassword = this.hashService.encode(password, customSalt);
+    const hashedPassword = this.hashService.encode(
+      userValidated.password,
+      customSalt,
+    );
     /**
      * encrypt encrypted password with code default salt hash value
      */
@@ -96,10 +101,10 @@ export class SignUpUseCase implements ISignUpUseCase {
     );
 
     const user: UserDto = {
-      email: userOrError.value.getEmail(),
-      name: userOrError.value.getName(),
-      lastname: userOrError.value.getLastname(),
-      taxvat: this.encryptService.encode(userOrError.value.getTaxvat()),
+      email: userValidated.email,
+      name: userValidated.name,
+      lastname: userValidated.lastname,
+      taxvat: this.encryptService.encode(userValidated.taxvat),
       password: strongHashedPassword,
       confirmed: false,
     };
@@ -112,28 +117,30 @@ export class SignUpUseCase implements ISignUpUseCase {
 
     const userCreated = await this.userRepository.create(user);
 
-    const refreshTokenOrError = this.tokenService.sign(
-      {
-        id: userCreated.id,
-      },
-      {
-        subject: process.env.APP_SECRET,
-        issuer: host,
-        jwtId: refreshTokenId,
-      },
-      refreshTokenExpiresIn,
-    );
-    const accessTokenOrError = this.tokenService.sign(
-      {
-        email: this.encryptService.encode(userCreated.email),
-      },
-      {
-        subject: userCreated.id,
-        issuer: host,
-        jwtId: accessTokenId,
-      },
-      accessTokenExpiresIn,
-    );
+    const [refreshTokenOrError, accessTokenOrError] = await Promise.all([
+      this.tokenService.sign(
+        {
+          id: userCreated.id,
+        },
+        {
+          subject: process.env.APP_SECRET,
+          issuer: host,
+          jwtId: refreshTokenId,
+        },
+        refreshTokenExpiresIn,
+      ),
+      this.tokenService.sign(
+        {
+          email: this.encryptService.encode(userCreated.email),
+        },
+        {
+          subject: userCreated.id,
+          issuer: host,
+          jwtId: accessTokenId,
+        },
+        accessTokenExpiresIn,
+      ),
+    ]);
 
     if (refreshTokenOrError.isLeft()) {
       return left(refreshTokenOrError.value);

@@ -5,10 +5,12 @@
   "main": "dist/main/index.js",
   "scripts": {
     "build:dev": "rm -rf .env && cat ./env/dev/.env >> .env",
+    "build:test": "rm -rf .env && cat ./env/test/.env >> .env",
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "start": "node dist/main/index.js",
     "start:dev": "npm run build:dev && npm run build && npm run start",
-    "test": "jest"
+    "pretest": "npm run build:test",
+    "test": "jest --clearCache ; jest --colors --coverage --verbose --runInBand --config jest-unit.config.js"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +22,6 @@
     "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^18.0.3",
     "@types/pg": "^8.6.5",
-    "@types/redis": "2.8.32",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
     "cpf-cnpj-validator": "^1.0.3",

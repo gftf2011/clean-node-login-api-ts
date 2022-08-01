@@ -2,6 +2,11 @@
  * Infra
  */
 import {
+  CreateUserDao,
+  FindUserByEmailDao,
+  ListBlacklistTaxvatDao,
+} from '../../../infra/dao';
+import {
   CryptoEncryptService,
   CryptoHashService,
   JwtTokenService,
@@ -14,6 +19,7 @@ import {
   RabbitmqQueueConnection,
   RabbitmqQueuePublishManager,
 } from '../../../infra/queue';
+import { CircuitBreakerDaoProxy } from '../../../infra/dao/helpers/proxies/circuit-breaker-dao-proxy';
 
 /**
  * Presentation
@@ -38,7 +44,7 @@ import { SignUpUseCase } from '../../../use-cases';
 /**
  * Infra
  */
-import { UserDao } from '../../../infra/dao';
+import { TaxvatBlacklistValidatorAdapter } from '../../../infra/validators';
 import { UserRepository } from '../../../infra/repositories';
 
 export const makeSignUpController = (): Controller => {
@@ -50,9 +56,26 @@ export const makeSignUpController = (): Controller => {
 
   const postgresClientManager = new PostgresDbClientManager(postgresPool);
 
-  const userDao = new UserDao(postgresClientManager);
+  const createUserDao = new CreateUserDao(postgresClientManager);
+  const findUserByEmailDao = new FindUserByEmailDao(postgresClientManager);
+  const listBlacklistTaxvatDao = new ListBlacklistTaxvatDao(
+    postgresClientManager,
+  );
 
-  const userRepository = new UserRepository(userDao);
+  const createUserDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
+    createUserDao,
+  );
+  const findUserByEmailDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
+    findUserByEmailDao,
+  );
+  const listBlacklistTaxvatDaoCircuitBreakerProxy = new CircuitBreakerDaoProxy(
+    listBlacklistTaxvatDao,
+  );
+
+  const userRepository = new UserRepository(
+    createUserDaoCircuitBreakerProxy,
+    findUserByEmailDaoCircuitBreakerProxy,
+  );
 
   const cryptoEncryptService = new CryptoEncryptService();
   const cryptoHashService = new CryptoHashService();
@@ -66,7 +89,13 @@ export const makeSignUpController = (): Controller => {
     queueManager,
   );
 
-  const signUpController = new SignUpController(signUpUseCase);
+  const taxvatBlacklistValidatorAdapter = new TaxvatBlacklistValidatorAdapter(
+    listBlacklistTaxvatDaoCircuitBreakerProxy,
+  );
+
+  const signUpController = new SignUpController(signUpUseCase, [
+    taxvatBlacklistValidatorAdapter,
+  ]);
 
   const decorator = new DbTransactionDecorator(
     signUpController,

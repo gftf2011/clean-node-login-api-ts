@@ -115,5 +115,8 @@ docker-compose.yml
 
 # env folder
 !backend/auth/env/dev/.env
+!backend/auth/env/test/.env
 !backend/email/env/dev/.env
+!backend/email/env/test/.env
 !backend-for-frontend/web/onboard-bff/env/dev/.env
+!backend-for-frontend/web/onboard-bff/env/test/.env

@@ -1,12 +1,17 @@
 /**
+ * Use Cases
+ */
+import { AccountDto, ISignInUseCase } from '../../../use-cases/ports';
+
+/**
  * Presentation
  */
 import { HttpRequest, HttpResponse } from '../../ports';
 
 /**
- * Use Cases
+ * Validation
  */
-import { ISignInUseCase } from '../../../use-cases/ports';
+import { IValidator, Validation } from '../../../validation';
 
 /**
  * Presentation
@@ -22,6 +27,8 @@ import { ok } from '../../helpers/http-helper';
 export class SignInController extends WebController {
   private readonly signInUseCase: ISignInUseCase;
 
+  private readonly validators: IValidator[];
+
   /**
    * @desc values overrides - ['host']
    */
@@ -32,14 +39,24 @@ export class SignInController extends WebController {
    */
   public override requiredParams: string[] = ['email', 'password'];
 
-  constructor(signInUseCase: ISignInUseCase) {
+  constructor(signInUseCase: ISignInUseCase, validators: IValidator[]) {
     super();
     this.signInUseCase = signInUseCase;
+    this.validators = validators;
+  }
+
+  /**
+   * @desc loads sign-in fields validation
+   * @param {AccountDto} data - account data transfer object
+   * @returns {Validation[]} array of validation objects
+   */
+  public buildValidators(data: AccountDto): Validation[] {
+    return [];
   }
 
   /**
    * @desc performs an sign-up action
-   * @param {HttpRequest} request - request that contains information about the 'clinet'
+   * @param {HttpRequest} request - request that contains information about the 'client'
    * @returns {Promise<HttpResponse>} data output after sign-in operation
    */
   public async perform(request: HttpRequest): Promise<HttpResponse> {

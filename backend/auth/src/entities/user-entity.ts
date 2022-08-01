@@ -2,429 +2,69 @@
  * Shared
  */
 import { Either, left, right } from '../shared';
-import {
-  InvalidEmailError,
-  InvalidLastnameError,
-  InvalidNameError,
-  InvalidPasswordError,
-  InvalidTaxvatError,
-} from '../shared/errors';
-import {
-  getOnlyCapitalLettersFromValue,
-  getOnlyLowerCaseLettersFromValue,
-  getOnlyNumbersFromValue,
-  normalizeValueToPascalCase,
-  removeExtremitiesWhiteSpaces,
-  removeMultipleWhiteSpacesToSingleWhiteSpace,
-} from '../shared/utils';
 
-export class UserEntity {
-  private readonly name: string;
+/**
+ * Entities
+ */
+import { EmailEntity } from './email-entity';
+import { EntityFactory } from './helpers/factory-methods';
+import { IEntity } from './contracts';
+import { LastnameEntity } from './lastname-entity';
+import { NameEntity } from './name-entity';
+import { PasswordEntity } from './password-entity';
+import { TaxvatEntity } from './taxvat-entity';
 
-  private readonly lastname: string;
+interface User {
+  name: string;
+  lastname: string;
+  taxvat: string;
+  email: string;
+  password: string;
+}
 
-  private readonly taxvat: string;
-
-  private readonly email: string;
-
-  private readonly password: string;
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc User business domain
+ */
+export class UserEntity implements IEntity<User> {
+  private readonly value: User;
 
   private constructor(
-    name: string,
-    lastname: string,
-    taxvat: string,
-    email: string,
-    password: string,
+    name: NameEntity,
+    lastname: LastnameEntity,
+    taxvat: TaxvatEntity,
+    email: EmailEntity,
+    password: PasswordEntity,
   ) {
-    this.name = name;
-    this.lastname = lastname;
-    this.taxvat = taxvat;
-    this.email = email;
-    this.password = password;
+    this.value = {
+      email: email.getValue(),
+      lastname: lastname.getValue(),
+      name: name.getValue(),
+      password: password.getValue(),
+      taxvat: taxvat.getValue(),
+    };
     Object.freeze(this);
   }
 
-  getName(): string {
-    return this.name;
-  }
-
-  getLastname(): string {
-    return this.lastname;
-  }
-
-  getTaxvat(): string {
-    return this.taxvat;
-  }
-
-  getEmail(): string {
-    return this.email;
-  }
-
-  getPassword(): string {
-    return this.password;
-  }
-
   /**
-   * @desc Utility method to tell if taxvat has correct length
+   * @desc Getter to return User value
    * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if taxvat has correct length
+   * @returns {User} get User
    */
-  private static hasTaxvatCorrectLength(taxvat: string): boolean {
-    const TAXVAT_CORRECT_LENGTH = 11;
-
-    return taxvat.length === TAXVAT_CORRECT_LENGTH;
+  getValue(): User {
+    return this.value;
   }
 
   /**
-   * @desc Utility method to tell if taxvat with correct length has only digits
+   * @desc responsible function to create a User
    * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+   * @param {string} name - user name
+   * @param {string} lastname - user lastname
    * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if taxvat has only digits
-   */
-  private static hasTaxvatOnlyDigits(taxvat: string): boolean {
-    const TAXVAT_ONLY_NUMBERS_REGEX =
-      /^([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})$/g;
-
-    return TAXVAT_ONLY_NUMBERS_REGEX.test(taxvat);
-  }
-
-  /**
-   * @desc Utility method to grab email account
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
    * @param {string} email - user email
-   * @returns {string} return user email account
-   */
-  private static getEmailAccount(email: string): string {
-    const EMAIL_ADDRESS_SEPARATOR = '@';
-
-    return email.split(EMAIL_ADDRESS_SEPARATOR)[0];
-  }
-
-  /**
-   * @desc Utility method to grab email address
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} email - user email
-   * @returns {string} return user email address
-   */
-  private static getEmailAddress = (email: string): string => {
-    const EMAIL_ADDRESS_SEPARATOR = '@';
-
-    return email.split(EMAIL_ADDRESS_SEPARATOR)[1];
-  };
-
-  /**
-   * @desc Utility method to grab email address separeted by parts
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} email - user email
-   * @returns {string[]} return user email address parts
-   */
-  private static getEmailDomainsFromAddress(address: string): string[] {
-    const EMAIL_DOMAIN_SEPARATOR = '.';
-
-    return address.split(EMAIL_DOMAIN_SEPARATOR);
-  }
-
-  /**
-   * @desc Utility method to tell if email is valid
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} email - user email
-   * @returns {boolean} return if email is valid
-   */
-  private static isEmailValid(email: string): boolean {
-    /**
-     * @desc Email regex
-     * @author Esteban Küber
-     * @link https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript
-     */
-    const VALID_EMAIL_REGEX =
-      /^[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
-
-    return VALID_EMAIL_REGEX.test(email);
-  }
-
-  /**
-   * @desc Utility method to tell if taxvat is in blacklist
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if taxvat is in blacklist
-   */
-  private static isTaxvatInBlacklist(taxvat: string): boolean {
-    /**
-     * Taxvat list that pass through the validation algoritm
-     * but are not considered valid
-     */
-    const TAXVAT_BLACKLIST: string[] = [
-      '00000000000',
-      '11111111111',
-      '22222222222',
-      '33333333333',
-      '44444444444',
-      '55555555555',
-      '66666666666',
-      '77777777777',
-      '88888888888',
-      '99999999999',
-    ];
-
-    return TAXVAT_BLACKLIST.some((value: string) => value === taxvat);
-  }
-
-  /**
-   * @desc Utility method to clean formatted taxvat
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {string} return unformatted taxvat
-   */
-  private static clearTaxvat(taxvat: string): string {
-    return taxvat.replace(/[\\.-]*/g, '').trim();
-  }
-
-  /**
-   * @desc Utility method to know if first validation digit from taxvat is valid
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if first validation digit is valid
-   */
-  private static isTaxvatFirstDigitValid(taxvat: string): boolean {
-    const TAXVAT_ONLY_NUMBERS_REGEX =
-      /^([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})$/g;
-
-    const groups = TAXVAT_ONLY_NUMBERS_REGEX.exec(taxvat);
-
-    const value1 = groups[1];
-    const value2 = groups[2];
-    const value3 = groups[3];
-    const validationDigits = groups[4];
-
-    const num1: number = 10 * +String(value1).charAt(0);
-    const num2: number = 9 * +String(value1).charAt(1);
-    const num3: number = 8 * +String(value1).charAt(2);
-
-    const num4: number = 7 * +String(value2).charAt(0);
-    const num5: number = 6 * +String(value2).charAt(1);
-    const num6: number = 5 * +String(value2).charAt(2);
-
-    const num7: number = 4 * +String(value3).charAt(0);
-    const num8: number = 3 * +String(value3).charAt(1);
-    const num9: number = 2 * +String(value3).charAt(2);
-
-    const result =
-      ((num1 + num2 + num3 + num4 + num5 + num6 + num7 + num8 + num9) * 10) %
-      11;
-
-    let resultString = String(result);
-    resultString = resultString.charAt(resultString.length - 1);
-
-    return +String(validationDigits).charAt(0) === +resultString;
-  }
-
-  /**
-   * @desc Utility method to know if second validation digit from taxvat is valid
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} taxvat - user taxvat
-   * @returns {boolean} return if second validation digit is valid
-   */
-  private static isTaxvatSecondDigitValid(taxvat: string): boolean {
-    const TAXVAT_ONLY_NUMBERS_REGEX =
-      /^([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})$/g;
-
-    const groups = TAXVAT_ONLY_NUMBERS_REGEX.exec(taxvat);
-
-    const value1 = groups[1];
-    const value2 = groups[2];
-    const value3 = groups[3];
-    const validationDigits = groups[4];
-
-    const num1: number = 11 * +String(value1).charAt(0);
-    const num2: number = 10 * +String(value1).charAt(1);
-    const num3: number = 9 * +String(value1).charAt(2);
-
-    const num4: number = 8 * +String(value2).charAt(0);
-    const num5: number = 7 * +String(value2).charAt(1);
-    const num6: number = 6 * +String(value2).charAt(2);
-
-    const num7: number = 5 * +String(value3).charAt(0);
-    const num8: number = 4 * +String(value3).charAt(1);
-    const num9: number = 3 * +String(value3).charAt(2);
-
-    const num10: number = 2 * +String(validationDigits).charAt(0);
-
-    const result =
-      ((num1 + num2 + num3 + num4 + num5 + num6 + num7 + num8 + num9 + num10) *
-        10) %
-      11;
-
-    let resultString = String(result);
-    resultString = resultString.charAt(resultString.length - 1);
-
-    return +String(validationDigits).charAt(1) === +resultString;
-  }
-
-  /**
-   * @desc Utility method to know if password has white spaces
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
    * @param {string} password - user password
-   * @returns {boolean} return if password has white spaces
+   * @returns {Either<Error, UserEntity>} returns the created User entity or an Error
    */
-  private static hasPasswordAnyEmptySpace(password: string): boolean {
-    const PASSWORD_HAS_ANY_SPACE_REGEX = /([ ]+)/g;
-
-    return PASSWORD_HAS_ANY_SPACE_REGEX.test(password);
-  }
-
-  /**
-   * @desc Utility method to get password special characters
-   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
-   * @param {string} password - user password
-   * @returns {string} return the password special characters
-   */
-  private static getOnlySpecialCharactersFromPassword(
-    password: string,
-  ): string {
-    const NOT_SPECIAL_CHARACTER_REGEX = /([^!@#$%&?]*)/g;
-
-    const EMPTY_CHARACTER_SEPARATOR = '';
-
-    return password.replace(
-      NOT_SPECIAL_CHARACTER_REGEX,
-      EMPTY_CHARACTER_SEPARATOR,
-    );
-  }
-
-  private static validateName(name: string): boolean {
-    if (!name) {
-      return false;
-    }
-    const cleanName = removeMultipleWhiteSpacesToSingleWhiteSpace(
-      removeExtremitiesWhiteSpaces(name),
-    );
-    if (cleanName.length < 2 || cleanName.length > 255) {
-      return false;
-    }
-    return true;
-  }
-
-  private static validateLastname(lastname: string): boolean {
-    if (!lastname) {
-      return false;
-    }
-    const cleanLastname = removeMultipleWhiteSpacesToSingleWhiteSpace(
-      removeExtremitiesWhiteSpaces(lastname),
-    );
-    if (cleanLastname.length < 2 || cleanLastname.length > 255) {
-      return false;
-    }
-    return true;
-  }
-
-  private static validateTaxvat(taxvat: string): boolean {
-    if (!taxvat) {
-      return false;
-    }
-
-    const clearedTaxvat = UserEntity.clearTaxvat(taxvat);
-
-    if (!UserEntity.hasTaxvatCorrectLength(clearedTaxvat)) {
-      return false;
-    }
-
-    if (!UserEntity.hasTaxvatOnlyDigits(clearedTaxvat)) {
-      return false;
-    }
-
-    if (
-      !UserEntity.isTaxvatFirstDigitValid(clearedTaxvat) ||
-      !UserEntity.isTaxvatSecondDigitValid(clearedTaxvat)
-    ) {
-      return false;
-    }
-
-    if (UserEntity.isTaxvatInBlacklist(clearedTaxvat)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private static validateEmail(email: string): boolean {
-    if (!email) {
-      return false;
-    }
-    if (email.length > 320) {
-      return false;
-    }
-    if (!UserEntity.isEmailValid(email)) {
-      return false;
-    }
-    const account = UserEntity.getEmailAccount(email);
-    const address = UserEntity.getEmailAddress(email);
-    if (account.length > 64) {
-      return false;
-    }
-    if (address.length > 255) {
-      return false;
-    }
-    const addresses = UserEntity.getEmailDomainsFromAddress(address);
-    if (addresses.some(part => part.length > 127)) {
-      return false;
-    }
-    return true;
-  }
-
-  private static validatePassword(password: string): boolean {
-    const pass: string = password;
-    if (!pass || pass.length < 11 || pass.length > 24) {
-      return false;
-    }
-    if (UserEntity.hasPasswordAnyEmptySpace(pass)) {
-      return false;
-    }
-    const onlyNumbers: string = getOnlyNumbersFromValue(pass);
-    if (onlyNumbers.length < 8) {
-      return false;
-    }
-    const onlyCapitalLetters: string = getOnlyCapitalLettersFromValue(pass);
-    if (onlyCapitalLetters.length < 1) {
-      return false;
-    }
-    const onlyLowerCaseLetters: string = getOnlyLowerCaseLettersFromValue(pass);
-    if (onlyLowerCaseLetters.length < 1) {
-      return false;
-    }
-    const onlySpecialCharacters: string =
-      UserEntity.getOnlySpecialCharactersFromPassword(pass);
-    if (onlySpecialCharacters.length < 1) {
-      return false;
-    }
-    return true;
-  }
-
-  private static validate(
-    name: string,
-    lastname: string,
-    taxvat: string,
-    email: string,
-    password: string,
-  ): Either<Error, true> {
-    if (!UserEntity.validateName(name)) {
-      return left(new InvalidNameError(name));
-    }
-    if (!UserEntity.validateLastname(lastname)) {
-      return left(new InvalidLastnameError(lastname));
-    }
-    if (!UserEntity.validateTaxvat(taxvat)) {
-      return left(new InvalidTaxvatError(taxvat));
-    }
-    if (!UserEntity.validateEmail(email)) {
-      return left(new InvalidEmailError(email));
-    }
-    if (!UserEntity.validatePassword(password)) {
-      return left(new InvalidPasswordError(password));
-    }
-    return right(true);
-  }
-
   static create(
     name: string,
     lastname: string,
@@ -432,26 +72,40 @@ export class UserEntity {
     email: string,
     password: string,
   ): Either<Error, UserEntity> {
-    const either = UserEntity.validate(name, lastname, taxvat, email, password);
-    if (either.isRight()) {
-      return right(
-        new UserEntity(
-          normalizeValueToPascalCase(
-            removeMultipleWhiteSpacesToSingleWhiteSpace(
-              removeExtremitiesWhiteSpaces(name),
-            ),
-          ),
-          normalizeValueToPascalCase(
-            removeMultipleWhiteSpacesToSingleWhiteSpace(
-              removeExtremitiesWhiteSpaces(lastname),
-            ),
-          ),
-          UserEntity.clearTaxvat(taxvat),
-          email,
-          password,
-        ),
-      );
+    const nameOrError = EntityFactory.create(NameEntity.name, name);
+    const lastnameOrError = EntityFactory.create(LastnameEntity.name, lastname);
+    const taxvatOrError = EntityFactory.create(TaxvatEntity.name, taxvat);
+    const emailOrError = EntityFactory.create(EmailEntity.name, email);
+    const passwordOrError = EntityFactory.create(PasswordEntity.name, password);
+
+    if (nameOrError.isLeft()) {
+      return left(nameOrError.value);
     }
-    return left(either.value);
+
+    if (lastnameOrError.isLeft()) {
+      return left(lastnameOrError.value);
+    }
+
+    if (taxvatOrError.isLeft()) {
+      return left(taxvatOrError.value);
+    }
+
+    if (emailOrError.isLeft()) {
+      return left(emailOrError.value);
+    }
+
+    if (passwordOrError.isLeft()) {
+      return left(passwordOrError.value);
+    }
+
+    return right(
+      new UserEntity(
+        nameOrError.value as NameEntity,
+        lastnameOrError.value as LastnameEntity,
+        taxvatOrError.value as TaxvatEntity,
+        emailOrError.value as EmailEntity,
+        passwordOrError.value as PasswordEntity,
+      ),
+    );
   }
 }

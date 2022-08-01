@@ -39,23 +39,23 @@ describe('User Entity', () => {
     return cpf.generate(formatted);
   };
 
-  const generateBlacklistedTaxvat = (): string => {
-    const taxvatBlacklist = [
-      '00000000000',
-      '11111111111',
-      '22222222222',
-      '33333333333',
-      '44444444444',
-      '55555555555',
-      '66666666666',
-      '77777777777',
-      '88888888888',
-      '99999999999',
-    ];
-    return taxvatBlacklist[
-      Math.round((taxvatBlacklist.length - 1) * Math.random())
-    ];
-  };
+  // const generateBlacklistedTaxvat = (): string => {
+  //   const taxvatBlacklist = [
+  //     '00000000000',
+  //     '11111111111',
+  //     '22222222222',
+  //     '33333333333',
+  //     '44444444444',
+  //     '55555555555',
+  //     '66666666666',
+  //     '77777777777',
+  //     '88888888888',
+  //     '99999999999',
+  //   ];
+  //   return taxvatBlacklist[
+  //     Math.round((taxvatBlacklist.length - 1) * Math.random())
+  //   ];
+  // };
 
   const generateInvalidFirstDigitTaxvat = (formatted?: boolean): string => {
     const cpfGenerated = cpf.generate();
@@ -304,25 +304,6 @@ describe('User Entity', () => {
       .toLowerCase()}${faker.lorem
       .word(faker.datatype.number({ min: 1, max: 1 }))
       .toUpperCase()}`;
-  };
-
-  const normalizeValueToPascalCase = (value: string): string => {
-    const MULTI_WHITE_SPACES_REGEX = /([ ]+)/g;
-
-    const valuePieces: string[] = value.split(MULTI_WHITE_SPACES_REGEX);
-
-    const formattedPieces: string[] = valuePieces.map((piece: string) => {
-      const newPiece: string = piece.toLocaleLowerCase();
-      if (newPiece.length > 1) {
-        return `${newPiece.charAt(0).toLocaleUpperCase()}${newPiece.substring(
-          1,
-          newPiece.length,
-        )}`;
-      }
-      return newPiece.toLocaleUpperCase();
-    });
-
-    return formattedPieces.join('');
   };
 
   const clearTaxvat = (taxvat: string): string => {
@@ -585,21 +566,21 @@ describe('User Entity', () => {
     expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
   });
 
-  it('should not create user if "taxvat" belongs to blacklist', () => {
-    const name = generateValidName();
-    const lastname = generateValidLastname();
-    const taxvat = generateBlacklistedTaxvat();
-    const email = generateValidEmail();
-    const password = generateValidPassword();
-    const userOrError = UserEntity.create(
-      name,
-      lastname,
-      taxvat,
-      email,
-      password,
-    );
-    expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
-  });
+  // it('should not create user if "taxvat" belongs to blacklist', () => {
+  //   const name = generateValidName();
+  //   const lastname = generateValidLastname();
+  //   const taxvat = generateBlacklistedTaxvat();
+  //   const email = generateValidEmail();
+  //   const password = generateValidPassword();
+  //   const userOrError = UserEntity.create(
+  //     name,
+  //     lastname,
+  //     taxvat,
+  //     email,
+  //     password,
+  //   );
+  //   expect(userOrError).toEqual(left(new InvalidTaxvatError(taxvat)));
+  // });
 
   it('should not create user if "taxvat" first validation digit is invalid', () => {
     const name = generateValidName();
@@ -1079,14 +1060,14 @@ describe('User Entity', () => {
       password,
     );
 
-    const user = userOrError.value as UserEntity;
+    const user = (userOrError.value as UserEntity).getValue();
 
     expect(userOrError.isRight()).toBeTruthy();
 
-    expect(user.getName()).toBe(normalizeValueToPascalCase(name));
-    expect(user.getLastname()).toBe(normalizeValueToPascalCase(lastname));
-    expect(user.getTaxvat()).toBe(clearTaxvat(taxvat));
-    expect(user.getEmail()).toBe(email);
-    expect(user.getPassword()).toBe(password);
+    expect(user.name).toBe(name);
+    expect(user.lastname).toBe(lastname);
+    expect(user.taxvat).toBe(clearTaxvat(taxvat));
+    expect(user.email).toBe(email);
+    expect(user.password).toBe(password);
   });
 });

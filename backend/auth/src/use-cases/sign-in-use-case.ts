@@ -9,14 +9,22 @@ import {
   ISignInUseCase,
   ITokenService,
   IUserRepository,
-  QueuePublishManager,
 } from './ports';
 
 /**
  * Shared
  */
 import { Either, left, right } from '../shared';
-import { ServerError, UnauthorizedError } from '../shared/errors';
+import {
+  ForbiddenError,
+  ServerError,
+  UnauthorizedError,
+} from '../shared/errors';
+
+/**
+ * Entities
+ */
+import { AccountEntity } from '../entities';
 
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
@@ -28,7 +36,6 @@ export class SignInUseCase implements ISignInUseCase {
     private readonly encryptService: IEncryptService,
     private readonly hashService: IHashService,
     private readonly tokenService: ITokenService,
-    private readonly queueManager: QueuePublishManager,
   ) {}
 
   /**
@@ -43,11 +50,11 @@ export class SignInUseCase implements ISignInUseCase {
     host: string,
   ): Promise<Either<Error, AuthenticatedAccountDto>> {
     if (
-      !process.env.CODE_SALT &&
-      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN &&
-      !process.env.JWT_ACCESS_TOKEN_ID &&
-      !process.env.JWT_REFRESH_TOKEN_ID &&
+      !process.env.CODE_SALT ||
+      !process.env.JWT_ACCESS_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_REFRESH_TOKEN_EXPIRES_IN ||
+      !process.env.JWT_ACCESS_TOKEN_ID ||
+      !process.env.JWT_REFRESH_TOKEN_ID ||
       !process.env.APP_SECRET
     ) {
       return left(new ServerError());
@@ -55,19 +62,35 @@ export class SignInUseCase implements ISignInUseCase {
 
     const { email, password } = request;
 
-    const userExists = await this.userRepository.findUserByEmail(email);
+    const accountOrError: Either<Error, AccountEntity> = AccountEntity.create(
+      email,
+      password,
+    );
+
+    if (accountOrError.isLeft()) {
+      return left(accountOrError.value);
+    }
+
+    const accountValidated = accountOrError.value.getValue();
+
+    const userExists = await this.userRepository.findUserByEmail(
+      accountValidated.email,
+    );
 
     if (!userExists) {
-      return left(new UnauthorizedError());
+      return left(new ForbiddenError());
     }
 
     const decryptedTaxvat = this.encryptService.decode(userExists.taxvat);
-    const customSalt = `${email}${decryptedTaxvat}`;
+    const customSalt = `${userExists.email}${decryptedTaxvat}`;
     const defaultSalt = process.env.CODE_SALT;
     /**
      * encrypt password with user custom salt hash value
      */
-    const hashedPassword = this.hashService.encode(password, customSalt);
+    const hashedPassword = this.hashService.encode(
+      userExists.password,
+      customSalt,
+    );
     /**
      * encrypt encrypted password with code default salt hash value
      */
@@ -86,28 +109,30 @@ export class SignInUseCase implements ISignInUseCase {
     const accessTokenExpiresIn = +process.env.JWT_ACCESS_TOKEN_EXPIRES_IN;
     const refreshTokenExpiresIn = +process.env.JWT_REFRESH_TOKEN_EXPIRES_IN;
 
-    const refreshTokenOrError = this.tokenService.sign(
-      {
-        id: userExists.id,
-      },
-      {
-        subject: process.env.APP_SECRET,
-        issuer: host,
-        jwtId: refreshTokenId,
-      },
-      refreshTokenExpiresIn,
-    );
-    const accessTokenOrError = this.tokenService.sign(
-      {
-        email: this.encryptService.encode(userExists.email),
-      },
-      {
-        subject: userExists.id,
-        issuer: host,
-        jwtId: accessTokenId,
-      },
-      accessTokenExpiresIn,
-    );
+    const [refreshTokenOrError, accessTokenOrError] = await Promise.all([
+      this.tokenService.sign(
+        {
+          id: userExists.id,
+        },
+        {
+          subject: process.env.APP_SECRET,
+          issuer: host,
+          jwtId: refreshTokenId,
+        },
+        refreshTokenExpiresIn,
+      ),
+      this.tokenService.sign(
+        {
+          email: this.encryptService.encode(userExists.email),
+        },
+        {
+          subject: userExists.id,
+          issuer: host,
+          jwtId: accessTokenId,
+        },
+        accessTokenExpiresIn,
+      ),
+    ]);
 
     if (refreshTokenOrError.isLeft()) {
       return left(refreshTokenOrError.value);
@@ -115,8 +140,6 @@ export class SignInUseCase implements ISignInUseCase {
     if (accessTokenOrError.isLeft()) {
       return left(accessTokenOrError.value);
     }
-
-    // await this.queueManager.publish('send-email-to-complete-sign-in', JSON.stringify(userExists))
 
     const authenticatedAccount: AuthenticatedAccountDto = {
       accessToken: accessTokenOrError.value,
