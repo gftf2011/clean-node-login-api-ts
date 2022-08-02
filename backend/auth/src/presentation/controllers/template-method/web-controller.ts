@@ -37,7 +37,7 @@ import { ValidationComposite } from '../../helpers/composite/validation-composit
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Contains the base algorithm that handles the data presentation.
- * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
+ * It uses the {@link https://refactoring.guru/design-patterns/template-method Template Method} design pattern
  */
 export abstract class WebController implements Controller {
   public requiredParams: string[] = [];

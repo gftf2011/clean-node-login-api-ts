@@ -22,7 +22,7 @@ import { ok } from '../../helpers/http-helper';
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Contains the base algorithm and the concrete implementation from the perform method
- * It uses the {@link https://refactoring.guru/pt-br/design-patterns/template-method Template Method} design pattern
+ * It uses the {@link https://refactoring.guru/design-patterns/template-method Template Method} design pattern
  */
 export class SignInController extends WebController {
   private readonly signInUseCase: ISignInUseCase;

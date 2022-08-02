@@ -11,21 +11,15 @@ import { EntityFactory } from './helpers/factory-methods';
 import { IEntity } from './contracts';
 import { PasswordEntity } from './password-entity';
 
-/**
- * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
- * @desc Account business domain
- */
-
-// interface Account {
-//   email: EmailEntity;
-//   password: PasswordEntity;
-// }
-
 interface Account {
   email: string;
   password: string;
 }
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Account business domain
+ */
 export class AccountEntity implements IEntity<Account> {
   private readonly value: Account;
 

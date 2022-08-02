@@ -8,6 +8,11 @@ import { DbClientManager, ICreateUserDao } from '../contracts';
  */
 import { UserDto as User } from '../../use-cases/ports';
 
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Data persistence abstraction, lower to data storage system
+ * It uses the {@link https://www.tutorialspoint.com/design_pattern/data_access_object_pattern.htm Data Access Object} Design Pattern
+ */
 export class CreateUserDao implements ICreateUserDao {
   constructor(private readonly dbClientManager: DbClientManager) {}
 

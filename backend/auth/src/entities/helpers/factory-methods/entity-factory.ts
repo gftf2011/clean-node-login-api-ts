@@ -16,10 +16,11 @@ import { TaxvatEntity } from '../../taxvat-entity';
 /**
  * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
  * @desc Wraps the Entity creation logic in a single place
- * It uses the {@link https://refactoring.guru/pt-br/design-patterns/factory-method Factory Method} design pattern
+ * It uses the {@link https://refactoring.guru/design-patterns/factory-method Factory Method} design pattern
  */
 export class EntityFactory {
   /**
+   * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
    * @desc performs the Individual Entity create
    * @param {string} entity - entity name
    * @param {string} value - initial value to verify inside Entity

@@ -7,7 +7,11 @@ interface Row {
   id: string;
   value: string;
 }
-
+/**
+ * @author Gabriel Ferrari Tarallo Ferraz <gftf2011@gmail.com>
+ * @desc Data persistence abstraction, lower to data storage system
+ * It uses the {@link https://www.tutorialspoint.com/design_pattern/data_access_object_pattern.htm Data Access Object} Design Pattern
+ */
 export class ListBlacklistTaxvatDao implements IListBlacklistTaxvatDao {
   constructor(private readonly dbClientManager: DbClientManager) {}
 
